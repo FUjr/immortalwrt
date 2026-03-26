@@ -99,8 +99,8 @@ ipq807x_setup_macs()
 
 	case "$board" in
 	aliyun,ap8220)
-		label_mac="mtd_get_mac_text product_info 0x4b"
-		[ -z "$label_mac" ] && label_mac="mtd_get_mac_text product_info 0x3c"
+		label_mac=$(mtd_get_mac_text product_info 0x4b)
+		[ -z "$label_mac" ] && label_mac=$(mtd_get_mac_text product_info 0x3c)
 		[ -z "$label_mac" ] && return
 		wan_mac="$label_mac"
 		lan_mac=$(macaddr_add "$wan_mac" 1)
