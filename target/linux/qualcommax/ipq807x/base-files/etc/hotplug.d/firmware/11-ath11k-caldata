@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "wififw $FIRMWARE" >> /tmp/wififw
+
 [ -e /lib/firmware/$FIRMWARE ] && exit 0
 
 . /lib/functions/caldata.sh
