@@ -2399,6 +2399,32 @@ define Device/mercusys_mr90x-v1-ubi
 endef
 TARGET_DEVICES += mercusys_mr90x-v1-ubi
 
+define Device/misectel_m02k45
+  DEVICE_VENDOR := Misectel
+  DEVICE_MODEL := M02K45
+  DEVICE_DTS := mt7988d-misectel_m02k45
+  DEVICE_DTS_DIR := ../dts 
+  DEVICE_DTS_LOADADDR := 0x45f00000
+  DEVICE_PACKAGES := mt7988-2p5g-phy-firmware kmod-mt7996e kmod-mt7992-23-firmware mt7988-wo-firmware kmod-usb3 kmod-hwmon-pwmfan
+  ARTIFACTS := preloader.bin bl31-uboot.fip factory.bin 
+  ARTIFACT/preloader.bin := mt7988-bl2 spim-nand-ddr4
+  ARTIFACT/bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k45
+  ARTIFACT/factory.bin := mt7988-bl2 spim-nand-ddr4 | pad-to 5632k | mt7988-bl31-uboot misectel_m02k45
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048      
+  KERNEL_IN_UBI := 1
+  UBOOTENV_IN_UBI := 1
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  KERNEL_LOADADDR := 0x46000000
+  IMAGES := sysupgrade.itb
+  IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
+endef
+TARGET_DEVICES += misectel_m02k45
+
 define Device/netcore_n60
   DEVICE_VENDOR := Netcore
   DEVICE_MODEL := N60

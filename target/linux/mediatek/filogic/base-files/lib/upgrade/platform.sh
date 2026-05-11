@@ -105,6 +105,7 @@ platform_do_upgrade() {
 	mediatek,mt7981-rfb|\
 	mediatek,mt7988a-rfb|\
 	mercusys,mr90x-v1-ubi|\
+	misectel,m02k45|\
 	netis,nx30v2|\
 	netis,nx31|\
 	netis,nx32u|\
@@ -308,6 +309,7 @@ platform_check_image() {
 	mediatek,mt7981-rfb|\
 	mediatek,mt7988a-rfb|\
 	mercusys,mr90x-v1-ubi|\
+	misectel,m02k45|\
 	nokia,ea0326gmp|\
 	netis,nx32u|\
 	openwrt,one|\

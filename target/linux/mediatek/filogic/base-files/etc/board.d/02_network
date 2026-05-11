@@ -60,6 +60,7 @@ mediatek_setup_interfaces()
 	keenetic,kn-3811|\
 	livinet,zr-3020|\
 	livinet,zr-3020-ubootmod|\
+	misectel,m02k45|\
 	netis,nx32u|\
 	qihoo,360t7|\
 	routerich,ax3000|\
