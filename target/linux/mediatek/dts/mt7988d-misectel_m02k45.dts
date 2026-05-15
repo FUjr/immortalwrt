@@ -72,12 +72,12 @@
 
 		led_5g_blue: led-5g-blue {
 			label = "5g:blue";
-			gpios = <&pio 28 GPIO_ACTIVE_HIGH>;
+			gpios = <&pio 3 GPIO_ACTIVE_HIGH>;
 		};
 
 		led_5g_yellow: led-5g-yellow {
 			label = "5g:yellow";
-			gpios = <&pio 3 GPIO_ACTIVE_HIGH>;
+			gpios = <&pio 28 GPIO_ACTIVE_HIGH>;
 		};
 
 		led_sys_blue: led-sys-blue {
