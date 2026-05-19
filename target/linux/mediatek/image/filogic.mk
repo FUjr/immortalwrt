@@ -2425,6 +2425,38 @@ define Device/misectel_m02k45
 endef
 TARGET_DEVICES += misectel_m02k45
 
+define Device/misectel_m02k45-emmc
+  DEVICE_VENDOR := Misectel
+  DEVICE_MODEL := M02K45 eMMC
+  DEVICE_DTS := mt7988d-misectel_m02k45-emmc
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTC_FLAGS := --pad 4096
+  DEVICE_DTS_LOADADDR := 0x45f00000
+  DEVICE_PACKAGES := mt7988-2p5g-phy-firmware kmod-mt7996e kmod-mt7992-23-firmware mt7988-wo-firmware kmod-usb3 kmod-hwmon-pwmfan
+  KERNEL_LOADADDR := 0x46000000
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  IMAGE_SIZE := $$(shell expr 64 + $$(CONFIG_TARGET_ROOTFS_PARTSIZE))m
+  IMAGES := sysupgrade.itb
+  IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
+  ARTIFACTS := emmc-preloader.bin emmc-bl31-uboot.fip emmc-gpt.bin emmc-programmer.img.gz
+  ARTIFACT/emmc-gpt.bin := mt798x-gpt emmc
+  ARTIFACT/emmc-preloader.bin := mt7988-bl2 emmc-comb
+  ARTIFACT/emmc-bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k45-emmc
+  ARTIFACT/emmc-programmer.img.gz := mt798x-gpt emmc |\
+				   pad-to 6656k | mt7988-bl31-uboot misectel_m02k45-emmc |\
+				$(if $(CONFIG_TARGET_ROOTFS_INITRAMFS),\
+				   pad-to 12M | append-image-stage initramfs-recovery.itb | check-size 44m |\
+				) \
+				$(if $(CONFIG_TARGET_ROOTFS_SQUASHFS),\
+				   pad-to 64M | append-image squashfs-sysupgrade.itb | check-size |\
+				) \
+				  gzip
+endef
+TARGET_DEVICES += misectel_m02k45-emmc
+
 define Device/netcore_n60
   DEVICE_VENDOR := Netcore
   DEVICE_MODEL := N60

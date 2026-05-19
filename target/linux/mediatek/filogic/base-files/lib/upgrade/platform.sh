@@ -106,6 +106,7 @@ platform_do_upgrade() {
 	mediatek,mt7988a-rfb|\
 	mercusys,mr90x-v1-ubi|\
 	misectel,m02k45|\
+	misectel,m02k45-emmc|\
 	netis,nx30v2|\
 	netis,nx31|\
 	netis,nx32u|\
