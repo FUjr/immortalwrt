@@ -60,12 +60,12 @@
 
 		led_4g_blue: led-4g-blue {
 			label = "4g:blue";
-			gpios = <&pio 1 GPIO_ACTIVE_HIGH>;
+			gpios = <&pio 2 GPIO_ACTIVE_HIGH>;
 		};
 
 		led_4g_yellow: led-4g-yellow {
 			label = "4g:yellow";
-			gpios = <&pio 2 GPIO_ACTIVE_HIGH>;
+			gpios = <&pio 1 GPIO_ACTIVE_HIGH>;
 		};
 
 		led_5g_blue: led-5g-blue {
