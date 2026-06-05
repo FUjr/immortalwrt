@@ -3,18 +3,20 @@ From: fjr <fjr@immortalwrt.org>
 Date: Sat, 05 Apr 2026 12:00:00 +0800
 Subject: [PATCH] pcie: mediatek-gen3: Add probe delay support
 
-Add support for an optional "probe-delay-ms" device tree property that
-delays PCIe port initialization. This is useful for endpoints like 5G/4G
-modems that require extra time to complete power-up before the PCIe host
-controller attempts link training.
+Add support for an optional "probe-delay-ms" device tree property.
+This is useful for endpoints like 5G/4G modems that require extra time
+to complete power-up before the PCIe host controller attempts link
+training.
 
-The delay is inserted before the PHY and clock initialization, giving the
-endpoint device sufficient time to stabilize after power-on.
+MT7981 and MT7988 use different PCIe initialization paths, so handle
+them separately. MT7981 applies the delay from the probe path before
+the controller setup starts, while the existing MT7988-style path keeps
+the delay before PHY and clock initialization.
 
 Signed-off-by: fjr <fjr@immortalwrt.org>
 ---
- drivers/pci/controller/pcie-mediatek-gen3.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/pci/controller/pcie-mediatek-gen3.c | 31 ++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 --- a/drivers/pci/controller/pcie-mediatek-gen3.c
 +++ b/drivers/pci/controller/pcie-mediatek-gen3.c
@@ -44,15 +46,18 @@ Signed-off-by: fjr <fjr@immortalwrt.org>
  	return 0;
  }
  
-@@ -1059,6 +1064,15 @@ static int mtk_pcie_setup(struct mtk_gen
+@@ -1059,6 +1064,18 @@ static int mtk_pcie_setup(struct mtk_gen
  	reset_control_assert(pcie->mac_reset);
  	usleep_range(10, 20);
  
-+	/* Delay before power-up if requested, to allow endpoint devices
-+	 * (e.g. 5G/4G modems) to complete their own power-on sequence
-+	 * before the host controller attempts link training.
++	/*
++	 * MT7981 handles probe-delay-ms earlier in mtk_pcie_probe(), because
++	 * its initialization path differs from the MT7988-style controller
++	 * setup path.
 +	 */
-+	if (pcie->probe_delay_ms) {
++	if (pcie->probe_delay_ms &&
++	    !of_device_is_compatible(pcie->dev->of_node,
++				     "mediatek,mt7981-pcie")) {
 +		dev_info(pcie->dev, "delaying probe by %u ms\n", pcie->probe_delay_ms);
 +		msleep(pcie->probe_delay_ms);
 +	}
@@ -60,3 +65,31 @@ Signed-off-by: fjr <fjr@immortalwrt.org>
  	/* Don't touch the hardware registers before power up */
  	err = pcie->soc->power_up(pcie);
  	if (err)
+@@ -1083,6 +1097,7 @@ static int mtk_pcie_probe(struct platfor
+ 	struct mtk_gen3_pcie *pcie;
+ 	struct pci_host_bridge *host;
+ 	int err;
++	u32 probe_delay_ms;
+ 
+ 	host = devm_pci_alloc_host_bridge(dev, sizeof(*pcie));
+ 	if (!host)
+@@ -1095,6 +1110,19 @@ static int mtk_pcie_probe(struct platfor
+ 	pcie->soc = device_get_match_data(dev);
+ 	platform_set_drvdata(pdev, pcie);
+ 
++	/*
++	 * MT7981 uses the mt8192 fallback compatible, which is shared with
++	 * other Filogic SoCs. Only honor this board-level endpoint power-up
++	 * delay on nodes that explicitly identify as MT7981 PCIe.
++	 */
++	if (of_device_is_compatible(dev->of_node, "mediatek,mt7981-pcie") &&
++	    !of_property_read_u32(dev->of_node, "probe-delay-ms",
++				  &probe_delay_ms) &&
++	    probe_delay_ms) {
++		dev_info(dev, "delaying probe by %u ms\n", probe_delay_ms);
++		msleep(probe_delay_ms);
++	}
++
+ 	err = mtk_pcie_setup(pcie);
+ 	if (err)
+ 		return err;

@@ -155,6 +155,7 @@
 &pcie {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie_pins>;
+	probe-delay-ms = <8000>;
 	status = "okay";
 };
 
