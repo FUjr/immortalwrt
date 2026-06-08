@@ -137,7 +137,7 @@
 		reset-assert-us = <15000>;
 		reset-deassert-us = <68000>;
 		realtek,aldps-enable;
-		realtek,led-link-select = <0x3 0xa4 0x0>;
+		realtek,led-link-select = <0xa7 0xa4 0x0>;
 		realtek,led-act-select = <0x3513>;
 	};
 
@@ -308,7 +308,6 @@
 			partition@310000 {
 				label = "ledeinfo";
 				reg = <0x310000 0x10000>;
-				read-only;
 			};
 
 			partition@320000 {
