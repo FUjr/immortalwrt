@@ -1117,8 +1117,8 @@ define U-Boot/mt7988_misectel_m02k45-emmc
   UBOOT_IMAGE:=u-boot.fip
   BL2_BOOTDEV:=emmc
   BL2_SOC:=mt7988
-  BL2_DDRTYPE:=comb
-  DEPENDS:=+trusted-firmware-a-mt7988-emmc-comb
+  BL2_DDRTYPE:=ddr4
+  DEPENDS:=+trusted-firmware-a-mt7988-emmc-ddr4
 endef
 
 define U-Boot/mt7988_tplink_tl-7dr7230-v1

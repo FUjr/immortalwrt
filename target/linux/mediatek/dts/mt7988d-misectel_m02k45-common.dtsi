@@ -80,12 +80,12 @@
 
 		led_sys_blue: led-sys-blue {
 			label = "sys:blue";
-			gpios = <&pio 29 GPIO_ACTIVE_LOW>;
+			gpios = <&pio 29 GPIO_ACTIVE_HIGH>;
 		};
 
 		led_sys_red: led-sys-red {
 			label = "sys:red";
-			gpios = <&pio 30 GPIO_ACTIVE_LOW>;
+			gpios = <&pio 30 GPIO_ACTIVE_HIGH>;
 		};
 	};
 
