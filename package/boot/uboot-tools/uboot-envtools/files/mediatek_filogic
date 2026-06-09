@@ -138,7 +138,8 @@ gatonetworks,gdsp)
 glinet,gl-mt3000)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x80000" "0x20000"
 	;;
-misectel,m01k43)
+misectel,m01k43|\
+misectel,m01k43-usb)
 	ubootenv_add_mtd "u-boot-env" "0x0" "0x10000" "0x10000"
 	;;
 openembed,som7981)

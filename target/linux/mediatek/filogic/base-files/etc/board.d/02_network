@@ -85,7 +85,8 @@ mediatek_setup_interfaces()
 	zbtlink,zbt-z8102ax-v2)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "eth1"
 		;;
-	misectel,m01k43)
+	misectel,m01k43|\
+	misectel,m01k43-usb)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
 		;;
 	zbtlink,zbt-z8106ax-t)

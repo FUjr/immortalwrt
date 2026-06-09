@@ -170,7 +170,8 @@ platform_do_upgrade() {
 	cudy,wr3000h-v1|\
 	cudy,wr3000p-v1|\
 	huasifei,wh3000-pro-nand|\
-	misectel,m01k43)
+	misectel,m01k43|\
+	misectel,m01k43-usb)
 		CI_UBIPART="ubi"
 		nand_do_upgrade "$1"
 		;;
