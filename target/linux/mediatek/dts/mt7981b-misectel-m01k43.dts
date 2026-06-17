@@ -137,8 +137,8 @@
 		reset-assert-us = <15000>;
 		reset-deassert-us = <68000>;
 		realtek,aldps-enable;
-		realtek,led-link-select = <0xa7 0xa4 0x0>;
-		realtek,led-act-select = <0x3513>;
+		realtek,led-link-select = <0xa7 0xa7 0xa7>;
+		realtek,led-act-select = <0x3515>;
 	};
 
 	switch: switch@1f {
