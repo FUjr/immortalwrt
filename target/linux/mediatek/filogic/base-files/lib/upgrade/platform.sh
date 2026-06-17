@@ -169,11 +169,19 @@ platform_do_upgrade() {
 	buffalo,wsr-6000ax8|\
 	cudy,wr3000h-v1|\
 	cudy,wr3000p-v1|\
-	huasifei,wh3000-pro-nand|\
-	misectel,m01k43|\
-	misectel,m01k43-usb)
+	huasifei,wh3000-pro-nand)
 		CI_UBIPART="ubi"
 		nand_do_upgrade "$1"
+		;;
+	misectel,m01k43|\
+	misectel,m01k43-usb)
+		echo "UPGRADING SECOND UBI PARTITION"
+		CI_UBIPART="ubi2"
+		nand_do_flash_file "$1" || nand_do_upgrade_failed
+		echo "UPGRADING PRIMARY UBI PARTITION"
+		CI_UBIPART="ubi"
+		nand_do_flash_file "$1" || nand_do_upgrade_failed
+		nand_do_upgrade_success
 		;;
 	cudy,re3000-v1|\
 	cudy,wr3000-v1|\
