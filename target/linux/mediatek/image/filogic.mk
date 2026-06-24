@@ -2457,6 +2457,23 @@ define Device/misectel_m01k43-usb
 endef
 TARGET_DEVICES += misectel_m01k43-usb
 
+define Device/misectel_m01k43-usb-p
+  $(call Device/misectel_m01k43-usb)
+  DEVICE_VARIANT := USB-P
+  DEVICE_DTS := mt7981b-misectel-m01k43-usb-p
+  SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-usb-p
+endef
+TARGET_DEVICES += misectel_m01k43-usb-p
+
+define Device/misectel_m01k43-p
+  $(call Device/misectel_m01k43)
+  DEVICE_MODEL := M01K43
+  DEVICE_VARIANT := P
+  DEVICE_DTS := mt7981b-misectel-m01k43-p
+  SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-p
+endef
+TARGET_DEVICES += misectel_m01k43-p
+
 define Device/misectel_m02k45-emmc
   DEVICE_VENDOR := Misectel
   DEVICE_MODEL := M02K45 eMMC

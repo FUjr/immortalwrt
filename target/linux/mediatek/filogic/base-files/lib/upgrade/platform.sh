@@ -174,7 +174,9 @@ platform_do_upgrade() {
 		nand_do_upgrade "$1"
 		;;
 	misectel,m01k43|\
-	misectel,m01k43-usb)
+	misectel,m01k43-p|\
+	misectel,m01k43-usb|\
+	misectel,m01k43-usb-p)
 		echo "UPGRADING SECOND UBI PARTITION"
 		CI_UBIPART="ubi2"
 		nand_do_flash_file "$1" || nand_do_upgrade_failed
