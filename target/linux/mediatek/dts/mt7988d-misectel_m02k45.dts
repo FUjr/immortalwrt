@@ -71,8 +71,19 @@
 			};
 
 			partition@780000 {
+				label = "woem";
+				reg = <0x780000 0x20000>;
+				read-only;
+			};
+
+			partition@7a0000 {
+				label = "ledeinfo";
+				reg = <0x7a0000 0x20000>;
+			};
+
+			partition@7c0000 {
 				compatible = "linux,ubi";
-				reg = <0x780000 0x7080000>;
+				reg = <0x7c0000 0x7040000>;
 				label = "ubi";
 
 				volumes {

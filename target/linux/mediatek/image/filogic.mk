@@ -2492,7 +2492,7 @@ define Device/misectel_m02k45-emmc
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
   ARTIFACTS := emmc-preloader.bin emmc-bl31-uboot.fip emmc-gpt.bin emmc-programmer.img.gz
   ARTIFACT/emmc-gpt.bin := mt798x-gpt emmc
-  ARTIFACT/emmc-preloader.bin := mt7988-bl2 emmc-comb
+  ARTIFACT/emmc-preloader.bin := mt7988-bl2 emmc-ddr4
   ARTIFACT/emmc-bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k45-emmc
   ARTIFACT/emmc-programmer.img.gz := mt798x-gpt emmc |\
 				   pad-to 6656k | mt7988-bl31-uboot misectel_m02k45-emmc |\

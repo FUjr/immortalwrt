@@ -120,7 +120,7 @@
 		phy-mode = "2500base-x";
 
 		nvmem-cell-names = "mac-address";
-		nvmem-cells = <&macaddr_factory_4 1>;
+		nvmem-cells = <&macaddr_factory_4 0>;
 
 		fixed-link {
 			speed = <2500>;
@@ -328,21 +328,21 @@
 			reg = <1>;
 			label = "lan3";
 			nvmem-cell-names = "mac-address";
-			nvmem-cells = <&macaddr_factory_4 1>;
+			nvmem-cells = <&macaddr_factory_4 0>;
 		};
 
 		port@2 {
 			reg = <2>;
 			label = "lan2";
 			nvmem-cell-names = "mac-address";
-			nvmem-cells = <&macaddr_factory_4 1>;
+			nvmem-cells = <&macaddr_factory_4 0>;
 		};
 
 		port@3 {
 			reg = <3>;
 			label = "lan1";
 			nvmem-cell-names = "mac-address";
-			nvmem-cells = <&macaddr_factory_4 1>;
+			nvmem-cells = <&macaddr_factory_4 0>;
 		};
 
 		port@5 {
@@ -352,7 +352,7 @@
 			phy-mode = "2500base-x";
 
 			nvmem-cell-names = "mac-address";
-			nvmem-cells = <&macaddr_factory_4 2>;
+			nvmem-cells = <&macaddr_factory_4 1>;
 		};
 
 		port@6 {

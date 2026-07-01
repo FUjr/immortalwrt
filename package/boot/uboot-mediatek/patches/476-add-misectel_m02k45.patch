@@ -191,7 +191,7 @@
 +_bootmenu_update_title=setenv _bootmenu_update_title ; setenv bootmenu_title "$bootmenu_title       $ver"
 --- /dev/null
 +++ b/arch/arm/dts/mt7988d-misectel_m02k45.dts
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,162 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2026 ImmortalWrt
@@ -333,8 +333,18 @@
 +			};
 +
 +			partition@780000 {
++				label = "woem";
++				reg = <0x780000 0x20000>;
++			};
++
++			partition@7a0000 {
++				label = "ledeinfo";
++				reg = <0x7a0000 0x20000>;
++			};
++
++			partition@7c0000 {
 +				label = "ubi";
-+				reg = <0x780000 0x7080000>;
++				reg = <0x7c0000 0x7040000>;
 +				compatible = "linux,ubi";
 +			};
 +		};

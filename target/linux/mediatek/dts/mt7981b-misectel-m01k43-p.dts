@@ -15,7 +15,7 @@
 			label = "lan4";
 
 			nvmem-cell-names = "mac-address";
-			nvmem-cells = <&macaddr_factory_4 1>;
+			nvmem-cells = <&macaddr_factory_4 0>;
 		};
 
 		port@4 {
@@ -23,7 +23,7 @@
 			label = "lan5";
 
 			nvmem-cell-names = "mac-address";
-			nvmem-cells = <&macaddr_factory_4 1>;
+			nvmem-cells = <&macaddr_factory_4 0>;
 		};
 	};
 };
