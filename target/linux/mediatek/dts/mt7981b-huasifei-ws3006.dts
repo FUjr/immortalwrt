@@ -25,6 +25,34 @@
 		stdout-path = "serial0:115200n8";
 	};
 
+	gpio-export {
+		compatible = "gpio-export";
+
+		m2_reset_1 {
+			gpio-export,name = "m2_reset_1";
+			gpio-export,output = <0>;
+			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
+		};
+
+		m2_reset_2 {
+			gpio-export,name = "m2_reset_2";
+			gpio-export,output = <0>;
+			gpios = <&pio 12 GPIO_ACTIVE_LOW>;
+		};
+
+		modem_pwr {
+			gpio-export,name = "modem_pwr";
+			gpio-export,output = <1>;
+			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
+		};
+
+		dual_sim {
+			gpio-export,name = "dual_sim";
+			gpio-export,output = <0>;
+			gpios = <&pio 13 GPIO_ACTIVE_LOW>;
+		};
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 
