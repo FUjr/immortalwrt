@@ -31,20 +31,21 @@
 | DEC-012 | NMS | HTTPS ubus JSON-RPC; SNMP is primarily monitoring and traps |
 | DEC-013 | Legacy security | HTTP, SNMPv1/v2c, and weak authentication are disabled by default |
 | DEC-014 | Compliance | IEC 62443-4-2 gap assessment only; no certification claim |
+| DEC-015 | First image | HTTPS LuCI with Misectel theme, dashboard, VRF NAT manager and VRF NAT page |
 
 ## Milestone 1: VRF NAT Vertical Slice
 
 | ID | Requirement | Acceptance | Status |
 | --- | --- | --- | --- |
-| NAT-001 | Four isolated device domains | `lan2` through `lan5` use independent VRF routing tables | planned |
-| NAT-002 | Overlapping IPv4 networks | The same internal address works concurrently on different VRFs | planned |
-| NAT-003 | Bidirectional 1:1 NAT | New inbound and outbound connections use the configured external address | planned |
-| NAT-004 | Static port-level 1:N | Non-overlapping TCP/UDP ranges on one external IP select different devices | planned |
-| NAT-005 | NAPT internet access | Unmapped device sources use the WAN management address | planned |
-| NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | planned |
-| NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | planned |
-| NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | planned |
-| SEC-001 | Safe factory state | No default route or forwarding until the one-time password setup completes | planned |
+| NAT-001 | Four isolated device domains | `lan2` through `lan5` use independent VRF routing tables | implemented, build pending |
+| NAT-002 | Overlapping IPv4 networks | The same internal address works concurrently on different VRFs | implemented, hardware pending |
+| NAT-003 | Bidirectional 1:1 NAT | New inbound and outbound connections use the configured external address | implemented, traffic test pending |
+| NAT-004 | Static port-level 1:N | Non-overlapping TCP/UDP ranges on one external IP select different devices | implemented, traffic test pending |
+| NAT-005 | NAPT internet access | Unmapped device sources use the WAN management address | implemented, traffic test pending |
+| NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | implemented, build pending |
+| NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | implemented, device test pending |
+| NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | implemented, device test pending |
+| SEC-001 | Safe factory state | No default route or forwarding until the one-time password setup completes | implemented, device test pending |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | planned |
 | SYS-001 | Flashable image | Image exists, is at most `15872k`, and passes manifest/checksum checks | planned |
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | deferred |

@@ -17,7 +17,9 @@ reported but are not release gates.
 
 The prototype target is `misectel_r700-nat-gateway`. It retains the standard
 Cudy R700 flash layout and adds the VRF/bridge kernel modules plus support for
-an externally wired DS3231 RTC.
+an externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,
+the Misectel theme, and the dedicated VRF NAT manager and application. Use
+`scripts/build-misectel-r700-nat.sh` for a size-checked reproducible build.
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.

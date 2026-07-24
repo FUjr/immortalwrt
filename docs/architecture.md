@@ -23,6 +23,11 @@ without changing the partition map. The native I2C pin group is enabled for an
 external `maxim,ds3231` at address `0x68`; physical wiring remains a hardware
 validation prerequisite.
 
+The image integrates `misectel-vrf-manager` and `luci-app-misectel-vrf` from
+the independent local feed. `luci-ssl-openssl` supplies the HTTPS management
+endpoint. The tracked build seed selects only this device profile; profile
+dependencies own the minimal runtime package set.
+
 ## Packet Processing
 
 Inbound WAN rules mark packets before routing and then apply DNAT. An `ip rule`

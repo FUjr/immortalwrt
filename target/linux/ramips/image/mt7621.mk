@@ -807,7 +807,8 @@ define Device/misectel_r700-nat-gateway
   IMAGE_SIZE := 15872k
   UIMAGE_NAME := R29
   DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
-	kmod-rtc-ds1307
+	kmod-rtc-ds1307 luci-ssl-openssl luci-base-misectel \
+	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-vrf
   SUPPORTED_DEVICES += cudy,r700
 endef
 TARGET_DEVICES += misectel_r700-nat-gateway
