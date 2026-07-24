@@ -17,6 +17,12 @@ One-port bridges preserve an FDB and allow later MAC admission controls while
 keeping the four Layer-2 domains isolated. A subnet and gateway address may be
 reused across VRFs. Devices sharing one VRF must still use unique addresses.
 
+The prototype image uses a derived `misectel,r700-nat-gateway` device tree. It
+inherits the Cudy R700 flash, Ethernet, MAC-address, button, and LED definitions
+without changing the partition map. The native I2C pin group is enabled for an
+external `maxim,ds3231` at address `0x68`; physical wiring remains a hardware
+validation prerequisite.
+
 ## Packet Processing
 
 Inbound WAN rules mark packets before routing and then apply DNAT. An `ip rule`

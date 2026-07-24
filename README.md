@@ -15,6 +15,10 @@ and software flow offload are disabled so that VRF policy routing and NAT rule
 selection remain observable and deterministic. Performance measurements are
 reported but are not release gates.
 
+The prototype target is `misectel_r700-nat-gateway`. It retains the standard
+Cudy R700 flash layout and adds the VRF/bridge kernel modules plus support for
+an externally wired DS3231 RTC.
+
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.
 

@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "mt7621_cudy_r700.dts"
+
+/ {
+	compatible = "misectel,r700-nat-gateway", "cudy,r700", "mediatek,mt7621-soc";
+	model = "Misectel MT7621 VRF NAT Gateway (Cudy R700)";
+};
+
+&i2c {
+	status = "okay";
+
+	rtc@68 {
+		compatible = "maxim,ds3231";
+		reg = <0x68>;
+	};
+};
+
+&state_default {
+	gpio {
+		groups = "jtag", "uart3", "wdt";
+		function = "gpio";
+	};
+};

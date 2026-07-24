@@ -17,8 +17,8 @@
 
 | ID | Decision | Value |
 | --- | --- | --- |
-| DEC-001 | Prototype | Cudy R700, 16 MiB NOR, 4 DSA device ports and 1 WAN |
-| DEC-002 | RTC | External DS3231 on the native I2C bus, address `0x68` |
+| DEC-001 | Prototype | Cudy R700, 16 MiB NOR, 4 DSA device ports and 1 WAN; derived profile implemented |
+| DEC-002 | RTC | External DS3231 on the native I2C bus, address `0x68`; DTS implemented, wiring unverified |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
 | DEC-005 | Management | WAN-side management IP, factory default `192.168.1.1/24` |
