@@ -4,7 +4,7 @@
 
 ## Misectel MT7621 VRF NAT Gateway
 
-The `misectel-switch` branch builds a Cudy R700 based prototype for isolating
+The `misectel-switch` branch builds the `misectel,7621evb` gateway for isolating
 overlapping IPv4 device networks and exposing them through distinct WAN-side
 addresses. Project requirements, architecture, build constraints, and the
 acceptance matrix are maintained in [`docs/requirements.md`](docs/requirements.md)
@@ -15,11 +15,12 @@ and software flow offload are disabled so that VRF policy routing and NAT rule
 selection remain observable and deterministic. Performance measurements are
 reported but are not release gates.
 
-The prototype target is `misectel_r700-nat-gateway`. It retains the standard
-Cudy R700 flash layout and adds the VRF/bridge kernel modules plus support for
-an externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,
+The target is `misectel_7621evb`, with 256 MiB DDR3 SDRAM and 16 MiB SPI NOR.
+Its flash map preserves dedicated `woem` and `ledeinfo` partitions following
+the Misectel MT7981 convention, and adds VRF/bridge modules plus support for an
+externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,
 the Misectel theme, and the dedicated VRF NAT manager and application. Use
-`scripts/build-misectel-r700-nat.sh` for a size-checked reproducible build.
+`scripts/build-misectel-7621evb.sh` for a size-checked reproducible build.
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.

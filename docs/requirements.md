@@ -17,7 +17,7 @@
 
 | ID | Decision | Value |
 | --- | --- | --- |
-| DEC-001 | Prototype | Cudy R700, 16 MiB NOR, 4 DSA device ports and 1 WAN; derived profile implemented |
+| DEC-001 | Hardware | `misectel,7621evb`, MT7621, 2 Gbit (256 MiB) DDR3 SDRAM rated at 933 MHz, 16 MiB SPI NOR, 4 DSA device ports and 1 WAN |
 | DEC-002 | RTC | External DS3231 on the native I2C bus, address `0x68`; DTS implemented, wiring unverified |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
@@ -32,6 +32,8 @@
 | DEC-013 | Legacy security | HTTP, SNMPv1/v2c, and weak authentication are disabled by default |
 | DEC-014 | Compliance | IEC 62443-4-2 gap assessment only; no certification claim |
 | DEC-015 | First image | HTTPS LuCI with Misectel theme, dashboard, VRF NAT manager and VRF NAT page |
+| DEC-016 | NOR metadata | Preserve 64 KiB `woem` and 64 KiB `ledeinfo` partitions following the Misectel MT7981 convention |
+| DEC-017 | DDR controller | Use U-Boot's supported DDR3-1200 profile (600 MHz clock), within the 933 MHz component rating; hardware training remains unverified |
 
 ## Milestone 1: VRF NAT Vertical Slice
 
@@ -47,7 +49,7 @@
 | NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | implemented, device test pending |
 | SEC-001 | Safe factory state | No default route or forwarding until the one-time password setup completes | implemented, device test pending |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | planned |
-| SYS-001 | Flashable image | Image exists, is at most `15872k`, and passes manifest/checksum checks | planned |
+| SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | planned |
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | deferred |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
 
@@ -105,9 +107,10 @@
 
 ## Capacity and Release Gates
 
-- The Cudy R700 firmware partition is unchanged.
+- The 16 MiB NOR contains `u-boot`, `u-boot-env`, `factory`, `woem`,
+  `ledeinfo`, and a 15936 KiB `firmware` partition in that order.
 - A successful `make` is insufficient: the final image must exist, fit the
   profile limit, and pass SHA-256 manifest verification.
 - A feature that does not fit must be marked `unsupported` here and removed
   completely from code, packages, menus, and documentation for that image.
-- Hardware claims remain `deferred` until tested on the R700 and wired DS3231.
+- Hardware claims remain `deferred` until tested on the 7621EVB and wired DS3231.

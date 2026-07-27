@@ -17,11 +17,27 @@ One-port bridges preserve an FDB and allow later MAC admission controls while
 keeping the four Layer-2 domains isolated. A subnet and gateway address may be
 reused across VRFs. Devices sharing one VRF must still use unique addresses.
 
-The prototype image uses a derived `misectel,r700-nat-gateway` device tree. It
-inherits the Cudy R700 flash, Ethernet, MAC-address, button, and LED definitions
-without changing the partition map. The native I2C pin group is enabled for an
+The image uses the standalone `misectel,7621evb` device tree for a 256 MiB DDR3
+and 16 MiB SPI NOR design. The RAM device is rated for a 933 MHz clock; U-Boot
+uses the MT7621-supported DDR3-1200 controller profile (600 MHz clock), which is
+within that component rating. The native I2C pin group is enabled for an
 external `maxim,ds3231` at address `0x68`; physical wiring remains a hardware
 validation prerequisite.
+
+The NOR layout follows the metadata convention used by Misectel MT7981 boards:
+
+| Offset | Size | Partition |
+| --- | --- | --- |
+| `0x000000` | `0x030000` | `u-boot` |
+| `0x030000` | `0x010000` | `u-boot-env` |
+| `0x040000` | `0x010000` | `factory` |
+| `0x050000` | `0x010000` | `woem` |
+| `0x060000` | `0x010000` | `ledeinfo` |
+| `0x070000` | `0xF90000` | `firmware` |
+
+The base MAC is stored at Factory offset `0xE000`; WAN derives the following
+address. A production programmer image must therefore contain per-device
+Factory data rather than a shared blank or example Factory partition.
 
 The image integrates `misectel-vrf-manager` and `luci-app-misectel-vrf` from
 the independent local feed. `luci-ssl-openssl` supplies the HTTPS management

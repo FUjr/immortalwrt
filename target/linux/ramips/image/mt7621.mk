@@ -798,20 +798,18 @@ define Device/cudy_r700
 endef
 TARGET_DEVICES += cudy_r700
 
-define Device/misectel_r700-nat-gateway
+define Device/misectel_7621evb
   $(Device/dsa-migration)
   DEVICE_VENDOR := Misectel
-  DEVICE_MODEL := MT7621 VRF NAT Gateway
-  DEVICE_VARIANT := Cudy R700 prototype
-  DEVICE_DTS := mt7621_cudy_r700-misectel-nat
-  IMAGE_SIZE := 15872k
-  UIMAGE_NAME := R29
+  DEVICE_MODEL := 7621EVB
+  DEVICE_VARIANT := VRF NAT Gateway
+  DEVICE_DTS := mt7621_misectel_7621evb
+  IMAGE_SIZE := 15936k
   DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
 	kmod-rtc-ds1307 luci-ssl-openssl luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-vrf
-  SUPPORTED_DEVICES += cudy,r700
 endef
-TARGET_DEVICES += misectel_r700-nat-gateway
+TARGET_DEVICES += misectel_7621evb
 
 define Device/cudy_wr1300-v1
   $(Device/dsa-migration)
