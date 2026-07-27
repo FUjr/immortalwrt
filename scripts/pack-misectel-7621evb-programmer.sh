@@ -143,5 +143,7 @@ size="$(wc -c < "$output")"
 	exit 1
 }
 
-sha256sum "$output" > "$output.sha256"
+output_dir="$(dirname "$output")"
+output_name="$(basename "$output")"
+(cd "$output_dir" && sha256sum "$output_name") > "$output.sha256"
 cat "$output.sha256"
