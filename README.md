@@ -23,6 +23,8 @@ the Misectel theme, and the dedicated VRF NAT manager and application. Use
 `scripts/build-misectel-7621evb.sh` for a size-checked reproducible build.
 The build produces a standalone U-Boot and, when `BASE_MAC` is supplied, an
 exact 16 MiB programmer image with Factory, WOEM and LEDEINFO regions.
+Build and hardware validation boundaries are recorded in
+[`docs/validation.md`](docs/validation.md).
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.
