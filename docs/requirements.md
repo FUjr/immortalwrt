@@ -34,6 +34,7 @@
 | DEC-015 | First image | HTTPS LuCI with Misectel theme, dashboard, VRF NAT manager and VRF NAT page |
 | DEC-016 | NOR metadata | Preserve 64 KiB `woem` and 64 KiB `ledeinfo` partitions following the Misectel MT7981 convention |
 | DEC-017 | DDR controller | Use U-Boot's supported DDR3-1200 profile (600 MHz clock), within the 933 MHz component rating; hardware training remains unverified |
+| DEC-018 | Programmer image | Exactly 16 MiB; production composition requires a unique unicast base MAC and supports per-device Factory/WOEM/LEDEINFO blobs |
 
 ## Milestone 1: VRF NAT Vertical Slice
 
@@ -50,6 +51,8 @@
 | SEC-001 | Safe factory state | No default route or forwarding until the one-time password setup completes | implemented, device test pending |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | planned |
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | planned |
+| SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | implemented, build pending |
+| SYS-004 | Programmer artifact | Reproducibly compose and checksum an exact 16 MiB full-flash image without overwriting partition boundaries | implemented, build pending |
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | deferred |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
 

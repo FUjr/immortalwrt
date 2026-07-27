@@ -30,3 +30,24 @@ size="$(wc -c < "$image")"
 }
 
 sha256sum "$image"
+
+uboot="$(find "$ROOT/build_dir" -type f \
+	-path '*/u-boot-mt7621_misectel_7621evb/u-boot-*/u-boot-mt7621.bin' \
+	-print -quit)"
+[ -n "$uboot" ] || {
+	echo '7621EVB U-Boot image was not produced' >&2
+	exit 1
+}
+uboot_output="$OUTPUT/immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin"
+cp "$uboot" "$uboot_output"
+sha256sum "$uboot_output"
+
+if [ -n "${BASE_MAC:-}" ]; then
+	set -- --uboot "$uboot_output" --firmware "$image" \
+		--base-mac "$BASE_MAC" \
+		--output "$OUTPUT/immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin"
+	[ -z "${FACTORY_BIN:-}" ] || set -- "$@" --factory "$FACTORY_BIN"
+	[ -z "${WOEM_BIN:-}" ] || set -- "$@" --woem "$WOEM_BIN"
+	[ -z "${LEDEINFO_BIN:-}" ] || set -- "$@" --ledeinfo "$LEDEINFO_BIN"
+	"$ROOT/scripts/pack-misectel-7621evb-programmer.sh" "$@"
+fi
