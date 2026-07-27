@@ -51,3 +51,9 @@ if [ -n "${BASE_MAC:-}" ]; then
 	[ -z "${LEDEINFO_BIN:-}" ] || set -- "$@" --ledeinfo "$LEDEINFO_BIN"
 	"$ROOT/scripts/pack-misectel-7621evb-programmer.sh" "$@"
 fi
+
+set -- "$(basename "$uboot_output")" "$(basename "$image")"
+programmer="immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin"
+[ ! -f "$OUTPUT/$programmer" ] || set -- "$@" "$programmer"
+(cd "$OUTPUT" && sha256sum "$@") > \
+	"$OUTPUT/immortalwrt-ramips-mt7621-misectel_7621evb-artifacts.sha256"

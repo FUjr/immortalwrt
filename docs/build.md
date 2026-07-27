@@ -26,6 +26,8 @@ Optional `FACTORY_BIN`, `WOEM_BIN`, and `LEDEINFO_BIN` variables accept exact
 (`0xff`) except for the required base MAC written at Factory offset `0xE000`.
 Production must use an assigned unique unicast MAC and any board-specific
 Factory/WOEM calibration data supplied by manufacturing.
+The generated `misectel_7621evb-artifacts.sha256` file covers the standalone
+U-Boot, sysupgrade image, and programmer image using relative filenames.
 
 To re-compose an already-built image without rebuilding:
 
