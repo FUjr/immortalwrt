@@ -16,6 +16,8 @@ selection remain observable and deterministic. Performance measurements are
 reported but are not release gates.
 
 The target is `misectel_7621evb`, with 256 MiB DDR3 SDRAM and 16 MiB SPI NOR.
+Its Ethernet layout exposes MT7530 port 0 as WAN, ports 1-3 as LAN1-3, and the
+separate `gmac1`/PHY4 interface as LAN4.
 Its flash map preserves dedicated `woem` and `ledeinfo` partitions following
 the Misectel MT7981 convention, and adds VRF/bridge modules plus support for an
 externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,

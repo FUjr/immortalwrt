@@ -21,7 +21,9 @@
 
 - DDR training and stability on the specified 2 Gbit DDR3 component.
 - SPI NOR erase/write/readback and reset-vector boot using a programmer.
-- UART output, Ethernet port order, WAN PHY, I2C wiring, and DS3231 detection.
+- UART output, corrected WAN/LAN traffic direction, I2C wiring, and DS3231
+  detection. Port tracing supplied from hardware maps MT7530 port 0 to WAN,
+  ports 1-3 to LAN1-3, and `gmac1`/PHY4 to LAN4; packet tests remain pending.
 - First boot, HTTPS setup, VRF isolation, overlapping-address NAT, rollback,
   restart, and power-cycle tests.
 

@@ -8,10 +8,10 @@ different Linux VRF:
 
 | Device | Bridge | VRF | Table | Mark |
 | --- | --- | --- | --- | --- |
+| `lan1` | `br-vrf-lan1` | `vrf-lan1` | 1001 | `0x101` |
 | `lan2` | `br-vrf-lan2` | `vrf-lan2` | 1002 | `0x102` |
 | `lan3` | `br-vrf-lan3` | `vrf-lan3` | 1003 | `0x103` |
 | `lan4` | `br-vrf-lan4` | `vrf-lan4` | 1004 | `0x104` |
-| `lan5` | `br-vrf-lan5` | `vrf-lan5` | 1005 | `0x105` |
 
 One-port bridges preserve an FDB and allow later MAC admission controls while
 keeping the four Layer-2 domains isolated. A subnet and gateway address may be
@@ -23,6 +23,12 @@ uses the MT7621-supported DDR3-1200 controller profile (600 MHz clock), which is
 within that component rating. The native I2C pin group is enabled for an
 external `maxim,ds3231` at address `0x68`; physical wiring remains a hardware
 validation prerequisite.
+
+Hardware port tracing defines the user-facing order independently of the SoC
+enumeration. MT7530 port 0 is the actual `wan`; ports 1, 2, and 3 are `lan1`,
+`lan2`, and `lan3`; the separate `gmac1`/internal PHY 4 interface is `lan4`.
+This replaces the initial provisional labels `lan5`, `lan4`, `lan3`, `lan2`,
+and `wan`, respectively.
 
 The NOR layout follows the metadata convention used by Misectel MT7981 boards:
 
