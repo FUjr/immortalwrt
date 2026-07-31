@@ -33,6 +33,7 @@ sha256sum "$image"
 
 uboot="$(find "$ROOT/build_dir" -type f \
 	-path '*/u-boot-mt7621_misectel_7621evb/u-boot-*/u-boot-mt7621.bin' \
+	-not -path '*/.pkgdir/*' \
 	-print -quit)"
 [ -n "$uboot" ] || {
 	echo '7621EVB U-Boot image was not produced' >&2
