@@ -17,7 +17,7 @@
 
 | ID | Decision | Value |
 | --- | --- | --- |
-| DEC-001 | Hardware | `misectel,7621evb`, MT7621, 2 Gbit (256 MiB) DDR3 SDRAM rated at 933 MHz, 16 MiB SPI NOR, 4 DSA device ports and 1 WAN |
+| DEC-001 | Hardware | `misectel,7621evb`, MT7621, 2 Gbit (256 MiB) DDR3 SDRAM rated at 933 MHz, 16 MiB SPI NOR, 4 LAN device ports and 1 WAN |
 | DEC-002 | RTC | External DS3231 on the native I2C bus, address `0x68`; DTS implemented, wiring unverified |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
@@ -41,12 +41,12 @@
 
 | ID | Requirement | Acceptance | Status |
 | --- | --- | --- | --- |
-| NAT-001 | Four isolated device domains | `lan1` through `lan4` use independent VRF routing tables | implemented, build pending |
+| NAT-001 | Four isolated device domains | `lan1` through `lan4` use independent VRF routing tables | implemented, hardware traffic test pending |
 | NAT-002 | Overlapping IPv4 networks | The same internal address works concurrently on different VRFs | implemented, hardware pending |
 | NAT-003 | Bidirectional 1:1 NAT | New inbound and outbound connections use the configured external address | implemented, traffic test pending |
 | NAT-004 | Static port-level 1:N | Non-overlapping TCP/UDP ranges on one external IP select different devices | implemented, traffic test pending |
 | NAT-005 | NAPT internet access | Unmapped device sources use the WAN management address | implemented, traffic test pending |
-| NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | implemented, build pending |
+| NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | implemented, hardware traffic test pending |
 | NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | implemented, device test pending |
 | NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | implemented, device test pending |
 | SEC-001 | Safe factory state | No default route or forwarding until the one-time password setup completes | implemented, device test pending |

@@ -11,6 +11,10 @@
 - The sysupgrade image is below the 15936 KiB firmware limit and its manifest
   contains `kmod-vrf`, `misectel-vrf-manager`, `luci-app-misectel-vrf`, and the
   Misectel theme.
+- The built kernel DTB labels MT7530 port 0 as `wan`, ports 1-3 as
+  `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The root filesystem contains VRF
+  manager v2 with fixed tables `1001`-`1004`, marks `0x101`-`0x104`, and the
+  v1 port migration script.
 - The programmer image is exactly 16 MiB. Byte comparison confirms U-Boot at
   `0x000000`, the base MAC at `0x04E000`, erased WOEM at `0x050000`, erased
   LEDEINFO at `0x060000`, and an exact sysupgrade payload at `0x070000`.
