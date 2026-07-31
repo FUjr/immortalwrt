@@ -23,6 +23,8 @@ the Misectel theme, and the dedicated VRF NAT manager and application. Use
 `scripts/build-misectel-7621evb.sh` for a size-checked reproducible build.
 The build produces a standalone U-Boot and, when `BASE_MAC` is supplied, an
 exact 16 MiB programmer image with Factory, WOEM and LEDEINFO regions.
+The build also asserts the required MT7621 SPI and SPL LZMA options before
+publishing boot artifacts.
 Build and hardware validation boundaries are recorded in
 [`docs/validation.md`](docs/validation.md).
 

@@ -38,6 +38,19 @@ uboot="$(find "$ROOT/build_dir" -type f \
 	echo '7621EVB U-Boot image was not produced' >&2
 	exit 1
 }
+uboot_build_dir="$(dirname "$uboot")"
+for option in \
+	CONFIG_MT7621_DRAM_FREQ_1200=y \
+	CONFIG_MT7621_DRAM_DDR3_2048M=y \
+	CONFIG_MT7621_SPI=y \
+	CONFIG_LZMA=y \
+	CONFIG_SPL_LZMA=y
+do
+	grep -qx "$option" "$uboot_build_dir/.config" || {
+		echo "required U-Boot option missing: $option" >&2
+		exit 1
+	}
+done
 uboot_output="$OUTPUT/immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin"
 cp "$uboot" "$uboot_output"
 sha256sum "$uboot_output"
