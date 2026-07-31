@@ -36,6 +36,7 @@
 | DEC-017 | DDR controller | Use U-Boot's supported DDR3-1200 profile (600 MHz clock), within the 933 MHz component rating; hardware training remains unverified |
 | DEC-018 | Programmer image | Exactly 16 MiB; production composition requires a unique unicast base MAC and supports per-device Factory/WOEM/LEDEINFO blobs |
 | DEC-019 | Ethernet port order | MT7530 port 0 is WAN; MT7530 ports 1-3 are LAN1-3; the separate `gmac1`/PHY4 interface is LAN4 |
+| DEC-020 | Subnet NAT delivery | Equal-length IPv4 prefixes preserve host bits; the upstream router routes each external prefix through the gateway WAN address |
 
 ## Milestone 1: VRF NAT Vertical Slice
 
@@ -49,7 +50,8 @@
 | NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | implemented, hardware traffic test pending |
 | NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | implemented, device test pending |
 | NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | implemented, device test pending |
-| SEC-001 | Safe factory state | No default route or forwarding until the one-time password setup completes | implemented, device test pending |
+| NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | implemented, hardware traffic test pending |
+| SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | implemented, device test pending |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | planned |
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | verified |
 | SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | verified |

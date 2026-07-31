@@ -13,8 +13,13 @@
   Misectel theme.
 - The built kernel DTB labels MT7530 port 0 as `wan`, ports 1-3 as
   `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The root filesystem contains VRF
-  manager v2 with fixed tables `1001`-`1004`, marks `0x101`-`0x104`, and the
-  v1 port migration script.
+  manager v5 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
+  `0x101`-`0x104`, and the port and subnet-NAT migration scripts.
+- The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
+  explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
+  factory state. Static validator tests cover valid subnet mappings, unequal
+  prefix lengths, overlapping external ranges, and internal ranges outside the
+  selected VRF.
 - The programmer image is exactly 16 MiB. Byte comparison confirms U-Boot at
   `0x000000`, the base MAC at `0x04E000`, erased WOEM at `0x050000`, erased
   LEDEINFO at `0x060000`, and an exact sysupgrade payload at `0x070000`.
@@ -28,8 +33,8 @@
 - UART output, corrected WAN/LAN traffic direction, I2C wiring, and DS3231
   detection. Port tracing supplied from hardware maps MT7530 port 0 to WAN,
   ports 1-3 to LAN1-3, and `gmac1`/PHY4 to LAN4; packet tests remain pending.
-- First boot, HTTPS setup, VRF isolation, overlapping-address NAT, rollback,
-  restart, and power-cycle tests.
+- First boot, default link state, HTTPS setup, VRF isolation, host and subnet
+  NAT traffic, rollback, restart, power-cycle, latency, and throughput tests.
 
 The first programmer image reached `U-Boot SPL` and printed
 `Trying to boot from NOR`, then stopped. Its generated defconfig had been

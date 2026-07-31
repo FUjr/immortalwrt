@@ -2,7 +2,7 @@
 
 ## Network Model
 
-The prototype reserves `wan` for upstream and management traffic. Each DSA
+The prototype reserves `wan` for upstream and management traffic. Each LAN
 device port is placed in a one-port bridge, and each bridge is enslaved to a
 different Linux VRF:
 
@@ -53,9 +53,15 @@ dependencies own the minimal runtime package set.
 ## Packet Processing
 
 Inbound WAN rules mark packets before routing and then apply DNAT. An `ip rule`
-for each mark selects the matching VRF table and device bridge. Outbound traffic
-from a VRF uses static SNAT when a 1:1 rule matches and otherwise uses NAPT to
-the configured WAN management address. Conntrack performs reverse translation.
+for each mark selects the matching VRF table and device bridge. Host 1:1 rules
+translate individual addresses; subnet 1:1 rules map equal-length prefixes and
+preserve host bits. Outbound traffic uses the matching host or prefix SNAT rule
+before falling back to NAPT on the WAN management address. Conntrack performs
+reverse translation.
+
+Subnet external prefixes are routed by the upstream router through the gateway
+WAN address. They are not installed as hundreds of local `/32` aliases, so the
+gateway does not need to synthesize ARP replies for every translated host.
 
 The manager owns a dedicated nftables table. A small firewall4 include admits
 only traffic carrying a valid manager mark; firewall4 continues to protect the
@@ -75,7 +81,8 @@ unconfirmed transaction restores the backup before forwarding is enabled.
 
 ## Security Boundary
 
-Factory state uses `192.168.1.1/24`, no gateway, and no forwarding. The one-time
+Factory state brings WAN and LAN1-LAN4 administratively up and uses
+`192.168.1.1/24` on WAN, with no gateway and no forwarding. The one-time
 HTTPS setup endpoint can only set the initial administrator password. Once setup
 is complete its unauthenticated RPC permission is permanently rejected. Normal
 configuration requires an authenticated ubus session and an explicit RPC ACL.

@@ -6,7 +6,8 @@
 
 The `misectel-switch` branch builds the `misectel,7621evb` gateway for isolating
 overlapping IPv4 device networks and exposing them through distinct WAN-side
-addresses. Project requirements, architecture, build constraints, and the
+host addresses or host-bit-preserving routed prefixes. Project requirements,
+architecture, build constraints, and the
 acceptance matrix are maintained in [`docs/requirements.md`](docs/requirements.md)
 and [`docs/architecture.md`](docs/architecture.md).
 
@@ -29,6 +30,8 @@ The build also asserts the required MT7621 SPI and SPL LZMA options before
 publishing boot artifacts.
 Build and hardware validation boundaries are recorded in
 [`docs/validation.md`](docs/validation.md).
+The minimum complete subnet-NAT isolation test uses three endpoint devices plus
+the gateway; see [`docs/subnet-nat-test.md`](docs/subnet-nat-test.md).
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.
