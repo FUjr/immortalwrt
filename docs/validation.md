@@ -20,7 +20,7 @@
   measured once without policers and once with an enabled policy.
 - The built kernel DTB must label MT7530 port 0 as the actual `wan`, ports 1-3
   as `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The manager package must contain
-  API/UCI schema v4 with independent VRF objects and interface membership; no
+  API/UCI schema v5 with independent VRF objects and interface membership; no
   pre-release configuration migration scripts are installed.
 - The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
   explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
@@ -128,16 +128,40 @@
   VRF-master matching at those later hooks and fixes fallback NAPT generation
   so rules are emitted before the SNAT chain is assembled. The temporary debug
   counters were removed by the final firewall reload.
+- Manager release 16 and the matching dashboard were installed on the gateway.
+  `get_status.interfaces` reported LAN1/LAN2 carrier up at 100 Mbps and
+  LAN3/LAN4 carrier down. The homepage rendered the same values and counted two
+  linked members without assigning the isolated LAN ports to netifd.
+- netifd owns the live static WAN `10.96.210.253/24`. After a full network
+  reload, all four VRFs remained up, the manager restored mapping alias
+  `10.96.210.252/32`, and VRF2 retained canonical connected route
+  `10.96.210.0/24` plus its onlink default route. The mapped address then passed
+  three ICMP packets with zero loss and 1.312 ms mean; HTTP returned 307.
+- Playwright exercised the gateway dashboard, WAN page, VRF overview, member
+  editor, NAT mapping editor and 390x844 mobile dashboard. It found four VRFs,
+  no cellular labels, and zero page errors. The screenshots are tracked under
+  `docs/assets/delivery`.
+- Final revision `r0+37862-f8ff143f00` was installed as a full, configuration-
+  preserving sysupgrade on both the actual VRF gateway and the USB0-connected
+  MT7621 endpoint. Both copies matched SHA-256 and passed `sysupgrade -T`
+  before writing. Both boards completed NOR boot, restored their overlays and
+  reported the final revision. The known JFFS2 busy-inode warning occurred on
+  both upgrades but did not prevent firmware writing, reboot or config restore.
+- The USB0 endpoint retained WAN `192.168.10.101/24` and its default route and
+  reached host `10.96.210.226` through the gateway. The gateway retained netifd
+  WAN `10.96.210.253/24`, mapping alias `10.96.210.252/32`, four active VRFs,
+  and table 1002 connected/default routes. Five post-upgrade pings to `.253`
+  and `.252` had zero loss and means of 0.613 ms and 0.991 ms respectively;
+  mapped HTTP returned 307.
 - SNMPv3 authPriv queries using SHA-256 and AES-256 returned system and IF-MIB
   data. EtherLike `dot3StatsTable` returned the switch interface indices, and
   the LLDP-MIB local system description returned `ImmortalWrt`. SNMP test
   credentials and generated runtime configuration were removed afterward.
-- The final sysupgrade image is 11,731,514 bytes with SHA-256
-  `65208d198b0013974e95e1963c33b5d89289d2852d291c74b0657711cc6d7c1f`.
-  The target downloaded the exact file and `sysupgrade -T` accepted it. The
-  16 MiB programmer image SHA-256 is
-  `8703e89b2a3707020f17d1b3057414ed2adf8c984fc9a845a7112dd5c4204228`;
-  standalone U-Boot remains
+- The final sysupgrade image is 11,797,050 bytes with SHA-256
+  `d564f18be597e68b23a867ac97a246118ea6b6e3aaeda61a9054f90e4d569c38`.
+  The 16 MiB programmer image SHA-256 is
+  `4156c7a04e76159bde5e6145c9811989bfe3bca88d7aa4201130679cc3c709ba`;
+  the 194,690-byte standalone U-Boot SHA-256 is
   `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654`.
 
 ## Hardware Validation Pending
@@ -146,12 +170,11 @@
   repetition.
 - LAN3-LAN4 traffic, routed external prefixes through an upstream router, host
   1:1 NAT, port mapping, and NAPT.
-- UDP, timeout and explicit rollback, browser-side LuCI submission, production HTTPS
+- UDP, timeout and explicit rollback, production HTTPS
   certificate provisioning and trust, throughput, PPS, CPU load, and sustained
   latency tests.
 - LLDP neighbor/topology rendering and LLDP-change Syslog with real neighbors;
-  neither connected simulator currently runs an LLDP daemon. Browser screenshot
-  validation is also pending because the test host has no Chromium/Playwright.
+  neither connected simulator currently runs an LLDP daemon.
 - I2C wiring and DS3231 detection; the current boot log reports RTC probe error
   `-145`.
 
