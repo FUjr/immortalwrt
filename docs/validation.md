@@ -96,15 +96,35 @@
   New-MAC logging recorded the real LAN1 endpoint. Port administrative state,
   ping-response toggling, event type filtering, API password redaction and
   HTTPS status 200 were also exercised and restored.
+- VRF manager release 11/API v4 and firmware revision
+  `r0+37858-3b3ef3b713` were installed with `sysupgrade -n` on both the gateway
+  at `/dev/ttyCH343USB5` and the MT7621 endpoint at `/dev/ttyCH343USB0`. The
+  endpoint downloaded the image through its WAN connection to a gateway VRF;
+  its SHA-256 matched before `sysupgrade -T` accepted the image. Both boards
+  completed NOR boot and reported `misectel,7621evb` after upgrade.
+- On both upgraded boards the active interface set is `wan`, `lan1`, `lan2`,
+  `lan3`, and independent `lan4`; the obsolete `lan5` name is absent. The
+  USB0 endpoint's cabled DSA port appeared as `wan` with carrier, confirming
+  the corrected physical WAN mapping. `capabilities` reported API v4, 16 VRFs,
+  and member interfaces `lan1`-`lan4`. Factory configuration assigns each LAN
+  interface to a separate `vrf1`-`vrf4` object while global forwarding remains
+  disabled until setup is completed.
+- The gateway was temporarily enabled to transfer the image into the VRF. The
+  temporary WAN address, port-8080 HTTP process, firmware copies, nftables
+  allow rules, and `tcp_l3mdev_accept=1` setting were removed afterward. Final
+  gateway state is `setup_complete=0`, `enabled=0`, WAN
+  `192.168.1.1/24`, `ip_forward=0`, no runtime VRF/bridge devices, and no port
+  8080 listener. Both `sysupgrade -n` operations intentionally leave the root
+  password unset for first-run provisioning.
 - SNMPv3 authPriv queries using SHA-256 and AES-256 returned system and IF-MIB
   data. EtherLike `dot3StatsTable` returned the switch interface indices, and
   the LLDP-MIB local system description returned `ImmortalWrt`. SNMP test
   credentials and generated runtime configuration were removed afterward.
 - The final sysupgrade image is 11,731,514 bytes with SHA-256
-  `17e96eff89afdcb1e105096c5e11fc7bb6b99a6772ed83a299aeb95af03f8384`.
+  `65208d198b0013974e95e1963c33b5d89289d2852d291c74b0657711cc6d7c1f`.
   The target downloaded the exact file and `sysupgrade -T` accepted it. The
   16 MiB programmer image SHA-256 is
-  `cbefe0bd4a3911d1df99765c150197278c61ec8187d290cf7fad9b62527622cd`;
+  `8703e89b2a3707020f17d1b3057414ed2adf8c984fc9a845a7112dd5c4204228`;
   standalone U-Boot remains
   `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654`.
 
