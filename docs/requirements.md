@@ -35,7 +35,7 @@
 | DEC-016 | NOR metadata | Preserve 64 KiB `woem` and 64 KiB `ledeinfo` partitions following the Misectel MT7981 convention |
 | DEC-017 | DDR controller | Use U-Boot's supported DDR3-1200 profile (600 MHz clock), within the 933 MHz component rating; hardware training remains unverified |
 | DEC-018 | Programmer image | Exactly 16 MiB; production composition requires a unique unicast base MAC and supports per-device Factory/WOEM/LEDEINFO blobs |
-| DEC-019 | Ethernet port order | MT7530 port 0 is WAN; MT7530 ports 1-3 are LAN1-3; the separate `gmac1`/PHY4 interface is LAN4 |
+| DEC-019 | Ethernet port order | MT7530 port 0 is LAN4; MT7530 ports 1-3 are LAN1-3; the separate `gmac1`/PHY4 interface is the actual WAN |
 | DEC-020 | Subnet NAT delivery | Equal-length IPv4 prefixes preserve host bits; the upstream router routes each external prefix through the gateway WAN address |
 
 ## Milestone 1: VRF NAT Vertical Slice
