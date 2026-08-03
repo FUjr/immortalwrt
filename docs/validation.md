@@ -13,7 +13,7 @@
   Misectel theme.
 - The built kernel DTB labels MT7530 port 0 as `wan`, ports 1-3 as
   `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The root filesystem contains VRF
-  manager v7 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
+  manager v8 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
   `0x101`-`0x104`, and the port and subnet-NAT migration scripts.
 - The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
   explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
@@ -47,6 +47,10 @@
   of the first-packet DNAT counter, proving that conntrack continuation packets
   retained VRF routing selection. Regular reboot WAN ping downtime was
   38.67 seconds, so the suggested 30-second startup target was not met.
+- Manager v8 supplied missing IPv4 and IPv6 HTTPS listeners, generated the
+  configured self-signed uHTTPd certificate, redirected HTTP with status 307,
+  and served the management page over HTTPS with status 200. Explicit TLS 1.2
+  and TLS 1.3 connections both succeeded.
 
 ## Hardware Validation Pending
 
@@ -54,8 +58,9 @@
   repetition.
 - LAN2-LAN4 traffic, two-VRF duplicate-address isolation, routed external
   prefixes through an upstream router, host 1:1 NAT, port mapping, and NAPT.
-- UDP, configuration confirmation and timeout rollback, HTTPS setup/TLS,
-  throughput, PPS, CPU load, and sustained latency tests.
+- UDP, configuration confirmation and timeout rollback, production HTTPS
+  certificate provisioning and trust, throughput, PPS, CPU load, and sustained
+  latency tests.
 - I2C wiring and DS3231 detection; the current boot log reports RTC probe error
   `-145`.
 
