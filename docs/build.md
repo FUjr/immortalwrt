@@ -33,7 +33,8 @@ The switch operations image requires `CONFIG_LLDPD_WITH_JSON=y` and
 `CONFIG_LLDPD_WITH_SNMP=y`. The linked packages feed must contain commit
 `e3c12d9` (Net-SNMP AES-256 and EtherLike `dot3StatsTable`) or an equivalent
 newer change. The build script installs `misectel-switch-manager` and
-`luci-app-misectel-switch` from the linked application feed before `defconfig`.
+`luci-app-misectel-switch` from the linked `misectel` application feed before
+`defconfig`; this project does not use the `trim_recovery` feed.
 
 To re-compose an already-built image without rebuilding:
 

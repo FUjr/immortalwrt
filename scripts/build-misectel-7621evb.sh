@@ -9,8 +9,8 @@ JOBS="${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || printf '1')}"
 
 cd "$ROOT"
 
-./scripts/feeds update -i trim_recovery
-./scripts/feeds install -p trim_recovery misectel-vrf-manager luci-app-misectel-vrf \
+./scripts/feeds update -i misectel
+./scripts/feeds install -p misectel misectel-vrf-manager luci-app-misectel-vrf \
 	misectel-switch-manager luci-app-misectel-switch luci-app-misectel-dashboard \
 	luci-base-misectel luci-theme-misectel
 ./scripts/feeds install -p luci luci-ssl-openssl
