@@ -54,6 +54,14 @@ then restores per-mapping `/32` aliases, routing tables and NAT after WAN
 hotplug events. The tracked build seed selects only this device profile;
 profile dependencies own the minimal runtime package set.
 
+An optional BusyBox `udhcpd` process binds each enabled VRF bridge. It only
+advertises IPv4 address, mask, gateway, up to two DNS servers, and lease time,
+and accepts static MAC/address reservations. All generated configuration,
+process, and lease state is under `/tmp/misectel-vrf-dhcp`; no DHCP database is
+persisted. Different VRFs may reuse the same pool because each server is bound
+to its isolated bridge. Firewall4 admits only DHCP client UDP 68 to server UDP
+67 on manager-created `br-*` interfaces.
+
 The same feed provides `misectel-switch-manager` and
 `luci-app-misectel-switch`. The manager owns fixed-port administrative and PHY
 settings, optional tc rate/storm policies, passive sysfs/FDB sampling, bounded

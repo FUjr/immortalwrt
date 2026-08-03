@@ -50,8 +50,9 @@ administratively enabled WAN/LAN links, and HTTP to HTTPS management
 redirection with TLS 1.2 and TLS 1.3. The exact tested scope and remaining
 LAN3/LAN4, UDP, routed-prefix, rollback, certificate provisioning, and
 performance gaps are recorded in the validation document.
-API/UCI v5 keeps editable VRF/interface membership while moving WAN protocol,
-address, gateway, DNS and link ownership to `network.wan`/netifd. The gateway
+API/UCI v6 keeps editable VRF/interface membership, adds an optional lightweight
+DHCP server and static reservations per VRF bridge, and leaves WAN protocol,
+address, gateway, DNS and link ownership with `network.wan`/netifd. The gateway
 homepage reads WAN state from netifd and member carrier/speed from the VRF
 runtime API. Core Web workflows and screenshots are documented in
 [`docs/delivery-report.md`](docs/delivery-report.md).

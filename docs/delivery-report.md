@@ -176,13 +176,13 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 | ARP | ARP 老化时间 | 基本需求 | 2 | 尚无产品化页面 |
 | ARP | Proxy ARP | 基本需求 | 2 | 尚无产品化页面 |
 | 路由 | 静态路由不少于 64 条 | 基本需求 | 1 | LuCI/netifd 静态路由 |
-| NAT | 1:1、端口 1:N、NAT/NAPT、双向 | 基本需求 | 1 | VRF NAT API/UI v5 |
+| NAT | 1:1、端口 1:N、NAT/NAPT、双向 | 基本需求 | 1 | VRF NAT API/UI v6 |
 | NAT | 映射表不少于 64 条 | 基本需求 | 1 | API 限制 64 条 |
 | NAT | 组播 NAT、SNAT | 基本需求 | 2 | SNAT 已实现；组播 NAT 尚未完成 |
 | NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | 用户允许不作为门禁，仍需专项压测 |
 | NAT | ALG 报文穿透 | 兴奋需求 | 2 | 基础 conntrack helper 可用，完整 ALG 管理/协议验收待补 |
 | DHCP | WAN DHCP Client | 基本需求 | 1 | WAN Network 页面支持 |
-| DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 2 | 每 VRF DHCP 管理尚未完成 |
+| DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 1 | API/UI v6 每 VRF独立地址池、网关、1-2个 DNS 和静态租约；实机报文验收待补 |
 | ACL | MAC/IP/子网过滤 | 期望需求 | 1 | firewall4 与端口安全后端 |
 | ACL | TCP/UDP、ICMP、IGMP 过滤 | 期望需求 | 1 | nftables/firewall4 |
 | ACL | Time Range | 期望需求 | 2 | 专用页面和模板待开发 |

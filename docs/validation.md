@@ -20,8 +20,12 @@
   measured once without policers and once with an enabled policy.
 - The built kernel DTB must label MT7530 port 0 as the actual `wan`, ports 1-3
   as `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The manager package must contain
-  API/UCI schema v5 with independent VRF objects and interface membership; no
-  pre-release configuration migration scripts are installed.
+  API/UCI schema v6 with independent VRF objects, interface membership and
+  per-VRF DHCP; no pre-release configuration migration scripts are installed.
+- The build seed enables BusyBox `udhcpd`. Static checks cover DHCP pool bounds,
+  DNS count, duplicate static reservations, firewall input admission, generated
+  runtime configuration and process status. Dynamic and static lease exchange
+  remain target traffic tests until recorded below.
 - The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
   explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
   factory state. Static validator tests cover valid subnet mappings, unequal

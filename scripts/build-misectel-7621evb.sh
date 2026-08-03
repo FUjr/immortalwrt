@@ -17,6 +17,10 @@ cd "$ROOT"
 ./scripts/feeds install -p luci luci-ssl-openssl
 cp "$SEED" .config
 make defconfig
+grep -qx 'CONFIG_BUSYBOX_CONFIG_UDHCPD=y' .config || {
+	echo 'BusyBox udhcpd applet is not enabled' >&2
+	exit 1
+}
 env TMPDIR="$ROOT/tmp" make -j"$JOBS"
 
 image="$(find "$OUTPUT" -maxdepth 1 -type f -name '*misectel_7621evb-squashfs-sysupgrade.bin' -print -quit)"
