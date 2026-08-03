@@ -19,7 +19,7 @@ and USB0 for simulator B. During the final 2026-08-03 regression the devices
 re-enumerated to the mapping above. The gateway and the older simulator report
 the same device-tree model and hostname family, so model alone is not a
 sufficient identity check. Also compare firmware revision, uptime, the
-presence of `vrf-lan1`/`vrf-lan2`, and the exact interface set before changing
+presence of `vrf-*` runtime links, and the exact interface set before changing
 state.
 
 Serial numbering and device configuration may change. Before every run,

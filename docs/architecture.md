@@ -2,20 +2,21 @@
 
 ## Network Model
 
-The prototype reserves `wan` for upstream and management traffic. Each LAN
-device port is placed in a one-port bridge, and each bridge is enslaved to a
-different Linux VRF:
+The gateway reserves `wan` for upstream and management traffic. VRF objects
+own their routing table, packet mark, bridge, and one or more selected LAN
+interfaces. The factory configuration assigns one interface to each VRF:
 
 | Device | Bridge | VRF | Table | Mark |
 | --- | --- | --- | --- | --- |
-| `lan1` | `br-vrf-lan1` | `vrf-lan1` | 1001 | `0x101` |
-| `lan2` | `br-vrf-lan2` | `vrf-lan2` | 1002 | `0x102` |
-| `lan3` | `br-vrf-lan3` | `vrf-lan3` | 1003 | `0x103` |
-| `lan4` | `br-vrf-lan4` | `vrf-lan4` | 1004 | `0x104` |
+| `lan1` | `br-vrf1` | `vrf-vrf1` | 1001 | `0x101` |
+| `lan2` | `br-vrf2` | `vrf-vrf2` | 1002 | `0x102` |
+| `lan3` | `br-vrf3` | `vrf-vrf3` | 1003 | `0x103` |
+| `lan4` | `br-vrf4` | `vrf-vrf4` | 1004 | `0x104` |
 
-One-port bridges preserve an FDB and allow later MAC admission controls while
-keeping the four Layer-2 domains isolated. A subnet and gateway address may be
-reused across VRFs. Devices sharing one VRF must still use unique addresses.
+VRF bridges preserve an FDB and allow MAC admission controls. An interface can
+be reassigned but cannot belong to two VRFs; `wan` is never a VRF member. A
+subnet and gateway address may be reused across VRFs. Devices sharing one VRF
+must still use unique addresses.
 
 The image uses the standalone `misectel,7621evb` device tree for a 256 MiB DDR3
 and 16 MiB SPI NOR design. The RAM device is rated for a 933 MHz clock; U-Boot
@@ -25,10 +26,10 @@ external `maxim,ds3231` at address `0x68`; physical wiring remains a hardware
 validation prerequisite.
 
 Hardware port tracing defines the user-facing order independently of the SoC
-enumeration. MT7530 port 0 is `lan4`; ports 1, 2, and 3 are `lan1`, `lan2`, and
-`lan3`; the separate `gmac1`/internal PHY 4 interface is the actual `wan`.
-This keeps all four device-facing ports on the DSA switch and reserves the
-independent Ethernet path for upstream traffic.
+enumeration. MT7530 port 0 is the actual `wan`; ports 1, 2, and 3 are `lan1`,
+`lan2`, and `lan3`; the separate `gmac1`/internal PHY 4 interface is `lan4`.
+The VRF manager reserves `wan` for upstream traffic and assigns LAN interfaces
+to VRFs independently of this physical enumeration.
 
 The NOR layout follows the metadata convention used by Misectel MT7981 boards:
 
@@ -79,9 +80,10 @@ WAN address. They are not installed as hundreds of local `/32` aliases, so the
 gateway does not need to synthesize ARP replies for every translated host.
 
 The manager owns a dedicated nftables table. A small firewall4 include admits
-only traffic carrying a valid manager mark; firewall4 continues to protect the
-management plane. WAN masquerading and flow offload are disabled to prevent a
-second translation or bypass of VRF policy routing.
+outbound traffic from dynamically named VRF masters and inbound connections
+that the manager DNATed; firewall4 continues to protect the management plane.
+WAN masquerading and flow offload are disabled to prevent a second translation
+or bypass of VRF policy routing.
 
 ## Control Plane
 

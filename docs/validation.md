@@ -18,10 +18,10 @@
   ubus/LuCI, MAC actions, event filters, SNMPv3 AES-256, standard MIB objects,
   Traps, LLDP topology/Syslog, storm counters and ping response. Latency is
   measured once without policers and once with an enabled policy.
-- The built kernel DTB labels MT7530 port 0 as `lan4`, ports 1-3 as
-  `lan1`-`lan3`, and `gmac1`/PHY4 as the actual `wan`. The manager package
-  contains VRF manager v10 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
-  `0x101`-`0x104`, and the port and subnet-NAT migration scripts.
+- The built kernel DTB must label MT7530 port 0 as the actual `wan`, ports 1-3
+  as `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The manager package must contain
+  API/UCI schema v4 with independent VRF objects and interface membership; no
+  pre-release configuration migration scripts are installed.
 - The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
   explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
   factory state. Static validator tests cover valid subnet mappings, unequal

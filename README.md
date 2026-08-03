@@ -17,8 +17,8 @@ selection remain observable and deterministic. Performance measurements are
 reported but are not release gates.
 
 The target is `misectel_7621evb`, with 256 MiB DDR3 SDRAM and 16 MiB SPI NOR.
-Its Ethernet layout exposes MT7530 port 0 as LAN4, ports 1-3 as LAN1-3, and the
-separate `gmac1`/PHY4 interface as the actual WAN.
+Its Ethernet layout exposes MT7530 port 0 as the actual WAN, ports 1-3 as
+LAN1-3, and the separate `gmac1`/PHY4 interface as LAN4.
 Its flash map preserves dedicated `woem` and `ledeinfo` partitions following
 the Misectel MT7981 convention, and adds VRF/bridge modules plus support for an
 externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,
@@ -49,6 +49,8 @@ administratively enabled WAN/LAN links, and HTTP to HTTPS management
 redirection with TLS 1.2 and TLS 1.3. The exact tested scope and remaining
 LAN3/LAN4, UDP, routed-prefix, rollback, certificate provisioning, and
 performance gaps are recorded in the validation document.
+The new API/UCI v4 interface-membership model and corrected WAN/LAN4 labels
+supersede that release-10 image and require a new build and hardware regression.
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.

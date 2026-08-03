@@ -35,14 +35,14 @@
 | DEC-016 | NOR metadata | Preserve 64 KiB `woem` and 64 KiB `ledeinfo` partitions following the Misectel MT7981 convention |
 | DEC-017 | DDR controller | Use U-Boot's supported DDR3-1200 profile (600 MHz clock), within the 933 MHz component rating; hardware training remains unverified |
 | DEC-018 | Programmer image | Exactly 16 MiB; production composition requires a unique unicast base MAC and supports per-device Factory/WOEM/LEDEINFO blobs |
-| DEC-019 | Ethernet port order | MT7530 port 0 is LAN4; MT7530 ports 1-3 are LAN1-3; the separate `gmac1`/PHY4 interface is the actual WAN |
+| DEC-019 | Ethernet port order | MT7530 port 0 is WAN; MT7530 ports 1-3 are LAN1-3; the separate `gmac1`/PHY4 interface is LAN4 |
 | DEC-020 | Subnet NAT delivery | Equal-length IPv4 prefixes preserve host bits; the upstream router routes each external prefix through the gateway WAN address |
 
 ## Milestone 1: VRF NAT Vertical Slice
 
 | ID | Requirement | Acceptance | Status |
 | --- | --- | --- | --- |
-| NAT-001 | Four isolated device domains | `lan1` through `lan4` use independent VRF routing tables | LAN1/LAN2 simultaneous hardware traffic verified; LAN3/LAN4 pending |
+| NAT-001 | Four isolated device domains | Factory defaults assign `lan1` through `lan4` to independent VRFs; membership is editable and one interface cannot belong to two VRFs | API/UCI v4 implemented; new firmware hardware regression pending |
 | NAT-002 | Overlapping IPv4 networks | The same internal address works concurrently on different VRFs | LAN1/LAN2 duplicate-address isolation verified on hardware |
 | NAT-003 | Bidirectional 1:1 NAT | New inbound and outbound connections use the configured external address | implemented, traffic test pending |
 | NAT-004 | Static port-level 1:N | Non-overlapping TCP/UDP ranges on one external IP select different devices | implemented, traffic test pending |
