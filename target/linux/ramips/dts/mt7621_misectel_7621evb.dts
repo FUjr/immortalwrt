@@ -106,6 +106,8 @@
 
 &switch0 {
 	ports {
+		/delete-node/ port@4;
+
 		port@0 {
 			status = "okay";
 			label = "wan";
