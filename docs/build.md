@@ -36,6 +36,10 @@ newer change. The build script installs `misectel-switch-manager` and
 `luci-app-misectel-switch` from the linked `misectel` application feed before
 `defconfig`; this project does not use the `trim_recovery` feed.
 
+The in-tree `lldpd` package resolves its optional SNMP dependency explicitly
+to `libnetsnmp-ssl`. This prevents the default non-SSL provider and the SSL
+provider from being installed together when the gateway enables SNMPv3.
+
 To re-compose an already-built image without rebuilding:
 
 ```sh
