@@ -72,3 +72,16 @@ programmer="immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin"
 [ ! -f "$OUTPUT/$programmer" ] || set -- "$@" "$programmer"
 (cd "$OUTPUT" && sha256sum "$@") > \
 	"$OUTPUT/immortalwrt-ramips-mt7621-misectel_7621evb-artifacts.sha256"
+
+# U-Boot and programmer artifacts are composed after the OpenWrt image pass.
+# Refresh the directory-wide checksum index only after all artifacts exist.
+(
+	cd "$OUTPUT"
+	: > .sha256sums.tmp
+	for output_file in *; do
+		[ "$output_file" = sha256sums ] && continue
+		[ -f "$output_file" ] || continue
+		sha256sum "$output_file" >> .sha256sums.tmp
+	done
+	mv .sha256sums.tmp sha256sums
+)

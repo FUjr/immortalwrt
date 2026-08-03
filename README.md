@@ -37,7 +37,8 @@ SNMPv3 SHA-256/AES-256, and MIB-II/IF-MIB/EtherLike/LLDP-MIB queries.
 The build produces a standalone U-Boot and, when `BASE_MAC` is supplied, an
 exact 16 MiB programmer image with Factory, WOEM and LEDEINFO regions.
 The build also asserts the required MT7621 SPI and SPL LZMA options before
-publishing boot artifacts.
+publishing boot artifacts, then refreshes the target-wide `sha256sums` after
+the standalone U-Boot and programmer image have been composed.
 Build and hardware validation boundaries are recorded in
 [`docs/validation.md`](docs/validation.md).
 The minimum complete subnet-NAT isolation test uses three endpoint devices plus

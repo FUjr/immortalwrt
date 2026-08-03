@@ -30,8 +30,9 @@
 - The programmer image is exactly 16 MiB. Byte comparison confirms U-Boot at
   `0x000000`, the base MAC at `0x04E000`, erased WOEM at `0x050000`, erased
   LEDEINFO at `0x060000`, and an exact sysupgrade payload at `0x070000`.
-- Both the OpenWrt target checksum list and the dedicated artifact checksum
-  list pass `sha256sum -c`.
+- After composing the standalone U-Boot and programmer image, the build script
+  refreshes the OpenWrt target checksum list. Both that list and the dedicated
+  artifact checksum list pass `sha256sum -c`.
 
 ## Verified On Hardware
 
