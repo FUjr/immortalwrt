@@ -182,7 +182,7 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 | NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | 用户允许不作为门禁，仍需专项压测 |
 | NAT | ALG 报文穿透 | 兴奋需求 | 2 | 基础 conntrack helper 可用，完整 ALG 管理/协议验收待补 |
 | DHCP | WAN DHCP Client | 基本需求 | 1 | WAN Network 页面支持 |
-| DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 1 | API/UI v6 每 VRF独立地址池、网关、1-2个 DNS 和静态租约；实机报文验收待补 |
+| DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 1 | API/UI v6 每 VRF独立地址池、网关、1-2个 DNS 和静态租约；VRF2/LAN2 实机静态租约已验证 |
 | ACL | MAC/IP/子网过滤 | 期望需求 | 1 | firewall4 与端口安全后端 |
 | ACL | TCP/UDP、ICMP、IGMP 过滤 | 期望需求 | 1 | nftables/firewall4 |
 | ACL | Time Range | 期望需求 | 2 | 专用页面和模板待开发 |

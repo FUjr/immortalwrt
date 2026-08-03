@@ -51,7 +51,7 @@
 | NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | HTTPS validate/apply/confirm and reboot persistence verified; timeout and explicit rollback pending |
 | NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | HTTPS API and Playwright desktop/mobile page flow verified |
 | NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | two-VRF duplicate-address ICMP/TCP and source translation verified; routed-prefix delivery pending |
-| DHCP-002 | Per-VRF lightweight DHCP | Each VRF can independently distribute IPv4 address, mask, gateway and up to two DNS servers, with static MAC/address reservations | API/UCI v6, LuCI and BusyBox udhcpd runtime implemented; target traffic test pending |
+| DHCP-002 | Per-VRF lightweight DHCP | Each VRF can independently distribute IPv4 address, mask, gateway and up to two DNS servers, with static MAC/address reservations | verified on VRF2/LAN2 with USB0 client static lease, gateway, DNS and reload recovery |
 | SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | verified on device |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | self-signed device certificate and both TLS versions verified; production certificate provisioning pending |
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | verified |

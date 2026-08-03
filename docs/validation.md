@@ -25,8 +25,8 @@
 - The build seed enables BusyBox `udhcpd`. Static checks cover DHCP pool bounds,
   DNS count, duplicate static reservations, firewall input admission, generated
   runtime configuration, process status, and closing the rc.common lock in each
-  background DHCP child. Dynamic and static lease exchange remain target
-  traffic tests until recorded below.
+  background DHCP child. Each server must run in its `ip vrf exec` context and
+  firewall input must match the `vrf-*` master rather than its bridge.
 - The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
   explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
   factory state. Static validator tests cover valid subnet mappings, unequal
@@ -41,6 +41,13 @@
 
 ## Verified On Hardware
 
+- VRF DHCP release 19 ran each BusyBox server in its matching `ip vrf exec`
+  context and admitted requests on the `vrf-*` input interface. The USB0
+  client on LAN2 received static lease `192.168.10.50/24`, gateway
+  `192.168.10.1`, DNS `10.96.210.1`, and lease time 43200 seconds. Server logs
+  recorded Offer and ACK. Two consecutive manager reloads completed in 14
+  seconds total, both DHCP instances returned to running state, and neither
+  child retained rc.common descriptor 1000.
 - Sysupgrade completed despite the existing JFFS2 busy-inode warning. SPL
   loaded the main U-Boot from NOR, U-Boot verified and decompressed the kernel,
   and Linux detected 256 MiB DDR3 and the 16 MiB SPI NOR partition map.
