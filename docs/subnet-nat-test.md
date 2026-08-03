@@ -43,3 +43,20 @@ gateway mappings:
 4. ICMP, TCP, UDP, return traffic, counters, configuration confirmation, and
    timeout rollback all work.
 5. The two identical internal addresses remain isolated from each other.
+
+## 2026-08-03 Smoke Result
+
+The available single internal OpenWrt device was physically linked through the
+interface reported by its kernel as `lan1`, although the test setup described
+the socket as WAN. Two addresses, `192.168.10.101` and `.102`, exercised the
+LAN1 mapping `192.168.10.100/30` to `10.96.210.244/30`.
+
+The WAN test host could not install a route without elevated privileges, so
+`10.96.210.245/32` and `.246/32` were added temporarily to the gateway only to
+provide ARP for this direct-L2 smoke test. This does not validate the production
+requirement that an upstream router route the whole external prefix.
+
+Both addresses passed continuous bidirectional ICMP and HTTP/TCP tests with
+zero observed loss and approximately 1 ms mean ICMP latency. UDP was not tested
+because the endpoint BusyBox `nc` lacks UDP mode. LAN2 duplicate-address
+isolation, routed-prefix delivery, rollback, and performance remain pending.

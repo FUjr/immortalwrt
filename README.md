@@ -32,6 +32,11 @@ Build and hardware validation boundaries are recorded in
 [`docs/validation.md`](docs/validation.md).
 The minimum complete subnet-NAT isolation test uses three endpoint devices plus
 the gateway; see [`docs/subnet-nat-test.md`](docs/subnet-nat-test.md).
+Manager release 7 has been exercised on the target with persistent per-packet
+VRF marks, bidirectional prefix NAT, restart recovery, idempotent package
+upgrade defaults, and administratively enabled WAN/LAN links. The exact tested
+scope and remaining multi-VRF, UDP, routing, rollback, and performance gaps are
+recorded in the validation document.
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.

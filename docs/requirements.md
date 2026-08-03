@@ -50,13 +50,13 @@
 | NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | implemented, hardware traffic test pending |
 | NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | implemented, device test pending |
 | NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | implemented, device test pending |
-| NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | implemented, hardware traffic test pending |
-| SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | implemented, device test pending |
+| NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | single-VRF two-address ICMP/TCP smoke verified; routed-prefix and multi-VRF isolation pending |
+| SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | verified on device |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | planned |
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | verified |
-| SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | verified |
+| SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | build and device boot verified |
 | SYS-004 | Programmer artifact | Reproducibly compose and checksum an exact 16 MiB full-flash image without overwriting partition boundaries | verified |
-| SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | deferred |
+| SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot ping downtime measured at 38.67 seconds; target not met |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
 
 ## Basic Product Requirements After Milestone 1
