@@ -46,10 +46,13 @@ The base MAC is stored at Factory offset `0xE000`; WAN derives the following
 address. A production programmer image must therefore contain per-device
 Factory data rather than a shared blank or example Factory partition.
 
-The image integrates `misectel-vrf-manager` and `luci-app-misectel-vrf` from
-the independent local feed. `luci-ssl-openssl` supplies the HTTPS management
-endpoint. The tracked build seed selects only this device profile; profile
-dependencies own the minimal runtime package set.
+The image integrates `misectel-vrf-manager`, `luci-app-misectel-vrf`, and
+`luci-app-misectel-network` from the independent local feed.
+`luci-ssl-openssl` supplies the HTTPS management endpoint. netifd owns
+`network.wan`; the VRF manager reads its live subnet, gateway and primary IPv4,
+then restores per-mapping `/32` aliases, routing tables and NAT after WAN
+hotplug events. The tracked build seed selects only this device profile;
+profile dependencies own the minimal runtime package set.
 
 The same feed provides `misectel-switch-manager` and
 `luci-app-misectel-switch`. The manager owns fixed-port administrative and PHY
@@ -87,10 +90,12 @@ or bypass of VRF policy routing.
 
 ## Control Plane
 
-`misectel-vrf-manager` is a procd-managed C service. It validates UCI, builds
-network state atomically, exposes ubus methods, records counters and errors, and
-reconciles after link/firewall changes. Configuration is persistent UCI; runtime
-state is held in RAM. No database is used.
+`misectel-vrf-manager` combines a procd-managed apply service with an rpcd
+ucode API. It validates UCI, builds network state atomically, exposes ubus
+methods and reconciles after WAN/firewall changes. `get_status` reads the raw
+VRF-member carrier, operstate and speed because LAN1-LAN4 are outside netifd
+ownership. Configuration is persistent UCI; runtime state is held in RAM. No
+database is used.
 
 A configuration transaction stores one last-known-good backup, applies the new
 state, and waits 90 seconds for confirmation. A timeout or reboot with an

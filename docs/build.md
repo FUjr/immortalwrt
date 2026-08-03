@@ -50,7 +50,7 @@ To re-compose an already-built image without rebuilding:
   --output bin/targets/ramips/mt7621/immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin
 ```
 
-The profile contains HTTPS LuCI, the Misectel theme/dashboard, the VRF NAT
-manager and UI, VRF/bridge support, and DS3231 RTC support. It deliberately
+The profile contains HTTPS LuCI, the Misectel theme/dashboard, the netifd WAN
+page, the VRF NAT manager and UI, VRF/bridge support, and DS3231 RTC support. It deliberately
 does not include hardware or software flow offload. Performance results are
 reported separately and are not build acceptance gates.

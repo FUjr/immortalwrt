@@ -12,6 +12,7 @@ cd "$ROOT"
 ./scripts/feeds update -i misectel
 ./scripts/feeds install -p misectel misectel-vrf-manager luci-app-misectel-vrf \
 	misectel-switch-manager luci-app-misectel-switch luci-app-misectel-dashboard \
+	luci-app-misectel-network \
 	luci-base-misectel luci-theme-misectel
 ./scripts/feeds install -p luci luci-ssl-openssl
 cp "$SEED" .config

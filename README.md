@@ -50,8 +50,11 @@ administratively enabled WAN/LAN links, and HTTP to HTTPS management
 redirection with TLS 1.2 and TLS 1.3. The exact tested scope and remaining
 LAN3/LAN4, UDP, routed-prefix, rollback, certificate provisioning, and
 performance gaps are recorded in the validation document.
-The new API/UCI v4 interface-membership model and corrected WAN/LAN4 labels
-supersede that release-10 image and require a new build and hardware regression.
+API/UCI v5 keeps editable VRF/interface membership while moving WAN protocol,
+address, gateway, DNS and link ownership to `network.wan`/netifd. The gateway
+homepage reads WAN state from netifd and member carrier/speed from the VRF
+runtime API. Core Web workflows and screenshots are documented in
+[`docs/delivery-report.md`](docs/delivery-report.md).
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.
