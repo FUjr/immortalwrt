@@ -44,7 +44,7 @@ gateway mappings:
    timeout rollback all work.
 5. The two identical internal addresses remain isolated from each other.
 
-## 2026-08-03 Smoke Result
+## 2026-08-03 Single-VRF Smoke Result
 
 The available single internal OpenWrt device was physically linked through the
 interface reported by its kernel as `lan1`, although the test setup described
@@ -59,4 +59,41 @@ requirement that an upstream router route the whole external prefix.
 Both addresses passed continuous bidirectional ICMP and HTTP/TCP tests with
 zero observed loss and approximately 1 ms mean ICMP latency. UDP was not tested
 because the endpoint BusyBox `nc` lacks UDP mode. LAN2 duplicate-address
-isolation, routed-prefix delivery, rollback, and performance remain pending.
+isolation, routed-prefix delivery, rollback, and performance remained pending
+at that stage.
+
+## 2026-08-03 Dual-VRF Result
+
+Two independent OpenWrt endpoints were connected to gateway LAN1 and LAN2.
+The first endpoint had carrier on its kernel `lan1` and used `br-lan`; the
+second endpoint's panel socket described as WAN had carrier on kernel `lan5`,
+not its separate `wan` interface. Both endpoints were assigned exactly
+`192.168.10.101/24` with gateway `192.168.10.1`.
+
+The gateway applied and confirmed this candidate through authenticated HTTPS
+ubus:
+
+| VRF | Internal prefix | External prefix | Exercised address |
+| --- | --- | --- | --- |
+| LAN1 | `192.168.10.100/30` | `10.96.210.212/30` | `10.96.210.213` |
+| LAN2 | `192.168.10.100/30` | `10.96.210.216/30` | `10.96.210.217` |
+
+Because the WAN test host could not add routes, `.213/32` and `.217/32` were
+again temporary gateway aliases for direct-L2 ARP only. They do not replace
+the required production upstream routes for the two complete external
+prefixes.
+
+Each VRF reached its own `192.168.10.101`, and the two neighbor entries had
+different endpoint MAC addresses. Inbound HTTP through `.213` returned
+`LAN1_ENDPOINT`; inbound HTTP through `.217` returned `LAN2_ENDPOINT`.
+The host web log recorded LAN1- and LAN2-originated requests with sources
+`.213` and `.217`, proving independent outbound prefix SNAT for the identical
+internal source address. Both directions passed ICMP without observed loss.
+LAN1 mean latency was approximately 1.05 ms inbound and 1.27 ms outbound;
+LAN2 mean latency was approximately 11.73 ms inbound and 11.84 ms outbound.
+
+The transaction API accepted the object candidate, returned a pending token,
+and confirmed it. Reboot preserved both VRFs and mappings. WAN ping recovery
+took 53 seconds and LAN1 link negotiation completed later. UDP, actual routed
+external prefixes, timeout/explicit rollback, LAN3/LAN4, and throughput/PPS
+remain pending.

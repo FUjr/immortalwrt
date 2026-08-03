@@ -12,8 +12,8 @@
   contains `kmod-vrf`, `misectel-vrf-manager`, `luci-app-misectel-vrf`, and the
   Misectel theme.
 - The built kernel DTB labels MT7530 port 0 as `wan`, ports 1-3 as
-  `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The root filesystem contains VRF
-  manager v8 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
+  `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The manager package contains VRF
+  manager v10 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
   `0x101`-`0x104`, and the port and subnet-NAT migration scripts.
 - The built root filesystem contains equal-prefix subnet DNAT/SNAT rules and
   explicitly brings `wan` and `lan1`-`lan4` administratively up in the safe
@@ -51,14 +51,37 @@
   configured self-signed uHTTPd certificate, redirected HTTP with status 307,
   and served the management page over HTTPS with status 200. Explicit TLS 1.2
   and TLS 1.3 connections both succeeded.
+- Manager v9 accepted a complete candidate object through authenticated HTTPS
+  ubus. A valid two-VRF candidate passed validation, apply returned a pending
+  token, confirm made it durable, and an empty object reached manager
+  validation and returned field-specific errors instead of an rpcd argument
+  error.
+- LAN1 and LAN2 simultaneously used `192.168.10.101`. The gateway learned that
+  address as MAC `00:0c:43:26:60:31` in VRF table 1001 and MAC
+  `02:76:21:00:00:01` in table 1002. WAN-side HTTP to `10.96.210.213` and
+  `.217` returned `LAN1_ENDPOINT` and `LAN2_ENDPOINT` respectively. Host HTTP
+  logs showed outbound requests translated to those same distinct addresses.
+  ICMP in both directions had zero observed loss. LAN1 means were about
+  1.05-1.27 ms; LAN2 means were about 11.73-11.84 ms, so latency performance
+  was not met on the second test endpoint.
+- The two mapping mark counters advanced on continuation packets while their
+  stateful DNAT/SNAT counters advanced per flow. This confirms independent
+  per-packet VRF selection and first-flow translation for both prefixes.
+- Manager v10 corrected a deliberately reproduced split state from
+  `setup_complete=1` and wizard `completed=0` to `1/1` during package upgrade.
+  The unauthenticated setup RPC then returned 403 and the HTTP/HTTPS management
+  rules remained deduplicated. After reboot, release 10, the confirmed two-VRF
+  configuration, and both completion flags persisted. WAN ping returned after
+  53 seconds; LAN1 link negotiation completed later, so the 30-second startup
+  target remains unmet.
 
 ## Hardware Validation Pending
 
 - Extended DDR stress, programmer erase/write/readback, and cold power-cycle
   repetition.
-- LAN2-LAN4 traffic, two-VRF duplicate-address isolation, routed external
-  prefixes through an upstream router, host 1:1 NAT, port mapping, and NAPT.
-- UDP, configuration confirmation and timeout rollback, production HTTPS
+- LAN3-LAN4 traffic, routed external prefixes through an upstream router, host
+  1:1 NAT, port mapping, and NAPT.
+- UDP, timeout and explicit rollback, browser-side LuCI submission, production HTTPS
   certificate provisioning and trust, throughput, PPS, CPU load, and sustained
   latency tests.
 - I2C wiring and DS3231 detection; the current boot log reports RTC probe error

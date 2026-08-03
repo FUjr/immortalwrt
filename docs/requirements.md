@@ -42,21 +42,21 @@
 
 | ID | Requirement | Acceptance | Status |
 | --- | --- | --- | --- |
-| NAT-001 | Four isolated device domains | `lan1` through `lan4` use independent VRF routing tables | implemented, hardware traffic test pending |
-| NAT-002 | Overlapping IPv4 networks | The same internal address works concurrently on different VRFs | implemented, hardware pending |
+| NAT-001 | Four isolated device domains | `lan1` through `lan4` use independent VRF routing tables | LAN1/LAN2 simultaneous hardware traffic verified; LAN3/LAN4 pending |
+| NAT-002 | Overlapping IPv4 networks | The same internal address works concurrently on different VRFs | LAN1/LAN2 duplicate-address isolation verified on hardware |
 | NAT-003 | Bidirectional 1:1 NAT | New inbound and outbound connections use the configured external address | implemented, traffic test pending |
 | NAT-004 | Static port-level 1:N | Non-overlapping TCP/UDP ranges on one external IP select different devices | implemented, traffic test pending |
 | NAT-005 | NAPT internet access | Unmapped device sources use the WAN management address | implemented, traffic test pending |
 | NAT-006 | Mapping capacity | 64 enabled or disabled mapping entries can be stored and applied | implemented, hardware traffic test pending |
-| NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | implemented, device test pending |
-| NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | implemented, device test pending |
-| NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | single-VRF two-address ICMP/TCP smoke verified; routed-prefix and multi-VRF isolation pending |
+| NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | HTTPS validate/apply/confirm and reboot persistence verified; timeout and explicit rollback pending |
+| NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | HTTPS JSON-RPC object validation/apply/confirm verified; browser submission pending |
+| NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | two-VRF duplicate-address ICMP/TCP and source translation verified; routed-prefix delivery pending |
 | SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | verified on device |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | self-signed device certificate and both TLS versions verified; production certificate provisioning pending |
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | verified |
 | SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | build and device boot verified |
 | SYS-004 | Programmer artifact | Reproducibly compose and checksum an exact 16 MiB full-flash image without overwriting partition boundaries | verified |
-| SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot ping downtime measured at 38.67 seconds; target not met |
+| SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot recovery measured at 38.67 and 53 seconds; target not met |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
 
 ## Basic Product Requirements After Milestone 1
