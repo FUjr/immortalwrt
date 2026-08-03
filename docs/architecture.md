@@ -50,6 +50,19 @@ the independent local feed. `luci-ssl-openssl` supplies the HTTPS management
 endpoint. The tracked build seed selects only this device profile; profile
 dependencies own the minimal runtime package set.
 
+The same feed provides `misectel-switch-manager` and
+`luci-app-misectel-switch`. The manager owns fixed-port administrative and PHY
+settings, optional tc rate/storm policies, passive sysfs/FDB sampling, bounded
+RAM events, SNMP configuration and LLDP AgentX integration. LuCI and NMS use
+the versioned `misectel.switch` ubus object; secrets are redacted on reads and
+the complete configuration is validated before apply. Runtime data stays
+under `/tmp/misectel-switch`.
+
+Passive monitoring never adds nftables or tc hooks. A qdisc is installed only
+on a port whose ingress, egress, or storm limit is nonzero. This preserves the
+default forwarding path, while enabled policing still requires target latency
+measurement.
+
 ## Packet Processing
 
 Inbound WAN rules mark packets before routing and then apply DNAT. An `ip rule`

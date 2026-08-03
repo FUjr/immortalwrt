@@ -805,9 +805,10 @@ define Device/misectel_7621evb
   DEVICE_VARIANT := VRF NAT Gateway
   DEVICE_DTS := mt7621_misectel_7621evb
   IMAGE_SIZE := 15936k
-  DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
+	DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
 	kmod-rtc-ds1307 luci-ssl-openssl luci-base-misectel \
-	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-vrf
+	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-vrf \
+	misectel-switch-manager luci-app-misectel-switch
 endef
 TARGET_DEVICES += misectel_7621evb
 

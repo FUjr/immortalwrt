@@ -59,6 +59,32 @@
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot recovery measured at 38.67 and 53 seconds; target not met |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
 
+## Milestone 2: Switch Operations and Security
+
+The following 17 expected requirements are implemented in source and included
+in the device profile. Their status remains `implemented` until the new image
+is exercised on the target; build or API checks alone are not hardware proof.
+
+| ID | Requirement | Implementation | Status |
+| --- | --- | --- | --- |
+| PSEC-004 | Per-port learned MAC limit | 1-64 entries with alert or administrative shutdown | implemented |
+| PSEC-005 | New MAC notification | Bounded local event/syslog and optional SNMP Trap | implemented |
+| SNMP-005 | Operational Traps | Link, CPU, port error, traffic and security events | implemented |
+| SNMP-006 | Standard MIB set | RFC1213/MIB-II, IF-MIB, EtherLike-MIB and LLDP-MIB through AgentX | implemented |
+| SNMP-007 | Strong SNMPv3 | SHA-256/384/512 authentication and AES-128/256 privacy | implemented |
+| PORT-005 | PHY configuration | Speed, duplex and RX/TX flow control | implemented |
+| PORT-006 | Port operations | Rate limit, administrative state and runtime status | implemented |
+| LLDP-005 | Topology view | Local node plus discovered LLDP neighbor graph | implemented |
+| LLDP-006 | LLDP reporting | AgentX LLDP-MIB plus topology-change Syslog snapshot | implemented |
+| NETSEC-007 | Storm suppression | Explicit per-port broadcast/multicast ingress policer | implemented |
+| NETSEC-008 | Default-path latency | Passive polling has no forwarding hook; enabled policers require measurement | implemented |
+| NETSEC-009 | Ping response | Configurable IPv4 ICMP echo response | implemented |
+| ALARM-007 | Link notification | Link Up/Down local event, Syslog and optional standard Trap | implemented |
+| ALARM-008 | Traffic threshold alerts | Utilization, broadcast and multicast thresholds | implemented |
+| ALARM-009 | Ethernet error detection | CRC, length/giant and drop deltas with counters/events | implemented |
+| DIAG-004 | Fast log search | Time, type, keyword and pagination filters | implemented |
+| DIAG-005 | Port security trace | Illegal MAC, overflow, shutdown and unblock event trail | implemented |
+
 ## Basic Product Requirements After Milestone 1
 
 - `L2-001..007`: at least 1K observable MAC entries, static and dynamic MAC

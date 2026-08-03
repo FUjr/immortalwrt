@@ -11,7 +11,8 @@ cd "$ROOT"
 
 ./scripts/feeds update -i trim_recovery
 ./scripts/feeds install -p trim_recovery misectel-vrf-manager luci-app-misectel-vrf \
-	luci-app-misectel-dashboard luci-base-misectel luci-theme-misectel
+	misectel-switch-manager luci-app-misectel-switch luci-app-misectel-dashboard \
+	luci-base-misectel luci-theme-misectel
 ./scripts/feeds install -p luci luci-ssl-openssl
 cp "$SEED" .config
 make defconfig

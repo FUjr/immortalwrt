@@ -24,6 +24,12 @@ the Misectel MT7981 convention, and adds VRF/bridge modules plus support for an
 externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,
 the Misectel theme, and the dedicated VRF NAT manager and application. Use
 `scripts/build-misectel-7621evb.sh` for a size-checked reproducible build.
+The current switch-operations release also includes a Misectel LuCI frontend
+and backend for fixed-port state/rate/flow control, MAC security, passive
+performance and error monitoring, searchable volatile events, SNMPv3
+SHA-256/AES-256, standard MIBs and Traps, LLDP topology, storm suppression,
+and configurable ping response. Monitoring does not install forwarding hooks;
+rate and storm policers are present only when explicitly configured.
 The build produces a standalone U-Boot and, when `BASE_MAC` is supplied, an
 exact 16 MiB programmer image with Factory, WOEM and LEDEINFO regions.
 The build also asserts the required MT7621 SPI and SPL LZMA options before

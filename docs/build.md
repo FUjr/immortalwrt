@@ -29,6 +29,12 @@ Factory/WOEM calibration data supplied by manufacturing.
 The generated `misectel_7621evb-artifacts.sha256` file covers the standalone
 U-Boot, sysupgrade image, and programmer image using relative filenames.
 
+The switch operations image requires `CONFIG_LLDPD_WITH_JSON=y` and
+`CONFIG_LLDPD_WITH_SNMP=y`. The linked packages feed must contain commit
+`e3c12d9` (Net-SNMP AES-256 and EtherLike `dot3StatsTable`) or an equivalent
+newer change. The build script installs `misectel-switch-manager` and
+`luci-app-misectel-switch` from the linked application feed before `defconfig`.
+
 To re-compose an already-built image without rebuilding:
 
 ```sh

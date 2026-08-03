@@ -11,6 +11,13 @@
 - The sysupgrade image is below the 15936 KiB firmware limit and its manifest
   contains `kmod-vrf`, `misectel-vrf-manager`, `luci-app-misectel-vrf`, and the
   Misectel theme.
+- Switch operations validation additionally requires the manifest to contain
+  `misectel-switch-manager`, `luci-app-misectel-switch`, `lldpd`, `snmpd-ssl`,
+  `snmp-utils-ssl`, `snmp-mibs`, `ethtool-full`, and `tc-full`. Static checks
+  must run both application-feed check scripts. Hardware validation must cover
+  ubus/LuCI, MAC actions, event filters, SNMPv3 AES-256, standard MIB objects,
+  Traps, LLDP topology/Syslog, storm counters and ping response. Latency is
+  measured once without policers and once with an enabled policy.
 - The built kernel DTB labels MT7530 port 0 as `wan`, ports 1-3 as
   `lan1`-`lan3`, and `gmac1`/PHY4 as `lan4`. The manager package contains VRF
   manager v10 with API/UCI schema v3, fixed tables `1001`-`1004`, marks
