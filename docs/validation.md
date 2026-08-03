@@ -117,6 +117,17 @@
   `192.168.1.1/24`, `ip_forward=0`, no runtime VRF/bridge devices, and no port
   8080 listener. Both `sysupgrade -n` operations intentionally leave the root
   password unset for first-run provisioning.
+- A later live configuration set gateway WAN to `10.96.210.253/24`, upstream
+  gateway to `10.96.210.1`, and enabled all four default VRFs. USB0 was placed
+  behind `vrf2` on LAN2 with WAN `192.168.10.101/24`, default route
+  `192.168.10.1`, and a unique test MAC. Host mapping `10.96.210.252` to
+  `vrf2/192.168.10.101` passed four-packet ICMP in both directions with zero
+  loss; HTTP returned the expected 307 HTTPS redirect and HTTPS returned 200.
+- Live nftables counters exposed the member bridge during prerouting and the
+  `vrf-vrf2` master during forward/postrouting. Manager release 13 retains
+  VRF-master matching at those later hooks and fixes fallback NAPT generation
+  so rules are emitted before the SNAT chain is assembled. The temporary debug
+  counters were removed by the final firewall reload.
 - SNMPv3 authPriv queries using SHA-256 and AES-256 returned system and IF-MIB
   data. EtherLike `dot3StatsTable` returned the switch interface indices, and
   the LLDP-MIB local system description returned `ImmortalWrt`. SNMP test
