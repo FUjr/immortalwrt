@@ -30,6 +30,10 @@ performance and error monitoring, searchable volatile events, SNMPv3
 SHA-256/AES-256, standard MIBs and Traps, LLDP topology, storm suppression,
 and configurable ping response. Monitoring does not install forwarding hooks;
 rate and storm policers are present only when explicitly configured.
+Switch manager release 11 has been exercised on the target with live MAC-table
+queries, structured rejection of malformed API candidates, software ingress
+and egress policing, multicast storm suppression, searchable security events,
+SNMPv3 SHA-256/AES-256, and MIB-II/IF-MIB/EtherLike/LLDP-MIB queries.
 The build produces a standalone U-Boot and, when `BASE_MAC` is supplied, an
 exact 16 MiB programmer image with Factory, WOEM and LEDEINFO regions.
 The build also asserts the required MT7621 SPI and SPL LZMA options before

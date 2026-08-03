@@ -4,13 +4,23 @@
 
 - Host HTTP server: `/var/www/html`, TCP port 80; host and gateway WAN share one
   Layer-2 segment.
-- Gateway console: `/dev/ttyCH343USB5`, 115200 8N1.
-- LAN simulator A: `/dev/ttyCH343USB4`, 115200 8N1; its WAN connects to a
+- Gateway console observed at the end of the run: `/dev/ttyCH343USB1`, 115200
+  8N1.
+- LAN simulator A: `/dev/ttyCH343USB5`, 115200 8N1; its WAN connects to a
   gateway LAN port and can hold multiple IPv4 addresses.
 - LAN simulator B: `/dev/ttyCH343USB0`, 115200 8N1; same role on another
-  gateway LAN port and currently uses the same firmware family as the gateway.
+  gateway LAN port and runs older MT7621 firmware with a `lan5` interface.
+- `/dev/ttyCH343USB4` did not answer during the final enumeration.
 - Credentials are supplied out of band for each run and must not be stored in
   scripts, command transcripts, artifacts, or this repository.
+
+The initially supplied mapping was USB5 for the gateway, USB4 for simulator A,
+and USB0 for simulator B. During the final 2026-08-03 regression the devices
+re-enumerated to the mapping above. The gateway and the older simulator report
+the same device-tree model and hostname family, so model alone is not a
+sufficient identity check. Also compare firmware revision, uptime, the
+presence of `vrf-lan1`/`vrf-lan2`, and the exact interface set before changing
+state.
 
 Serial numbering and device configuration may change. Before every run,
 enumerate all `/dev/ttyCH343USB*`, open each console at 115200 8N1, and verify

@@ -81,6 +81,32 @@
   configuration, and both completion flags persisted. WAN ping returned after
   53 seconds; LAN1 link negotiation completed later, so the 30-second startup
   target remains unmet.
+- Switch manager release 11 and the final release image were validated on the
+  gateway after identifying it by revision, uptime, VRF devices and interface
+  set. `get_macs` returned the real LAN1 MAC and the distinct LAN2 simulator
+  MAC. An incomplete `validate_config` candidate returned `valid: false` with
+  field-specific errors; release 10 had instead raised an ubus unknown error.
+- The final kernel loaded `cls_flower` and `act_police`. A temporary LAN3 test
+  installed a 1 Mbit TBF, multicast-destination flower policer and matchall
+  ingress policer. `tc -s` reported all three rules, and restoring the settings
+  to zero removed them. Ping response was restored enabled, SNMP was disabled,
+  and test SNMP authentication/privacy values were absent after the run.
+- A temporary allowed-MAC mismatch and a two-address MAC limit generated
+  searchable critical security events while the alert action left LAN1 up.
+  New-MAC logging recorded the real LAN1 endpoint. Port administrative state,
+  ping-response toggling, event type filtering, API password redaction and
+  HTTPS status 200 were also exercised and restored.
+- SNMPv3 authPriv queries using SHA-256 and AES-256 returned system and IF-MIB
+  data. EtherLike `dot3StatsTable` returned the switch interface indices, and
+  the LLDP-MIB local system description returned `ImmortalWrt`. SNMP test
+  credentials and generated runtime configuration were removed afterward.
+- The final sysupgrade image is 11,731,514 bytes with SHA-256
+  `17e96eff89afdcb1e105096c5e11fc7bb6b99a6772ed83a299aeb95af03f8384`.
+  The target downloaded the exact file and `sysupgrade -T` accepted it. The
+  16 MiB programmer image SHA-256 is
+  `cbefe0bd4a3911d1df99765c150197278c61ec8187d290cf7fad9b62527622cd`;
+  standalone U-Boot remains
+  `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654`.
 
 ## Hardware Validation Pending
 
@@ -91,6 +117,9 @@
 - UDP, timeout and explicit rollback, browser-side LuCI submission, production HTTPS
   certificate provisioning and trust, throughput, PPS, CPU load, and sustained
   latency tests.
+- LLDP neighbor/topology rendering and LLDP-change Syslog with real neighbors;
+  neither connected simulator currently runs an LLDP daemon. Browser screenshot
+  validation is also pending because the test host has no Chromium/Playwright.
 - I2C wiring and DS3231 detection; the current boot log reports RTC probe error
   `-145`.
 
