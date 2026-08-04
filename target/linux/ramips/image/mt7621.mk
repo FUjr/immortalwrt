@@ -809,7 +809,8 @@ define Device/misectel_7621evb
 	kmod-rtc-ds1307 luci-ssl-openssl luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
 	luci-app-misectel-vrf luci-app-misectel-system \
-	misectel-switch-manager luci-app-misectel-switch
+	misectel-switch-manager luci-app-misectel-switch \
+	misectel-security-manager luci-app-misectel-security misectel-system-manager
 endef
 TARGET_DEVICES += misectel_7621evb
 

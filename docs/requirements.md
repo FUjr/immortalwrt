@@ -102,7 +102,8 @@ is exercised on the target; build or API checks alone are not hardware proof.
 - `TLS-001..004`: HTTP redirect, HTTPS, TLS 1.2/1.3, and secure upgrade,
   backup, and monitoring.
 - `LOG-001..003`: critical event logging, filtered export, RAM ring buffer, and
-  optional remote Syslog; TLS Syslog is a later capacity-gated item.
+  remote Syslog over TLS 1.2/1.3 with certificate validation and an exact
+  destination IPv4 whitelist.
 - `SNMP-001..004`: v1/v2c/v3 protocol support with Get/GetNext/Set/BulkGet;
   v1/v2c disabled by default; traps, MIB-II/IF-MIB/EtherLike-MIB/LLDP-MIB and
   advanced SNMPv3 algorithms are capability and capacity gated.
@@ -148,3 +149,7 @@ is exercised on the target; build or API checks alone are not hardware proof.
 - A feature that does not fit must be marked `unsupported` here and removed
   completely from code, packages, menus, and documentation for that image.
 - Hardware claims remain `deferred` until tested on the 7621EVB and wired DS3231.
+- NAT performance remains a measured, non-gating delivery result. The feed
+  provides raw-data/report tooling for 15Kpps, 100 Mbps forward/reverse and
+  sub-1 ms latency, requiring the gateway plus independent WAN and LAN test
+  endpoints.

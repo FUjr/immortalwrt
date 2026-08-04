@@ -136,15 +136,15 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 | MAC | 新 MAC 日志或 SNMP Trap | 期望需求 | 1 | 本地事件、Syslog、可选 Trap |
 | IP 地址 | Web 配置 IPv4、掩码、网关 | 基本需求 | 1 | WAN Network 页面由 netifd 管理 |
 | IP 地址 | NMS 配置 IPv4、掩码、网关 | 期望需求 | 1 | 认证 HTTPS ubus/UCI JSON-RPC |
-| IP 地址 | IP-MAC 静态绑定防 ARP 欺骗 | 期望需求 | 2 | 尚无完整 Web 工作流 |
+| IP 地址 | IP-MAC 静态绑定防 ARP 欺骗 | 期望需求 | 1 | VRF/端口感知的 Web/NMS 增删查改及防欺骗联动 |
 | IP 地址 | IPv4/IPv6 管理 ACL | 期望需求 | 1 | firewall4 页面和规则引擎 |
 | DNS | 解析 NTP 服务器域名 | 期望需求 | 1 | 系统解析器支持 |
 | DNS | 解析远程日志服务器域名 | 期望需求 | 1 | 系统解析器支持 |
 | DNS | 1-2 个静态 IPv4/IPv6 DNS | 期望需求 | 1 | WAN 页面支持列表 |
-| DNS | 域名访问管理页并绑定证书 | 期望需求 | 2 | 自签名 HTTPS 已有，域名证书待交付 |
+| DNS | 域名访问管理页并绑定证书 | 期望需求 | 1 | 客户 HTTPS 服务器证书链/私钥导入、状态、到期预警和回退已实现；实装待客户证书 |
 | DNS | 可配置 DNS 缓存 | 期望需求 | 1 | dnsmasq 配置能力 |
 | DNS | DDNS | 期望需求 | 2 | 本镜像未集成 DDNS 前端 |
-| 系统 WEB | HTTPS/SSH 加密和权限分级 | 基本需求 | 2 | HTTPS/SSH 已有，细粒度用户分级待开发 |
+| 系统 WEB | HTTPS/SSH 加密和权限分级 | 基本需求 | 1 | Web/NMS 管理员、运维、只读角色；SSH仍仅厂家root |
 | 系统 WEB | 登录认证/用户管理 | 基本需求 | 1 | 首次强制口令与 root 登录 |
 | 系统 WEB | 配置、日志导出 | 基本需求 | 1 | 系统备份和日志导出 |
 | 系统 WEB | 设备重启 | 基本需求 | 1 | LuCI 系统操作 |
@@ -160,7 +160,7 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 | HTTPS/TLS | HTTPS 升级、备份、监控 | 基本需求 | 1 | LuCI 管理面 |
 | 日志 | 记录关键事件 | 基本需求 | 1 | logd 与交换机事件环 |
 | 日志 | 日志导出 | 基本需求 | 1 | Web 检索和导出 |
-| 日志 | Syslog over TLS 和 IP 白名单 | 期望需求 | 2 | 普通远程 Syslog 已有，TLS/白名单待开发 |
+| 日志 | Syslog over TLS 和 IP 白名单 | 期望需求 | 1 | 轻量TLS 1.2/1.3转发、CA/名称校验、固定IPv4目标白名单，无明文降级 |
 | SNMP | v1/v2c/v3 Get/GetNext/Set/BulkGet | 基本需求 | 1 | Net-SNMP；v1/v2c 默认关闭 |
 | SNMP | Link/CPU/端口错误 Trap | 期望需求 | 1 | 后端已实现并实机检查配置 |
 | SNMP | RFC1213、EtherLike、IF、LLDP MIB | 期望需求 | 1 | SNMPv3 实机查询通过 |
@@ -185,32 +185,32 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 | LLDP | 网络拓扑图 | 期望需求 | 1 | 前后端已实现，真实邻居专项验收待补 |
 | LLDP | IEEE 802.1ab 第三方互通 | 期望需求 | 1 | lldpd 标准实现 |
 | LLDP | SNMP 或 Syslog 上报 | 期望需求 | 1 | LLDP-MIB/拓扑变更 Syslog |
-| ARP | 静态 ARP 配置 | 基本需求 | 2 | CLI 可用，专用 Web/NMS 接口待开发 |
-| ARP | ARP 表查询 | 基本需求 | 1 | 内核邻居表查询 |
-| ARP | 最多 1024 条静态 ARP | 基本需求 | 2 | 未完成容量和 Web 验收 |
-| ARP | ARP 老化时间 | 基本需求 | 2 | 尚无产品化页面 |
-| ARP | Proxy ARP | 基本需求 | 2 | 尚无产品化页面 |
+| ARP | 静态 ARP 配置 | 基本需求 | 1 | Web/NMS增删查改、UCI持久化和仅清理自有邻居 |
+| ARP | ARP 表查询 | 基本需求 | 1 | 分页查询内核邻居表，不阻塞转发路径 |
+| ARP | 最多 1024 条静态 ARP | 基本需求 | 1 | 后端/API/UI限制及可恢复满表工具已实现；实机重启容量数据待跑 |
+| ARP | ARP 老化时间 | 基本需求 | 1 | 专用页面配置30-86400秒及邻居容量阈值 |
+| ARP | Proxy ARP | 基本需求 | 1 | WAN/VRF逐接口启停、状态和持久化 |
 | 路由 | 静态路由不少于 64 条 | 基本需求 | 1 | LuCI/netifd 静态路由 |
 | NAT | 1:1、端口 1:N、NAT/NAPT、双向 | 基本需求 | 1 | VRF NAT API/UI v6 |
 | NAT | 映射表不少于 64 条 | 基本需求 | 1 | API 限制 64 条 |
-| NAT | 组播 NAT、SNAT | 基本需求 | 2 | SNAT 已实现；组播 NAT 尚未完成 |
-| NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | 用户允许不作为门禁，仍需专项压测 |
+| NAT | 组播 NAT、SNAT | 基本需求 | 1 | IPv4 UDP组地址双向静态转换和SNAT已实现；不含IPv6/动态IGMP建表 |
+| NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | 非发布门禁；原始数据和Markdown报告工具已交付，实机专项数据待跑 |
 | NAT | ALG 报文穿透 | 兴奋需求 | 2 | 基础 conntrack helper 可用，完整 ALG 管理/协议验收待补 |
 | DHCP | WAN DHCP Client | 基本需求 | 1 | WAN Network 页面支持 |
 | DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 1 | API/UI v6 每 VRF独立地址池、网关、1-2个 DNS 和静态租约；VRF2/LAN2 实机静态租约已验证 |
 | ACL | MAC/IP/子网过滤 | 期望需求 | 1 | firewall4 与端口安全后端 |
 | ACL | TCP/UDP、ICMP、IGMP 过滤 | 期望需求 | 1 | nftables/firewall4 |
 | ACL | Time Range | 期望需求 | 2 | 专用页面和模板待开发 |
-| ACL | Permit/Deny/物理端口 Redirect | 期望需求 | 2 | Permit/Deny 已有，物理口 Redirect 待开发 |
+| ACL | Permit/Deny/物理端口 Redirect | 期望需求 | 1 | 同一VRF不同物理口独占Redirect，支持IPv4/L4匹配并拒绝反向环路 |
 | ACL | 工业协议白名单模板 | 期望需求 | 2 | 尚未交付模板库 |
-| ACL | 动态 ARP 保护 | 期望需求 | 2 | 需与静态绑定联动开发 |
+| ACL | 动态 ARP 保护 | 期望需求 | 1 | IP-MAC绑定与ARP/IP源校验支持监控或阻断 |
 | ACL | 端口最大 MAC 数量 | 期望需求 | 1 | 已实现 1-64 |
 | 安全 MAC | 动态学习数量限制 | 期望需求 | 1 | 告警或行政关断 |
 | 安全 MAC | 静态端口/MAC 绑定 | 期望需求 | 1 | allowlist |
 | 安全 MAC | MAC 老化时间可调 | 期望需求 | 1 | 交换运维配置 |
 | 网络安全 | 广播/多播风暴抑制 | 期望需求 | 1 | 显式 tc ingress policer |
-| 网络安全 | DoS/DDoS 防护 | 基本需求 | 2 | 基础防火墙可用，产品化策略和压测待补 |
-| 网络安全 | ARP/DHCP 防御 | 期望需求 | 2 | 尚未完整交付 |
+| 网络安全 | DoS/DDoS 防护 | 基本需求 | 1 | 七类限速、监控/阻断页面及有界攻击验收工具；实机攻击报告待跑 |
+| 网络安全 | ARP/DHCP 防御 | 期望需求 | 1 | IP-MAC/ARP防欺骗及下联伪DHCP服务器阻断 |
 | 网络安全 | IEC 62443-4-2 Level 2 | 期望需求 | 0 | 仅可做差距分析，不声明认证 |
 | 网络安全 | 防御策略不增加延迟 | 期望需求 | 2 | 默认旁路不挂钩；启用 policer 后需测量 |
 | 网络安全 | IP Ping Response 可配 | 期望需求 | 1 | 前后端已验证 |

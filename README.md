@@ -30,6 +30,10 @@ performance and error monitoring, searchable volatile events, SNMPv3
 SHA-256/AES-256, standard MIBs and Traps, LLDP topology, storm suppression,
 and configurable ping response. Monitoring does not install forwarding hooks;
 rate and storm policers are present only when explicitly configured.
+The image also includes the VRF-aware static ARP/IP-MAC and Proxy ARP manager,
+seven-class DoS and ARP/DHCP guard policy, same-VRF physical-port Redirect,
+Web/NMS role management, lightweight Syslog over TLS with a target whitelist,
+and customer HTTPS server-certificate import and rollback.
 Switch manager release 11 has been exercised on the target with live MAC-table
 queries, structured rejection of malformed API candidates, software ingress
 and egress policing, multicast storm suppression, searchable security events,
