@@ -129,6 +129,10 @@
   `192.168.1.1/24`, `ip_forward=0`, no runtime VRF/bridge devices, and no port
   8080 listener. Both `sysupgrade -n` operations intentionally leave the root
   password unset for first-run provisioning.
+- Manager release 20 corrects the factory-WAN regression caused by the board
+  defaults creating `network.wan` as DHCP before the gateway defaults run. The
+  gateway defaults now rebuild WAN as static `192.168.1.1/24` whenever
+  `setup_complete=0`, but preserve the configured WAN after setup completion.
 - A later live configuration set gateway WAN to `10.96.210.253/24`, upstream
   gateway to `10.96.210.1`, and enabled all four default VRFs. USB0 was placed
   behind `vrf2` on LAN2 with WAN `192.168.10.101/24`, default route

@@ -21,7 +21,7 @@
 | DEC-002 | RTC | External DS3231 on the native I2C bus, address `0x68`; DTS implemented, wiring unverified |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
-| DEC-005 | Management | WAN-side management IP, factory default `192.168.1.1/24` |
+| DEC-005 | Management | WAN-side management IP, forced to static `192.168.1.1/24` until first-run setup completes; later upgrades preserve the configured WAN |
 | DEC-006 | NAT 1:N meaning | One external IP split by protocol/port ranges to multiple internal devices |
 | DEC-007 | IPv6 boundary | Management and ACL may be dual stack; VRF NAT is IPv4 only |
 | DEC-008 | Acceleration | Software and hardware flow offload disabled |

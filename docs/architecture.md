@@ -117,3 +117,7 @@ Factory state brings WAN and LAN1-LAN4 administratively up and uses
 HTTPS setup endpoint can only set the initial administrator password. Once setup
 is complete its unauthenticated RPC permission is permanently rejected. Normal
 configuration requires an authenticated ubus session and an explicit RPC ACL.
+The gateway default script replaces the board-generated DHCP WAN while setup is
+incomplete, so a reset device does not depend on an upstream DHCP server for
+management access. After setup completes, upgrades retain the selected WAN
+protocol and address.
