@@ -35,6 +35,9 @@ The switch operations image requires `CONFIG_LLDPD_WITH_JSON=y` and
 newer change. The build script installs `misectel-switch-manager` and
 `luci-app-misectel-switch` from the linked `misectel` application feed before
 `defconfig`; this project does not use the `trim_recovery` feed.
+The same clean-feed step installs `misectel-security-manager`,
+`luci-app-misectel-security`, and `misectel-system-manager`. The build rejects
+the output if any of these control-plane packages is absent from the manifest.
 
 The in-tree `lldpd` package resolves its optional SNMP dependency explicitly
 to `libnetsnmp-ssl`. This prevents the default non-SSL provider and the SSL

@@ -13,6 +13,7 @@ cd "$ROOT"
 ./scripts/feeds install -p misectel misectel-vrf-manager luci-app-misectel-vrf \
 	misectel-switch-manager luci-app-misectel-switch luci-app-misectel-dashboard \
 	luci-app-misectel-network luci-app-misectel-system misectel-fan-control \
+	misectel-security-manager luci-app-misectel-security misectel-system-manager \
 	luci-base-misectel luci-theme-misectel
 ./scripts/feeds install -p luci luci-ssl-openssl
 cp "$SEED" .config
@@ -38,6 +39,12 @@ grep -Eq '^luci-app-misectel-system - ' "$manifest" || {
 	echo 'Misectel Web upgrade package is missing from the image manifest' >&2
 	exit 1
 }
+for package in misectel-security-manager luci-app-misectel-security misectel-system-manager; do
+	grep -Eq "^${package} - " "$manifest" || {
+		echo "required gateway security package is missing from the image manifest: $package" >&2
+		exit 1
+	}
+done
 
 size="$(wc -c < "$image")"
 [ "$size" -le 16318464 ] || {
