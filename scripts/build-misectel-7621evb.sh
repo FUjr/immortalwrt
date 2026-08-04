@@ -12,7 +12,7 @@ cd "$ROOT"
 ./scripts/feeds update -i misectel
 ./scripts/feeds install -p misectel misectel-vrf-manager luci-app-misectel-vrf \
 	misectel-switch-manager luci-app-misectel-switch luci-app-misectel-dashboard \
-	luci-app-misectel-network \
+	luci-app-misectel-network luci-app-misectel-system misectel-fan-control \
 	luci-base-misectel luci-theme-misectel
 ./scripts/feeds install -p luci luci-ssl-openssl
 cp "$SEED" .config
@@ -26,6 +26,16 @@ env TMPDIR="$ROOT/tmp" make -j"$JOBS"
 image="$(find "$OUTPUT" -maxdepth 1 -type f -name '*misectel_7621evb-squashfs-sysupgrade.bin' -print -quit)"
 [ -n "$image" ] || {
 	echo '7621EVB NAT sysupgrade image was not produced' >&2
+	exit 1
+}
+
+manifest="$(find "$OUTPUT" -maxdepth 1 -type f -name '*misectel_7621evb.manifest' -print -quit)"
+[ -n "$manifest" ] || {
+	echo '7621EVB package manifest was not produced' >&2
+	exit 1
+}
+grep -Eq '^luci-app-misectel-system - ' "$manifest" || {
+	echo 'Misectel Web upgrade package is missing from the image manifest' >&2
 	exit 1
 }
 

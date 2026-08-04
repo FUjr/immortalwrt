@@ -808,7 +808,7 @@ define Device/misectel_7621evb
 	DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
 	kmod-rtc-ds1307 luci-ssl-openssl luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
-	luci-app-misectel-vrf \
+	luci-app-misectel-vrf luci-app-misectel-system \
 	misectel-switch-manager luci-app-misectel-switch
 endef
 TARGET_DEVICES += misectel_7621evb
