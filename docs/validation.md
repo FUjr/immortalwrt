@@ -207,6 +207,16 @@
   gateway, matched SHA-256, passed the device check and `sysupgrade --test`,
   then completed a preserving upgrade. After reboot the board reported
   `r0+37869-06929658b5` and `misectel,7621evb`.
+- Revision `r0+37872-7a55c977bf` integrates the static ARP/IP-MAC, Proxy ARP,
+  DoS/ARP-DHCP guard, physical Redirect, role-management, TLS Syslog and HTTPS
+  certificate managers. The 11,797,050-byte sysupgrade SHA-256 is
+  `c58d33a9ddf3c72d5b5449cb167521b2d67b25366fb5118fd2c4bdfd97ac36ad`;
+  the exact 16 MiB programmer SHA-256 is
+  `be5349b2b4adfae4f6d414668b4dab67ac1db933cd275c77d626e18abaea6ddf`.
+  The manifest contains all three new security packages, checksum manifests
+  pass, and the programmer payload at `0x070000` matches sysupgrade byte for
+  byte. This is build evidence; the hardware upgrade and feature tests are
+  recorded separately below when executed.
 
 ## Hardware Validation Pending
 

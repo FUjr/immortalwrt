@@ -20,10 +20,10 @@ Factory `0x040000-0x04ffff`、WOEM `0x050000-0x05ffff`、LEDEINFO
 | 文件 | 大小（字节） | SHA-256 |
 | --- | ---: | --- |
 | `immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin` | 194690 | `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `dc6f0e4dd147373b90729e87e645da7f6cba1ec2f39962ab3782970b876f8f0b` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `d666f7fa70df0456e730730b13ace2e481667197c51a26600134d6c0198f39c6` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `c58d33a9ddf3c72d5b5449cb167521b2d67b25366fb5118fd2c4bdfd97ac36ad` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `be5349b2b4adfae4f6d414668b4dab67ac1db933cd275c77d626e18abaea6ddf` |
 
-版本号为 `r0+37869-06929658b5`。压缩交付包内的 `SHA256SUMS` 可用于
+版本号为 `r0+37872-7a55c977bf`。压缩交付包内的 `SHA256SUMS` 可用于
 离线核验，写入或升级前必须先确认校验值一致。
 
 ## 2. 核心功能与操作指引
