@@ -191,6 +191,22 @@
   `4156c7a04e76159bde5e6145c9811989bfe3bca88d7aa4201130679cc3c709ba`;
   the 194,690-byte standalone U-Boot SHA-256 is
   `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654`.
+- Revision `r0+37869-06929658b5` adds the branded Web firmware upgrade package
+  to the device profile. Its 11,797,050-byte sysupgrade SHA-256 is
+  `dc6f0e4dd147373b90729e87e645da7f6cba1ec2f39962ab3782970b876f8f0b`;
+  the exact 16 MiB programmer image SHA-256 is
+  `d666f7fa70df0456e730730b13ace2e481667197c51a26600134d6c0198f39c6`.
+  The firmware payload embedded at programmer offset `0x070000` matches the
+  sysupgrade image byte for byte.
+- Playwright logged into the gateway over HTTPS, selected that exact image and
+  exercised the RAM upload and compatibility check without starting a second
+  write. The page displayed the expected SHA-256, device match, fwtool status,
+  preserve-settings control and confirmation action; it reported no page
+  errors or horizontal overflow. The uploaded temporary image was removed.
+- The same image had first been uploaded through the Web backend on the actual
+  gateway, matched SHA-256, passed the device check and `sysupgrade --test`,
+  then completed a preserving upgrade. After reboot the board reported
+  `r0+37869-06929658b5` and `misectel,7621evb`.
 
 ## Hardware Validation Pending
 

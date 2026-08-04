@@ -57,7 +57,7 @@
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | verified |
 | SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | build and device boot verified |
 | SYS-004 | Programmer artifact | Reproducibly compose and checksum an exact 16 MiB full-flash image without overwriting partition boundaries | verified |
-| SYS-005 | Web firmware upgrade | Authenticated `System > Upgrade` accepts a RAM upload, validates device compatibility, displays SHA-256, supports preserving settings, and requires confirmation before sysupgrade | implemented; browser and hardware verification pending |
+| SYS-005 | Web firmware upgrade | Authenticated `System > Upgrade` accepts a RAM upload, validates device compatibility, displays SHA-256, supports preserving settings, and requires confirmation before sysupgrade | verified with Playwright upload/validation and a preserving hardware upgrade |
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot recovery measured at 38.67 and 53 seconds; target not met |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
 

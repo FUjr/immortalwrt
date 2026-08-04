@@ -1,6 +1,6 @@
 # Misectel 7621EVB VRF NAT 网关交付报告
 
-交付日期：2026-08-03  
+交付日期：2026-08-04
 设备：`misectel,7621evb`，MT7621，256 MiB DDR3，16 MiB SPI NOR  
 软件路径：Linux 软件转发，不启用硬件或软件 flow offload
 
@@ -20,10 +20,10 @@ Factory `0x040000-0x04ffff`、WOEM `0x050000-0x05ffff`、LEDEINFO
 | 文件 | 大小（字节） | SHA-256 |
 | --- | ---: | --- |
 | `immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin` | 194690 | `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `9c658ebcb9d2192d3ba580cf2a6835cd425c852c68ee67db1368027591b4e7cb` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `4156c7a04e76159bde5e6145c9811989bfe3bca88d7aa4201130679cc3c709ba` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `dc6f0e4dd147373b90729e87e645da7f6cba1ec2f39962ab3782970b876f8f0b` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `d666f7fa70df0456e730730b13ace2e481667197c51a26600134d6c0198f39c6` |
 
-版本号为 `r0+37867-29ea152184`。压缩交付包内的 `SHA256SUMS` 可用于
+版本号为 `r0+37869-06929658b5`。压缩交付包内的 `SHA256SUMS` 可用于
 离线核验，写入或升级前必须先确认校验值一致。
 
 ## 2. 核心功能与操作指引
@@ -88,6 +88,11 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 不得断电。该入口不接受未通过设备兼容性校验的镜像，也不提供跳过校验的
 强制升级操作。
 
+下图为实际网关上传本次 sysupgrade 镜像后的校验结果。页面已确认设备
+型号匹配、fwtool 元数据可读，并显示与交付表一致的 SHA-256。
+
+![Web 固件上传与校验](assets/delivery/07-web-firmware-upgrade.png)
+
 ## 3. 实机与浏览器验证
 
 - WAN：`10.96.210.253/24`，默认网关 `10.96.210.1`。
@@ -107,6 +112,9 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
   `192.168.1.1`；临时测试映射已删除，VRF2 已恢复原配置。
 - 两台升级时均出现既有的 JFFS2 `Busy inodes after unmount` 警告，但后续
   固件写入、配置追加、重启和 overlay 恢复均成功；该警告未中断本次升级。
+- 本次 `r0+37869-06929658b5` 在实际网关通过 Web 入口上传，
+  页面显示设备匹配和 SHA-256 校验通过；Playwright 无 JavaScript
+  错误且无水平溢出。确认保留配置升级后，网关重新上线并报告该版本。
 
 ## 4. 需求实现矩阵
 
