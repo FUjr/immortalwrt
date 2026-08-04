@@ -20,10 +20,10 @@ Factory `0x040000-0x04ffff`、WOEM `0x050000-0x05ffff`、LEDEINFO
 | 文件 | 大小（字节） | SHA-256 |
 | --- | ---: | --- |
 | `immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin` | 194690 | `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `d564f18be597e68b23a867ac97a246118ea6b6e3aaeda61a9054f90e4d569c38` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `9c658ebcb9d2192d3ba580cf2a6835cd425c852c68ee67db1368027591b4e7cb` |
 | `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `4156c7a04e76159bde5e6145c9811989bfe3bca88d7aa4201130679cc3c709ba` |
 
-版本号为 `r0+37862-f8ff143f00`。压缩交付包内的 `SHA256SUMS` 可用于
+版本号为 `r0+37867-29ea152184`。压缩交付包内的 `SHA256SUMS` 可用于
 离线核验，写入或升级前必须先确认校验值一致。
 
 ## 2. 核心功能与操作指引
@@ -91,13 +91,12 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
   HTTP 穿透返回 307。
 - Playwright 验证 4 个 VRF、无蜂窝模组标签、桌面/移动端六张截图，页面
   JavaScript 错误为 0。
-- 最终 sysupgrade 镜像已分别在实际 VRF 网关和 USB0 下联 MT7621 上通过
-  SHA-256 与 `sysupgrade -T` 校验，并完成保留配置升级。两台设备均从 SPI
-  NOR 经过 SPL、主 U-Boot 进入 Linux，报告版本
-  `r0+37862-f8ff143f00`。
-- USB0 下联设备保留 `192.168.10.101/24` 和默认路由，并能经 VRF 网关访问
-  本机 `10.96.210.226`。实际网关保留 `.253` WAN、`.252/32` 映射别名、四个
-  VRF 及 table 1002 的 WAN 直连路由和默认路由。
+- release 20 sysupgrade 镜像已分别在实际 VRF 网关和 USB0 下联 MT7621
+  上通过 SHA-256、型号匹配和 `sysupgrade --test` 校验，并完成保留配置
+  升级。实际网关报告版本 `r0+37867-29ea152184`。
+- 实际网关在升级后保留 `10.96.210.253/24` WAN。USB0 在升级前为未完成
+  初始化的 DHCP WAN，升级重启后可从 VRF2 直接访问默认管理地址
+  `192.168.1.1`；临时测试映射已删除，VRF2 已恢复原配置。
 - 两台升级时均出现既有的 JFFS2 `Busy inodes after unmount` 警告，但后续
   固件写入、配置追加、重启和 overlay 恢复均成功；该警告未中断本次升级。
 

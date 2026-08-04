@@ -173,8 +173,20 @@
   data. EtherLike `dot3StatsTable` returned the switch interface indices, and
   the LLDP-MIB local system description returned `ImmortalWrt`. SNMP test
   credentials and generated runtime configuration were removed afterward.
-- The final sysupgrade image is 11,797,050 bytes with SHA-256
-  `d564f18be597e68b23a867ac97a246118ea6b6e3aaeda61a9054f90e4d569c38`.
+- Manager release 20 image `r0+37867-29ea152184` was uploaded through the
+  authenticated LuCI firmware path to both boards. Device matching and
+  `sysupgrade --test` passed, and the uploaded 11,797,050-byte copies matched
+  SHA-256 `9c658ebcb9d2192d3ba580cf2a6835cd425c852c68ee67db1368027591b4e7cb`.
+  The configured gateway completed a preserving upgrade and retained
+  `setup_complete=1` and WAN `10.96.210.253/24`.
+- Before its preserving upgrade, the USB0 endpoint reported
+  `setup_complete=0` with a DHCP WAN. After reboot, a direct ping from VRF2
+  reached `192.168.1.1` three times with zero loss, proving that release 20
+  replaced the DHCP section with the factory static management address. The
+  temporary VRF2 prefix and `10.96.210.252` mapping used for this check were
+  removed; VRF2 was restored to `192.168.10.1/24` with DHCP enabled and no
+  pending transaction. Serial devices were not enumerated during this run, so
+  the USB0 post-upgrade revision was not read from its console.
   The 16 MiB programmer image SHA-256 is
   `4156c7a04e76159bde5e6145c9811989bfe3bca88d7aa4201130679cc3c709ba`;
   the 194,690-byte standalone U-Boot SHA-256 is

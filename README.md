@@ -56,6 +56,10 @@ address, gateway, DNS and link ownership with `network.wan`/netifd. The gateway
 homepage reads WAN state from netifd and member carrier/speed from the VRF
 runtime API. Core Web workflows and screenshots are documented in
 [`docs/delivery-report.md`](docs/delivery-report.md).
+Before first-run setup completes, the gateway overrides the board-generated
+DHCP WAN with static `192.168.1.1/24`, so management login does not require an
+upstream DHCP server. Upgrades preserve the selected WAN configuration after
+setup completion.
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.
