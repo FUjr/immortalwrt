@@ -18,7 +18,7 @@
 | ID | Decision | Value |
 | --- | --- | --- |
 | DEC-001 | Hardware | `misectel,7621evb`, MT7621, 2 Gbit (256 MiB) DDR3 SDRAM rated at 933 MHz, 16 MiB SPI NOR, 4 LAN device ports and 1 WAN |
-| DEC-002 | RTC | External DS3231 on the native I2C bus, address `0x68`; DTS implemented, wiring unverified |
+| DEC-002 | RTC | PCF85063AT on native I2C PF0_SDA/PF1_SCL, address `0x51`; DTS and kernel module enabled, hardware detection pending |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
 | DEC-005 | Management | WAN-side management IP, forced to static `192.168.1.1/24` until first-run setup completes; later upgrades preserve the configured WAN |
@@ -148,7 +148,7 @@ is exercised on the target; build or API checks alone are not hardware proof.
   profile limit, and pass SHA-256 manifest verification.
 - A feature that does not fit must be marked `unsupported` here and removed
   completely from code, packages, menus, and documentation for that image.
-- Hardware claims remain `deferred` until tested on the 7621EVB and wired DS3231.
+- Hardware claims remain `deferred` until tested on the 7621EVB, including PCF85063AT read/write and backup-power retention.
 - NAT performance remains a measured, non-gating delivery result. The feed
   provides raw-data/report tooling for 15Kpps, 100 Mbps forward/reverse and
   sub-1 ms latency, requiring the gateway plus independent WAN and LAN test

@@ -55,10 +55,11 @@ To re-compose an already-built image without rebuilding:
 
 The profile contains HTTPS LuCI, the Misectel theme/dashboard, the netifd WAN
 page, the VRF NAT manager and UI, the branded Web firmware upgrade page, the
-BusyBox `udhcpd` applet, VRF/bridge support, and DS3231 RTC support. It deliberately
-does not include hardware or software flow offload. Performance results are
-reported separately and are not build acceptance gates.
+BusyBox `udhcpd` applet, VRF/bridge support, and PCF85063AT RTC support. It
+deliberately does not include hardware or software flow offload. Performance
+results are reported separately and are not build acceptance gates.
 The build script stops before compilation if the expanded BusyBox configuration
 does not contain `CONFIG_BUSYBOX_CONFIG_UDHCPD=y`.
 It also rejects an image whose manifest omits `luci-app-misectel-system`, which
-owns the `System > Upgrade` entry.
+owns the `System > Upgrade` entry, or `kmod-rtc-pcf85063`, which provides the
+PCF85063AT driver.

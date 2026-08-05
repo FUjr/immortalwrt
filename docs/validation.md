@@ -257,6 +257,10 @@
   Gateway CPU busy averaged 15.82% and peaked at 45%. The strict 15K pps,
   100 Mbps and sub-1 ms requirements all failed; raw JSON and ping output are
   retained in the delivery archive.
+- After a clean ramips kernel rebuild, the 7621EVB DTB reports the native I2C
+  controller enabled and `nxp,pcf85063a` at address `0x51`. Kernel configuration
+  has `CONFIG_RTC_DRV_PCF85063=m`, `CONFIG_RTC_DRV_DS1307` disabled, and produced
+  both `rtc-pcf85063.ko` and the `kmod-rtc-pcf85063` APK with an autoload entry.
 
 ## Hardware Validation Pending
 
@@ -269,8 +273,9 @@
   policies enabled.
 - LLDP neighbor/topology rendering and LLDP-change Syslog with real neighbors;
   neither connected simulator currently runs an LLDP daemon.
-- I2C wiring and DS3231 detection; the current boot log reports RTC probe error
-  `-145`.
+- PCF85063AT detection at I2C address `0x51`, time read/write, reboot restore and
+  backup-power retention. The former DS3231 `0x68` probe and its `-145` error
+  were caused by an incorrect pre-hardware DTS assumption and have been removed.
 
 The first programmer image reached `U-Boot SPL` and printed
 `Trying to boot from NOR`, then stopped. Its generated defconfig had been

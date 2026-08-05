@@ -80,9 +80,9 @@
 &i2c {
 	status = "okay";
 
-	rtc@68 {
-		compatible = "maxim,ds3231";
-		reg = <0x68>;
+	rtc@51 {
+		compatible = "nxp,pcf85063a";
+		reg = <0x51>;
 	};
 };
 

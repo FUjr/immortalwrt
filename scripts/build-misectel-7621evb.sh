@@ -39,9 +39,10 @@ grep -Eq '^luci-app-misectel-system - ' "$manifest" || {
 	echo 'Misectel Web upgrade package is missing from the image manifest' >&2
 	exit 1
 }
-for package in misectel-security-manager luci-app-misectel-security misectel-system-manager kmod-sched; do
+for package in misectel-security-manager luci-app-misectel-security \
+	misectel-system-manager kmod-sched kmod-rtc-pcf85063; do
 	grep -Eq "^${package} - " "$manifest" || {
-		echo "required gateway security package is missing from the image manifest: $package" >&2
+		echo "required gateway package is missing from the image manifest: $package" >&2
 		exit 1
 	}
 done

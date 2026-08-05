@@ -187,6 +187,23 @@ endef
 
 $(eval $(call KernelPackage,rtc-pcf2127))
 
+define KernelPackage/rtc-pcf85063
+  SUBMENU:=$(RTC_MENU)
+  TITLE:=NXP PCF85063 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core +kmod-regmap-i2c
+  KCONFIG:=CONFIG_RTC_DRV_PCF85063 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-pcf85063.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-pcf85063)
+endef
+
+define KernelPackage/rtc-pcf85063/description
+ Kernel module for NXP PCF85063A/PCF85063TP compatible I2C RTC chips.
+endef
+
+$(eval $(call KernelPackage,rtc-pcf85063))
+
 define KernelPackage/rtc-r7301
   SUBMENU:=$(RTC_MENU)
   TITLE:=Epson RTC7301 support

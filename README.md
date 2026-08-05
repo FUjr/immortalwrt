@@ -21,7 +21,7 @@ Its Ethernet layout exposes MT7530 port 0 as the actual WAN, ports 1-3 as
 LAN1-3, and the separate `gmac1`/PHY4 interface as LAN4.
 Its flash map preserves dedicated `woem` and `ledeinfo` partitions following
 the Misectel MT7981 convention, and adds VRF/bridge modules plus support for an
-externally wired DS3231 RTC. Its first-milestone image includes HTTPS LuCI,
+externally wired PCF85063AT RTC. Its first-milestone image includes HTTPS LuCI,
 the Misectel theme, and the dedicated VRF NAT manager and application. Use
 `scripts/build-misectel-7621evb.sh` for a size-checked reproducible build.
 The current switch-operations release also includes a Misectel LuCI frontend
