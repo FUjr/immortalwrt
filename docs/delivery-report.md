@@ -231,9 +231,9 @@ WAN `10.96.210.253`。构建同时补齐 `kmod-sched`，正式镜像启动后自
 | 日志 | 记录关键事件 | 基本需求 | 1 | logd 与交换机事件环 |
 | 日志 | 日志导出 | 基本需求 | 1 | Web 检索和导出 |
 | 日志 | Syslog over TLS 和 IP 白名单 | 期望需求 | 1 | 轻量TLS 1.2/1.3转发、CA/名称校验、固定IPv4目标白名单，无明文降级 |
-| SNMP | v1/v2c/v3 Get/GetNext/Set/BulkGet | 基本需求 | 1 | Net-SNMP；v1/v2c 默认关闭 |
-| SNMP | Link/CPU/端口错误 Trap | 期望需求 | 1 | 后端已实现并实机检查配置 |
-| SNMP | RFC1213、EtherLike、IF、LLDP MIB | 期望需求 | 1 | SNMPv3 实机查询通过 |
+| SNMP | v1/v2c/v3 Get/GetNext/Set/BulkGet | 基本需求 | 2 | Get/GetNext/BulkGet实机通过；当前用户只读，SET返回`noAccess`，v1/v2c默认关闭 |
+| SNMP | Link/CPU/端口错误 Trap | 期望需求 | 1 | SNMPv3实机收到私有事件、端口错误和标准linkDown通知；真实拔线待窗口复测 |
+| SNMP | RFC1213、EtherLike、IF、LLDP MIB | 期望需求 | 1 | SNMPv3实机查询及真实LLDP邻居通过；私有MIB正式PEN待申请 |
 | SNMPv3 | SHA-256/AES-256 | 期望需求 | 1 | authPriv 实机查询通过，不声明 IEC 认证 |
 | NTP | 多 NTP 主备和自动切换 | 期望需求 | 1 | 系统 NTP 客户端多服务器 |
 | NTP | RTC 失联回退 | 期望需求 | 2 | PCF85063AT驱动和I2C `0x51`节点已生效，但两台实机均无ACK并返回`-145`；需检查供电、上拉、焊接和`I2C_SD`/`I2C_SCLK`走线 |
@@ -299,6 +299,9 @@ WAN `10.96.210.253`。构建同时补齐 `kmod-sched`，正式镜像启动后自
 - 性能目标不作为本次发布门禁；本轮基础 NAT 专项测试未达到 15K PPS、
   100 Mbps 和小于 1 ms 的门槛。启用防御策略后的延迟仍需单独测试。
 - 当前实机普通重启到 WAN Ping 恢复超过 30 秒。
+- SNMP MIB、查询和 Trap 的命令及实测结果见
+  [SNMP MIB 交付报告](snmp-mib-delivery-report.md)。当前 SNMP 用户为只读，
+  SET 尚未交付；私有 MIB 仍需取得正式 PEN 并修复解析警告。
 - PCF85063AT DTS 和内核模块已在两台实机加载，但 `0x51` 均无 I2C ACK，
   驱动报告 `RTC chip is not present` 和 `-145`。需检查供电、SDA/SCL 上拉、
   焊接以及 MT7621 `I2C_SD`/`I2C_SCLK` 到 RTC SDA/SCL 的实际走线；硬件

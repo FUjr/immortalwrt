@@ -106,7 +106,10 @@ is exercised on the target; build or API checks alone are not hardware proof.
   destination IPv4 whitelist.
 - `SNMP-001..004`: v1/v2c/v3 protocol support with Get/GetNext/Set/BulkGet;
   v1/v2c disabled by default; traps, MIB-II/IF-MIB/EtherLike-MIB/LLDP-MIB and
-  advanced SNMPv3 algorithms are capability and capacity gated.
+  advanced SNMPv3 algorithms are capability and capacity gated. Current
+  hardware validation passes Get/GetNext/BulkGet, while the read-only VACM
+  profile rejects Set with `noAccess`; writable objects and their authorization
+  model remain to be specified and implemented.
 - `TIME-001..006`: multiple NTP/SNTP IPv4 sources with failover, RTC fallback,
   optional authentication, and Web status containing lock state, offset, and
   active server.

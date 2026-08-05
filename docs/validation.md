@@ -283,6 +283,28 @@
   `192.168.10.1` with 2/2 replies. Temporary port-8080 service, nft rules and
   transfer/diagnostic files were removed afterward.
 
+## SNMP MIB Validation (2026-08-05)
+
+- Revision `r0+37877-52c94e7647` passed external SNMPv3 authPriv Get, GetNext,
+  and BulkGet with SHA-256/AES-256. MIB-II system objects, IF-MIB status and
+  64-bit counters, EtherLike indices/counters, and LLDP-MIB local/neighbor data
+  returned successfully.
+- The receiver decrypted the private event Trap and observed LLDP-change and
+  port-error events. A synthetic linkDown test selected the standard linkDown
+  notification OID and carried the private port/message fields; physical cable
+  removal remains pending.
+- A Set request for `sysLocation.0` returned `noAccess`, so the delivered VACM
+  profile is read-only and does not satisfy the customer's Set requirement.
+- The private symbols resolve to `.1.3.6.1.4.1.8072.9999`, but Net-SNMP warns
+  that `CONTACT-INFO` is missing. PEN 8072 belongs to Net-SNMP; a production PEN
+  and complete SMIv2 metadata remain required.
+- The test restored `misectel_switch`, `snmpd`, and firewall configuration,
+  removed temporary credentials and receiver state, and left SNMP disabled as
+  before the test. A live HTTPS RPC re-check confirmed revision, disabled agent,
+  threshold 90%, poll interval 5 seconds, and disabled Trap state.
+- Full commands, returned objects, component versions, and operational guidance
+  are in `docs/snmp-mib-delivery-report.md`.
+
 ## Hardware Validation Pending
 
 - Extended DDR stress, programmer erase/write/readback, and cold power-cycle
@@ -292,8 +314,8 @@
 - UDP timeout and explicit rollback, production HTTPS certificate provisioning
   and trust, sustained/long-duration performance, and latency with protection
   policies enabled.
-- LLDP neighbor/topology rendering and LLDP-change Syslog with real neighbors;
-  neither connected simulator currently runs an LLDP daemon.
+- LLDP topology rendering and LLDP-change Syslog with broader third-party
+  neighbors; the SNMP/MIB run validated one ImmortalWrt neighbor and LLDP Trap.
 - PCF85063AT detection at I2C address `0x51`, time read/write, reboot restore and
   backup-power retention. The former DS3231 `0x68` probe and its `-145` error
   were caused by an incorrect pre-hardware DTS assumption and have been removed.

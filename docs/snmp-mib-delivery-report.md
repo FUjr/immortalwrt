@@ -299,3 +299,5 @@ eventMessage  = "MIB delivery trap verification"
    本次 `snmpd`、AgentX、查询和 Trap 均正常，但正式验收不应保留不明错误。
 7. 增加真实网线 Link Up/Down、Trap 风暴抑制、长时间轮询、NMS 兼容性和
    重启后 EngineID/用户持久化专项测试。
+
+PEN 归属依据：[IANA Private Enterprise Numbers，8072](https://www.iana.org/assignments/enterprise-numbers/?page=81)。
