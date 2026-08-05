@@ -274,8 +274,9 @@
   controller runs at 100 kHz, and pinctrl assigns GPIO3/GPIO4 to the I2C group.
   Nevertheless, both probes report `RTC chip is not present` and error `-145`;
   an address-specific `i2cdetect` scan reports no ACK at `0x51`, so `/dev/rtc0`
-  is not created. Power, pull-ups, soldering and the PF0/PF1-to-GPIO3/GPIO4
-  schematic path require hardware inspection before further driver changes.
+  is not created. Power, pull-ups, soldering and the MT7621
+  `I2C_SD`/`I2C_SCLK`-to-RTC SDA/SCL schematic path require hardware inspection
+  before further driver changes.
 - Gateway WAN `10.96.210.253/24` survived the upgrade. The downstream board
   returned to factory WAN because setup is incomplete, then was restored to
   `192.168.10.101/24` with test MAC `02:76:21:00:00:02`; it reached VRF2 gateway

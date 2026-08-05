@@ -22,7 +22,8 @@ The image uses the standalone `misectel,7621evb` device tree for a 256 MiB DDR3
 and 16 MiB SPI NOR design. The RAM device is rated for a 933 MHz clock; U-Boot
 uses the MT7621-supported DDR3-1200 controller profile (600 MHz clock), which is
 within that component rating. The native I2C pin group is enabled for an
-external `nxp,pcf85063a` at address `0x51` on PF0_SDA/PF1_SCL; physical read,
+external `nxp,pcf85063a` at address `0x51` on MT7621 `I2C_SD`/`I2C_SCLK`
+(GPIO3/GPIO4); physical read,
 write and backup-power retention remain hardware validation prerequisites.
 
 Hardware port tracing defines the user-facing order independently of the SoC

@@ -18,7 +18,7 @@
 | ID | Decision | Value |
 | --- | --- | --- |
 | DEC-001 | Hardware | `misectel,7621evb`, MT7621, 2 Gbit (256 MiB) DDR3 SDRAM rated at 933 MHz, 16 MiB SPI NOR, 4 LAN device ports and 1 WAN |
-| DEC-002 | RTC | PCF85063AT on native I2C PF0_SDA/PF1_SCL, address `0x51`; DTS/module enabled, but both boards return no ACK and require hardware inspection |
+| DEC-002 | RTC | PCF85063AT on native `I2C_SD`/`I2C_SCLK` (GPIO3/GPIO4), address `0x51`; DTS/module enabled, but both boards return no ACK and require hardware inspection |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
 | DEC-005 | Management | WAN-side management IP, forced to static `192.168.1.1/24` until first-run setup completes; later upgrades preserve the configured WAN |
