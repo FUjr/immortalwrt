@@ -217,6 +217,20 @@
   pass, and the programmer payload at `0x070000` matches sysupgrade byte for
   byte. This is build evidence; the hardware upgrade and feature tests are
   recorded separately below when executed.
+- The same revision was booted on both currently connected boards (`ACM0` VRF
+  gateway and `ACM5` downstream board). Both report
+  `r0+37872-7a55c977bf`; `misectel.security` and `misectel.system` expose the
+  expected management methods on both images. The downstream image matched the
+  build SHA-256 and passed `sysupgrade -T` before writing.
+- The downstream upgrade logged the known JFFS2 `Busy inodes after unmount`
+  warning, continued through firmware write and booted the new revision. Its
+  temporary WAN address was not retained and was restored manually, so
+  configuration-preserving upgrade remains unaccepted.
+- With the duplicated development MAC isolated by a distinct runtime MAC on the
+  gateway LAN2/VRF2 bridge, the gateway reached `192.168.10.101` from
+  `vrf-vrf2` with 3/3 replies and 1.093 ms average RTT. The reverse path to the
+  host Web server did not complete; this run therefore does not close the NAPT
+  bidirectional hardware test.
 
 ## Hardware Validation Pending
 
