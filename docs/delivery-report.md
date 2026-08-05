@@ -20,10 +20,10 @@ Factory `0x040000-0x04ffff`、WOEM `0x050000-0x05ffff`、LEDEINFO
 | 文件 | 大小（字节） | SHA-256 |
 | --- | ---: | --- |
 | `immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin` | 194690 | `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11862586 | `b40d623a3c73765425da0d9c7c14218f94bf2850e939afb214adde644901de92` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `e5be7bf496e9fe4aaeaa4ee71a9ca22eb76dd591ab05c4eda96ff3a9e31b55e7` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11862586 | `e0c44cc7ae345db310a1b3d6c5c6c3c3f6463ee05304208b77a4647b83cc1603` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `69a152b92c63a8706e7e8a660a288126e6c2974555a6cf0fed7092dc3ef95dbe` |
 
-版本号为 `r0+37875-97f2ec324a`。压缩交付包内的 `SHA256SUMS` 可用于
+版本号为 `r0+37877-52c94e7647`。压缩交付包内的 `SHA256SUMS` 可用于
 离线核验，写入或升级前必须先确认校验值一致。
 
 ## 2. 核心功能与操作指引
@@ -104,10 +104,10 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
   HTTP 穿透返回 307。
 - Playwright 验证 4 个 VRF、无蜂窝模组标签、桌面/移动端六张截图，页面
   JavaScript 错误为 0。
-- 本次 sysupgrade 镜像已在实际 VRF 网关（当前串口 `ACM0`）和下联
+- 上一版 sysupgrade 镜像已在实际 VRF 网关（当前串口 `ACM0`）和下联
   MT7621（当前串口 `ACM5`）启动，两台均报告
-  `r0+37875-97f2ec324a`。下联设备在写入前通过了大小、SHA-256、
-  型号和 `sysupgrade -T` 校验。
+  `r0+37875-97f2ec324a`。本表所列 RTC 适配版已完成全量构建、大小、
+  SHA-256、型号和 manifest 校验，尚未刷入实机。
 - 网关保留 WAN `10.96.210.253/24`、VRF2 `192.168.10.1/24` 及 LAN2
   成员关系；下联设备重启后 WAN 回到出厂值，已按测试拓扑重配为
   `192.168.10.101/24`，并持久设置唯一测试 MAC `02:76:21:00:00:02`。

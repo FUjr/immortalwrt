@@ -261,6 +261,14 @@
   controller enabled and `nxp,pcf85063a` at address `0x51`. Kernel configuration
   has `CONFIG_RTC_DRV_PCF85063=m`, `CONFIG_RTC_DRV_DS1307` disabled, and produced
   both `rtc-pcf85063.ko` and the `kmod-rtc-pcf85063` APK with an autoload entry.
+- Full image revision `r0+37877-52c94e7647` contains that DTB and RTC package.
+  Its 11,862,586-byte sysupgrade SHA-256 is
+  `e0c44cc7ae345db310a1b3d6c5c6c3c3f6463ee05304208b77a4647b83cc1603`;
+  the exact 16 MiB programmer image SHA-256 is
+  `69a152b92c63a8706e7e8a660a288126e6c2974555a6cf0fed7092dc3ef95dbe`.
+  The running gateway downloaded the image, reproduced its SHA-256 and accepted
+  it with `sysupgrade -T`; no flash write was started. The image has not yet
+  been installed, so RTC detection and time retention remain pending.
 
 ## Hardware Validation Pending
 
