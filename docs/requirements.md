@@ -152,4 +152,6 @@ is exercised on the target; build or API checks alone are not hardware proof.
 - NAT performance remains a measured, non-gating delivery result. The feed
   provides raw-data/report tooling for 15Kpps, 100 Mbps forward/reverse and
   sub-1 ms latency, requiring the gateway plus independent WAN and LAN test
-  endpoints.
+  endpoints. The 2026-08-05 RTL8152 run measured 14998.02 pps, 92.85/93.20
+  Mbps forward/reverse and 2.673 ms average RTT, so all three strict targets
+  remain unmet; the raw results are included in the delivery archive.

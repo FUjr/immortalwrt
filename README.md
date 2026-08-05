@@ -60,6 +60,10 @@ address, gateway, DNS and link ownership with `network.wan`/netifd. The gateway
 homepage reads WAN state from netifd and member carrier/speed from the VRF
 runtime API. Core Web workflows and screenshots are documented in
 [`docs/delivery-report.md`](docs/delivery-report.md).
+The same report records the recoverable security-feature validation,
+bidirectional multicast NAT proof, and the RTL8152 performance run. The strict
+15Kpps, 100 Mbps and sub-1 ms performance targets were not met; raw test output
+is shipped with the delivery archive rather than treated as a release gate.
 The image includes the Misectel-styled `System > Upgrade` page for authenticated
 firmware upload, device compatibility validation, SHA-256 review, optional
 configuration preservation, confirmation, and automatic reconnect after

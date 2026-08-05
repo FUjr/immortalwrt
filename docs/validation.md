@@ -231,6 +231,32 @@
   `vrf-vrf2` with 3/3 replies and 1.093 ms average RTT. The reverse path to the
   host Web server did not complete; this run therefore does not close the NAPT
   bidirectional hardware test.
+- Revision `r0+37875-97f2ec324a` adds `kmod-sched` as an explicit multicast
+  NAT dependency. Its 11,862,586-byte sysupgrade SHA-256 is
+  `b40d623a3c73765425da0d9c7c14218f94bf2850e939afb214adde644901de92`;
+  the exact 16 MiB programmer image SHA-256 is
+  `e5be7bf496e9fe4aaeaa4ee71a9ca22eb76dd591ab05c4eda96ff3a9e31b55e7`.
+  The manifest contains manager release 22 and `kmod-sched`; the programmer
+  payload at `0x070000` matches sysupgrade byte for byte.
+- The formal image booted on both `ACM0` gateway and `ACM5` downstream board.
+  Both report the new revision and installed scheduler packages. The gateway
+  retained WAN `10.96.210.253/24`; the downstream board returned to factory WAN
+  and was restored to `192.168.10.101/24` with a unique persistent test MAC.
+  Both upgrades logged the known JFFS2 busy-inode warning but completed.
+- On the formal image, a temporary bidirectional multicast mapping installed
+  complete flower, pedit, checksum and mirred actions without manual module
+  loading. Earlier live packets proved WAN group `239.20.20.20` rewrites to
+  VRF1 group `239.10.10.10`, while the reverse direction rewrites the group and
+  SNAT source to `10.96.210.253`. Temporary mappings and filters were removed.
+- HTTPS feature validation passed static ARP/IP-MAC apply and paging, Proxy ARP,
+  DoS and ARP/DHCP monitor policies, redirect loop rejection, three roles,
+  password policy, TLS Syslog whitelist rejection and certificate state. The
+  script restored the complete security configuration afterward.
+- RTL8152 NAT testing measured 14,998.02 pps at 64-byte UDP with zero loss,
+  92.85 Mbps forward and 93.20 Mbps reverse UDP, and 2.673 ms average ICMP RTT.
+  Gateway CPU busy averaged 15.82% and peaked at 45%. The strict 15K pps,
+  100 Mbps and sub-1 ms requirements all failed; raw JSON and ping output are
+  retained in the delivery archive.
 
 ## Hardware Validation Pending
 
@@ -238,9 +264,9 @@
   repetition.
 - LAN3-LAN4 traffic, routed external prefixes through an upstream router, host
   1:1 NAT, port mapping, and NAPT.
-- UDP, timeout and explicit rollback, production HTTPS
-  certificate provisioning and trust, throughput, PPS, CPU load, and sustained
-  latency tests.
+- UDP timeout and explicit rollback, production HTTPS certificate provisioning
+  and trust, sustained/long-duration performance, and latency with protection
+  policies enabled.
 - LLDP neighbor/topology rendering and LLDP-change Syslog with real neighbors;
   neither connected simulator currently runs an LLDP daemon.
 - I2C wiring and DS3231 detection; the current boot log reports RTC probe error

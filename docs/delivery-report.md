@@ -20,10 +20,10 @@ Factory `0x040000-0x04ffff`、WOEM `0x050000-0x05ffff`、LEDEINFO
 | 文件 | 大小（字节） | SHA-256 |
 | --- | ---: | --- |
 | `immortalwrt-ramips-mt7621-misectel_7621evb-u-boot.bin` | 194690 | `5199a4aab34c3a383666992c749d706ecbf98e3d5a03e90252dc12a6061a8654` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11797050 | `c58d33a9ddf3c72d5b5449cb167521b2d67b25366fb5118fd2c4bdfd97ac36ad` |
-| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `be5349b2b4adfae4f6d414668b4dab67ac1db933cd275c77d626e18abaea6ddf` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-squashfs-sysupgrade.bin` | 11862586 | `b40d623a3c73765425da0d9c7c14218f94bf2850e939afb214adde644901de92` |
+| `immortalwrt-ramips-mt7621-misectel_7621evb-programmer.bin` | 16777216 | `e5be7bf496e9fe4aaeaa4ee71a9ca22eb76dd591ab05c4eda96ff3a9e31b55e7` |
 
-版本号为 `r0+37872-7a55c977bf`。压缩交付包内的 `SHA256SUMS` 可用于
+版本号为 `r0+37875-97f2ec324a`。压缩交付包内的 `SHA256SUMS` 可用于
 离线核验，写入或升级前必须先确认校验值一致。
 
 ## 2. 核心功能与操作指引
@@ -106,12 +106,12 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
   JavaScript 错误为 0。
 - 本次 sysupgrade 镜像已在实际 VRF 网关（当前串口 `ACM0`）和下联
   MT7621（当前串口 `ACM5`）启动，两台均报告
-  `r0+37872-7a55c977bf`。下联设备在写入前通过了大小、SHA-256、
+  `r0+37875-97f2ec324a`。下联设备在写入前通过了大小、SHA-256、
   型号和 `sysupgrade -T` 校验。
-- 网关已恢复 WAN `10.96.210.253/24`、VRF2 `192.168.10.1/24` 及 LAN2
-  成员关系；下联设备重启后临时 WAN 地址回到出厂值，已按测试拓扑
-  重配为 `192.168.10.101/24`。因此本轮验收不声明 sysupgrade 保留配置
-  已通过。
+- 网关保留 WAN `10.96.210.253/24`、VRF2 `192.168.10.1/24` 及 LAN2
+  成员关系；下联设备重启后 WAN 回到出厂值，已按测试拓扑重配为
+  `192.168.10.101/24`，并持久设置唯一测试 MAC `02:76:21:00:00:02`。
+  因此本轮验收不声明下联设备的 sysupgrade 保留配置已通过。
 - 下联升级时出现既有的 JFFS2 `Busy inodes after unmount` 警告，但后续
   写入完成并正常启动新版本；该警告未中断本次写入，但保留配置和
   overlay 稳定性仍需单独回归。
@@ -125,6 +125,42 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 - 本次 `r0+37869-06929658b5` 在实际网关通过 Web 入口上传，
   页面显示设备匹配和 SHA-256 校验通过；Playwright 无 JavaScript
   错误且无水平溢出。确认保留配置升级后，网关重新上线并报告该版本。
+
+### 3.1 新功能实现验证
+
+通过认证 HTTPS JSON-RPC 对安全功能做了可恢复实机验收：静态 ARP/IP-MAC
+绑定完成创建、应用、分页查询和运行时邻居计数；Proxy ARP 在 VRF1 启用并
+回读状态；DoS 与 ARP/DHCP 防护以 monitor 模式原子应用；同端口 Redirect
+环路被 HTTP 400 拒绝；管理员、运维、只读角色能力矩阵及短口令拒绝通过；
+TLS Syslog 对非白名单目标的拒绝和 HTTPS 证书有效期检查通过。测试结束后
+完整恢复安全配置。总体结果为 PASS；本轮不包含 1024 条满表和有界攻击流量。
+
+组播 NAT 在 WAN `239.20.20.20:5000` 与 VRF1
+`239.10.10.10:5000` 之间进行了双向实机验证。WAN 到 LAN1 的报文目的组被
+改写为内部组；LAN1 到 WAN 的报文目的组被改写为外部组，源地址被改写为
+WAN `10.96.210.253`。构建同时补齐 `kmod-sched`，正式镜像启动后自动加载
+`act_pedit`、`act_csum`，临时规则重启返回 0 且包含校验和、MAC/IP 改写和
+转发动作。测试规则随后已删除。
+
+### 3.2 NAT 性能测试
+
+测试路径为网关 WAN 与 LAN1/VRF1 之间的 1:1 NAT，LAN 端使用 RTL8152 USB
+网卡，物理链路协商为 100 Mbps Full Duplex。严格按需求门槛判定如下：
+
+| 指标 | 实测 | 目标 | 结果 |
+| --- | ---: | ---: | --- |
+| UDP 64 字节小包转发 | 14998.02 pps，0% 丢包 | 不少于 15000 pps | FAIL |
+| 正向 UDP 吞吐 | 92.85 Mbps，6.34% 丢包 | 不少于 100 Mbps | FAIL |
+| 反向 UDP 吞吐 | 93.20 Mbps，1.40% 丢包 | 不少于 100 Mbps | FAIL |
+| ICMP 平均时延 | 2.673 ms，0% 丢包 | 小于 1 ms | FAIL |
+| ICMP 最大时延 | 12.901 ms | 记录项 | INFO |
+| 网关 CPU busy | 平均 15.82%，最大 45% | 记录项 | INFO |
+
+总体结果为 FAIL。15K pps 仅差 1.98 pps，但仍按未达标记录。两端物理口均为
+100 Mbps，以应用层 UDP 负载统计时还包含以太网/IP/UDP 开销，因此无法把
+100 Mbps 线速全部计为有效载荷；这不改变客户门槛未通过的结论。原始
+`iperf3 --json`、Ping 输出及机器生成报告随交付包提供。首次反向并发测试的
+控制连接被重置，该错误原样保留；隔离重试成功并用于上表。
 
 ## 4. 需求实现矩阵
 
@@ -204,7 +240,7 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 | NAT | 1:1、端口 1:N、NAT/NAPT、双向 | 基本需求 | 1 | VRF NAT API/UI v6 |
 | NAT | 映射表不少于 64 条 | 基本需求 | 1 | API 限制 64 条 |
 | NAT | 组播 NAT、SNAT | 基本需求 | 1 | IPv4 UDP组地址双向静态转换和SNAT已实现；不含IPv6/动态IGMP建表 |
-| NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | 非发布门禁；原始数据和Markdown报告工具已交付，实机专项数据待跑 |
+| NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | RTL8152实测14998.02pps、正/反向92.85/93.20Mbps、平均2.673ms，严格判定未达标 |
 | NAT | ALG 报文穿透 | 兴奋需求 | 2 | 基础 conntrack helper 可用，完整 ALG 管理/协议验收待补 |
 | DHCP | WAN DHCP Client | 基本需求 | 1 | WAN Network 页面支持 |
 | DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 1 | API/UI v6 每 VRF独立地址池、网关、1-2个 DNS 和静态租约；VRF2/LAN2 实机静态租约已验证 |
@@ -236,11 +272,12 @@ WAN 直连网段或其他映射重叠。点击“Apply Configuration”后，在
 
 ## 5. 已知边界
 
-- 性能目标不作为本次发布门禁；未完成 15K PPS、持续 100 Mbps、CPU/丢包和
-  启用防御策略后的延迟测试。
+- 性能目标不作为本次发布门禁；本轮基础 NAT 专项测试未达到 15K PPS、
+  100 Mbps 和小于 1 ms 的门槛。启用防御策略后的延迟仍需单独测试。
 - 当前实机普通重启到 WAN Ping 恢复超过 30 秒。
 - RTC 实物线路未工作；NTP 可用但断网后的硬件时钟回退不能验收。
 - 编程器镜像中的测试 MAC 不能用于量产；Factory/WOEM/LEDEINFO 未提供的
   区域保持 `0xff`，量产必须写入每台设备的唯一数据。
-- 已完成两台设备的整包升级与热重启回归；保留配置未通过本轮
-  验收，仍需进行断电冷启动、编程器擦写/回读和长时间稳定性验收。
+- 已完成两台设备的整包升级与热重启回归；网关配置保留，下联配置回到
+  出厂值后重新设置，因此不声明下联保留配置通过。仍需进行断电冷启动、
+  编程器擦写/回读和长时间稳定性验收。
