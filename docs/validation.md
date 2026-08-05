@@ -266,9 +266,21 @@
   `e0c44cc7ae345db310a1b3d6c5c6c3c3f6463ee05304208b77a4647b83cc1603`;
   the exact 16 MiB programmer image SHA-256 is
   `69a152b92c63a8706e7e8a660a288126e6c2974555a6cf0fed7092dc3ef95dbe`.
-  The running gateway downloaded the image, reproduced its SHA-256 and accepted
-  it with `sysupgrade -T`; no flash write was started. The image has not yet
-  been installed, so RTC detection and time retention remain pending.
+  Both the gateway and downstream board downloaded the image, reproduced its
+  SHA-256, accepted it with `sysupgrade -T`, completed NOR write and booted the
+  new revision. The known JFFS2 busy-inode warning occurred but did not stop
+  either upgrade.
+- On both boards `kmod-rtc-pcf85063` and `rtc_pcf85063` are present, the native
+  controller runs at 100 kHz, and pinctrl assigns GPIO3/GPIO4 to the I2C group.
+  Nevertheless, both probes report `RTC chip is not present` and error `-145`;
+  an address-specific `i2cdetect` scan reports no ACK at `0x51`, so `/dev/rtc0`
+  is not created. Power, pull-ups, soldering and the PF0/PF1-to-GPIO3/GPIO4
+  schematic path require hardware inspection before further driver changes.
+- Gateway WAN `10.96.210.253/24` survived the upgrade. The downstream board
+  returned to factory WAN because setup is incomplete, then was restored to
+  `192.168.10.101/24` with test MAC `02:76:21:00:00:02`; it reached VRF2 gateway
+  `192.168.10.1` with 2/2 replies. Temporary port-8080 service, nft rules and
+  transfer/diagnostic files were removed afterward.
 
 ## Hardware Validation Pending
 
