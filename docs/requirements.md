@@ -159,3 +159,19 @@ is exercised on the target; build or API checks alone are not hardware proof.
   endpoints. The 2026-08-05 RTL8152 run measured 14998.02 pps, 92.85/93.20
   Mbps forward/reverse and 2.673 ms average RTT, so all three strict targets
   remain unmet; the raw results are included in the delivery archive.
+
+## Test Traceability
+
+`scripts/generate-requirements-testcases.mjs` converts every customer row in
+the delivery requirement matrix into one traceable case. It generates the
+following artifacts from the same source and rejects mismatched case IDs:
+
+- `docs/testcases/7621-nat-gateway-requirements-testcases.xmind`
+- `docs/testcases/7621-nat-gateway-requirements-testcases.md`
+- `docs/testcases/7621-nat-gateway-coverage.md`
+
+The 2026-08-06 baseline contains 100 requirements and 100 cases: design
+coverage is 100%, implementation coverage is 85%, and conservative explicit
+execution-evidence coverage is 15%. Design and implementation coverage must
+not be reported as test pass coverage; READY cases require evidence-producing
+execution before they can become PASS.

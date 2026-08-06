@@ -68,6 +68,10 @@ runtime API. Core Web workflows and screenshots are documented in
 SNMP MIB inventory, configuration examples, live OID/Trap evidence, and the
 current SET/PEN limitations are documented in
 [`docs/snmp-mib-delivery-report.md`](docs/snmp-mib-delivery-report.md).
+The requirement-traceable test suite is available as
+[`XMind`](docs/testcases/7621-nat-gateway-requirements-testcases.xmind) and
+[`Markdown`](docs/testcases/7621-nat-gateway-requirements-testcases.md), with a
+separate [`coverage report`](docs/testcases/7621-nat-gateway-coverage.md).
 The main delivery report records the recoverable security-feature validation,
 bidirectional multicast NAT proof, and the RTL8152 performance run. The strict
 15Kpps, 100 Mbps and sub-1 ms performance targets were not met; raw test output
