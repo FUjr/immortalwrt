@@ -60,6 +60,7 @@
 | SYS-005 | Web firmware upgrade | Authenticated `System > Upgrade` accepts a RAM upload, validates device compatibility, displays SHA-256, supports preserving settings, and requires confirmation before sysupgrade | verified with Playwright upload/validation and a preserving hardware upgrade |
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot recovery measured at 38.67 and 53 seconds; target not met |
 | PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | planned |
+| PERF-002 | Network and management CPU separation | Dynamically place the Ethernet IRQ on CPU1, RPS on CPU2, spread XPS queue selection across CPUs, and constrain low-priority switch/LLDP/SNMP monitoring to CPU3; restore settings after network reload | verified on hardware with switch manager release 13 |
 
 ## Milestone 2: Switch Operations and Security
 

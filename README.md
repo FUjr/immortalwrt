@@ -38,6 +38,11 @@ Switch manager release 11 has been exercised on the target with live MAC-table
 queries, structured rejection of malformed API candidates, software ingress
 and egress policing, multicast storm suppression, searchable security events,
 SNMPv3 SHA-256/AES-256, and MIB-II/IF-MIB/EtherLike/LLDP-MIB queries.
+Switch manager release 13 separates the MT7621 Ethernet IRQ, packet steering,
+and management monitoring workloads across logical CPUs. It restores IRQ,
+RPS, and XPS settings after service or network reload, starts the switch
+watcher on CPU3 at nice level 10, samples basic port counters every 10 seconds,
+and limits MAC-table and LLDP scans to one run every 30 seconds.
 The build produces a standalone U-Boot and, when `BASE_MAC` is supplied, an
 exact 16 MiB programmer image with Factory, WOEM and LEDEINFO regions.
 The build also asserts the required MT7621 SPI and SPL LZMA options before

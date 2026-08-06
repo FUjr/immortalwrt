@@ -41,6 +41,20 @@
 
 ## Verified On Hardware
 
+- Switch manager release 13 was installed on the attached gateway from a
+  checksum-matched APK (`4dcca769a022d9d6eef4cf9ab0feb3f33eaace667cc67209bb988ed26c88904d`).
+  The dynamically discovered Ethernet IRQ was 19 and its effective mask was
+  `2` (CPU1). Both `eth0` and `lan4` RX queues reported RPS mask `4` (CPU2),
+  while the first four TX queues reported XPS masks `1,2,4,8`, repeated across
+  the remaining queues. The switch watcher ran on CPU3 with nice level 10;
+  active `lldpd` processes were also constrained to CPU3. `snmpd` was disabled
+  by the retained product configuration, while the same tuning script covers
+  it whenever enabled.
+- After `/etc/init.d/network reload`, IRQ mask `2`, RPS mask `4`, XPS mask `1`,
+  and watcher CPU3 affinity remained in place. Basic WAN port state timestamps
+  advanced every 10-11 seconds. Consecutive MAC-table and LLDP timestamps
+  advanced by about 34 seconds, consistent with their independent 30-second
+  schedule plus collection time, rather than running on every port sample.
 - VRF DHCP release 19 ran each BusyBox server in its matching `ip vrf exec`
   context and admitted requests on the `vrf-*` input interface. The USB0
   client on LAN2 received static lease `192.168.10.50/24`, gateway
