@@ -265,23 +265,21 @@ function makeMarkdown(cases, summary) {
     `用例数量：${summary.total}；需求分类：${summary.categories}。`, '',
     '## 覆盖口径', '',
     `- 需求设计覆盖率：${summary.total}/${summary.total}（100.0%）。每条客户需求至少对应一个用例。`,
-    `- 当前实现覆盖率：${summary.implementation[1] || 0}/${summary.total}（${percent(summary.implementation[1] || 0, summary.total)}）。该指标来自交付矩阵状态，不代表测试通过。`,
-    `- 已有证据执行覆盖率：${summary.executed}/${summary.total}（${percent(summary.executed, summary.total)}）。仅统计交付矩阵明确写出实测、验证、失败、部分通过或硬件阻塞的条目。`,
-    `- 已有证据通过覆盖率：${summary.pass}/${summary.total}（${percent(summary.pass, summary.total)}）。READY 不计为 PASS。`, '',
-    '状态说明：PASS 已有通过证据；FAIL 已执行但未达需求；PARTIAL 部分通过；BLOCKED 已执行但被硬件阻塞；READY 已实现待完整回归；NOT_READY 待开发/专项验收；UNSUPPORTED 当前不交付。', '',
+    `- P0 基本需求设计覆盖率：${summary.priorities.P0 || 0}/${summary.kano['基本需求'] || 0}（${percent(summary.priorities.P0 || 0, summary.kano['基本需求'] || 0)}）。`,
+    '- 本文档面向外部测试执行方，只定义测试方法和预期结果，不包含产品实现状态、历史执行结果或通过率。', '',
     '## 公共要求', '',
     '1. 测试固件、配置和硬件拓扑必须记录版本、SHA-256、设备序列号和端口连接。',
     '2. 破坏性、升级、攻击、容量和恢复出厂测试必须先备份配置并安排业务窗口。',
-    '3. PASS 必须保存命令输出、抓包、日志、截图或机器生成报告；只有源码或页面存在时标记 READY。',
+    '3. 执行方应另行保存命令输出、抓包、日志、截图或机器生成报告，并在测试报告中记录判定。',
     '4. 每个用例执行后恢复临时账号、地址、路由、防火墙、SNMP、限速和测试服务。', ''
   ];
 
   for (const group of groups) {
     const items = cases.filter((item) => item.category === group);
-    lines.push(`## ${group}（${items.length}）`, '', '| ID | 用例名称 | 优先级 | 前置条件 | 操作步骤 | 预期结果 | 当前状态 |', '| --- | --- | --- | --- | --- | --- | --- |');
+    lines.push(`## ${group}（${items.length}）`, '', '| ID | 用例名称 | 优先级 | 前置条件 | 操作步骤 | 预期结果 |', '| --- | --- | --- | --- | --- | --- |');
     for (const item of items) {
       const steps = item.steps.map((step, i) => `${i + 1}. ${step}`).join('<br>');
-      lines.push(`| ${item.id} | ${escapeCell(item.requirement)} | ${item.priority} | ${escapeCell(item.precondition)} | ${escapeCell(steps)} | ${escapeCell(item.expected)} | ${item.executionState}：${escapeCell(item.executionNote)} |`);
+      lines.push(`| ${item.id} | ${escapeCell(item.requirement)} | ${item.priority} | ${escapeCell(item.precondition)} | ${escapeCell(steps)} | ${escapeCell(item.expected)} |`);
     }
     lines.push('');
   }
@@ -289,8 +287,7 @@ function makeMarkdown(cases, summary) {
 }
 
 function makeCoverage(cases, summary) {
-  const implementation = summary.implementation;
-  const executionOrder = ['PASS', 'FAIL', 'PARTIAL', 'BLOCKED', 'READY', 'NOT_READY', 'UNSUPPORTED'];
+  const groups = [...new Set(cases.map((item) => item.category))];
   const lines = [
     '# Misectel 7621EVB 需求测试覆盖率', '',
     '统计日期：2026-08-06',
@@ -300,34 +297,27 @@ function makeCoverage(cases, summary) {
     '| --- | ---: | ---: | --- |',
     `| 需求设计覆盖率 | ${summary.total}/${summary.total} | 100.0% | 每条需求均生成测试用例 |`,
     `| P0 基本需求设计覆盖率 | ${summary.priorities.P0 || 0}/${summary.kano['基本需求'] || 0} | ${percent(summary.priorities.P0 || 0, summary.kano['基本需求'] || 0)} | 基本需求全部有用例 |`,
-    `| 当前实现覆盖率 | ${implementation[1] || 0}/${summary.total} | ${percent(implementation[1] || 0, summary.total)} | 状态 1，不等同实测 PASS |`,
-    `| 已有证据执行覆盖率 | ${summary.executed}/${summary.total} | ${percent(summary.executed, summary.total)} | 只统计明确执行证据 |`,
-    `| 已有证据通过覆盖率 | ${summary.pass}/${summary.total} | ${percent(summary.pass, summary.total)} | READY 不计入通过 |`,
-    `| 已执行用例通过率 | ${summary.pass}/${summary.executed} | ${percent(summary.pass, summary.executed)} | 仅在已有执行证据内计算 |`, '',
+    `| P1 期望需求设计覆盖率 | ${summary.priorities.P1 || 0}/${summary.kano['期望需求'] || 0} | ${percent(summary.priorities.P1 || 0, summary.kano['期望需求'] || 0)} | 期望需求全部有用例 |`,
+    `| P2 兴奋需求设计覆盖率 | ${summary.priorities.P2 || 0}/${summary.kano['兴奋需求'] || 0} | ${percent(summary.priorities.P2 || 0, summary.kano['兴奋需求'] || 0)} | 兴奋需求全部有用例 |`,
+    `| P3 无差异需求设计覆盖率 | ${summary.priorities.P3 || 0}/${summary.kano['无差异需求'] || 0} | ${percent(summary.priorities.P3 || 0, summary.kano['无差异需求'] || 0)} | 无差异需求全部有用例 |`, '',
     '## 需求基线分布', '',
     '| 维度 | 数量 |', '| --- | ---: |',
     `| 基本需求/P0 | ${summary.kano['基本需求'] || 0} |`,
     `| 期望需求/P1 | ${summary.kano['期望需求'] || 0} |`,
     `| 兴奋需求/P2 | ${summary.kano['兴奋需求'] || 0} |`,
-    `| 无差异需求/P3 | ${summary.kano['无差异需求'] || 0} |`,
-    `| 状态 1（当前实现） | ${implementation[1] || 0} |`,
-    `| 状态 2（待开发/专项验收） | ${implementation[2] || 0} |`,
-    `| 状态 0（不交付） | ${implementation[0] || 0} |`, '',
-    '## 执行状态分布', '',
-    '| 状态 | 数量 | 是否计入执行覆盖 |', '| --- | ---: | --- |'
+    `| 无差异需求/P3 | ${summary.kano['无差异需求'] || 0} |`, '',
+    '## 分类覆盖率', '',
+    '| 分类 | 已设计用例/需求 | 覆盖率 |', '| --- | ---: | ---: |'
   ];
-  for (const state of executionOrder)
-    lines.push(`| ${state} | ${summary.execution[state] || 0} | ${['PASS', 'FAIL', 'PARTIAL', 'BLOCKED'].includes(state) ? '是' : '否'} |`);
-
-  lines.push('', '## 未闭环重点', '');
-  for (const item of cases.filter((item) => ['FAIL', 'PARTIAL', 'BLOCKED', 'NOT_READY', 'UNSUPPORTED'].includes(item.executionState)))
-    lines.push(`- \`${item.id}\` ${item.requirement}：${item.executionState}，${item.executionNote}`);
+  for (const group of groups) {
+    const count = cases.filter((item) => item.category === group).length;
+    lines.push(`| ${group} | ${count}/${count} | 100.0% |`);
+  }
 
   lines.push('', '## 统计边界', '',
     '- 需求设计覆盖率只说明用例已经设计，不说明功能实现或测试通过。',
-    '- 当前实现覆盖率直接采用交付矩阵的 0/1/2 状态。',
-    '- 已有证据执行覆盖率采用保守口径；交付矩阵未明确写出执行证据的状态 1 条目仍记为 READY。',
-    '- 后续执行用例时应回填证据路径和实际结果，再重新生成 XMind 与覆盖率报告。', '');
+    '- 本报告不包含产品实现状态、历史测试结果、通过率或未闭环事项。',
+    '- 执行结果、证据路径和最终判定应由测试执行方记录在独立测试报告中。', '');
   return lines.join('\n').trimEnd();
 }
 
@@ -343,27 +333,23 @@ function makeXmind(cases, summary) {
   const groups = [...new Set(cases.map((item) => item.category))];
   const summaryTopic = topic('覆盖率摘要', [
     topic(`需求设计覆盖率：${summary.total}/${summary.total}（100.0%）`),
-    topic(`当前实现覆盖率：${summary.implementation[1] || 0}/${summary.total}（${percent(summary.implementation[1] || 0, summary.total)}）`),
-    topic(`已有证据执行覆盖率：${summary.executed}/${summary.total}（${percent(summary.executed, summary.total)}）`),
-    topic(`已有证据通过覆盖率：${summary.pass}/${summary.total}（${percent(summary.pass, summary.total)}）`),
-    topic('READY 仅表示已实现待回归，不计为 PASS')
+    topic(`P0 基本需求：${summary.priorities.P0 || 0}/${summary.kano['基本需求'] || 0}（${percent(summary.priorities.P0 || 0, summary.kano['基本需求'] || 0)}）`),
+    topic('仅表示测试设计覆盖，不表示产品实现或测试通过')
   ]);
   const environmentTopic = topic('公共环境与通过标准', [
     topic('记录固件版本、SHA-256、设备身份、端口拓扑和测试时间'),
-    topic('PASS 必须附命令、抓包、日志、截图或机器报告'),
+    topic('执行方另行保存命令、抓包、日志、截图或机器报告'),
     topic('破坏性测试先备份，结束后恢复临时配置和服务'),
-    topic('性能和容量按实际数值判定，不以实现状态替代测试结果')
+    topic('性能和容量按实际数值判定，结果记录在独立测试报告中')
   ]);
 
   const categoryTopics = groups.map((group) => {
     const items = cases.filter((item) => item.category === group);
     return topic(`${group}（${items.length}）`, items.map((item) => topic(`${item.id} ${item.requirement}`, [
       topic(`优先级：${item.priority} / ${item.kano}`),
-      topic(`实现基线：${item.implementation} / ${item.note}`),
       topic(`前置条件：${item.precondition}`),
       topic('操作步骤', item.steps.map((step, i) => topic(`${i + 1}. ${step}`))),
-      topic(`预期结果：${item.expected}`),
-      topic(`当前状态：${item.executionState} / ${item.executionNote}`)
+      topic(`预期结果：${item.expected}`)
     ])));
   });
 

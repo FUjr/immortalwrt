@@ -170,8 +170,8 @@ following artifacts from the same source and rejects mismatched case IDs:
 - `docs/testcases/7621-nat-gateway-requirements-testcases.md`
 - `docs/testcases/7621-nat-gateway-coverage.md`
 
-The 2026-08-06 baseline contains 100 requirements and 100 cases: design
-coverage is 100%, implementation coverage is 85%, and conservative explicit
-execution-evidence coverage is 15%. Design and implementation coverage must
-not be reported as test pass coverage; READY cases require evidence-producing
-execution before they can become PASS.
+The 2026-08-06 external-partner baseline contains 100 requirements and 100
+cases, for 100% requirement design coverage. Test-case artifacts intentionally
+exclude product implementation state, historical execution results, pass rate,
+and unresolved delivery notes. Test evidence and verdicts belong in a separate
+execution report maintained by the testing party.
