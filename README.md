@@ -68,7 +68,7 @@ runtime API. Core Web workflows and screenshots are documented in
 SNMP MIB inventory, configuration examples, live OID/Trap evidence, and the
 current SET/PEN limitations are documented in
 [`docs/snmp-mib-delivery-report.md`](docs/snmp-mib-delivery-report.md).
-The requirement-traceable test suite is available as
+The requirement-traceable test suite is available as a balanced left/right
 [`XMind`](docs/testcases/7621-nat-gateway-requirements-testcases.xmind) and
 [`Markdown`](docs/testcases/7621-nat-gateway-requirements-testcases.md), with a
 separate [`coverage report`](docs/testcases/7621-nat-gateway-coverage.md).

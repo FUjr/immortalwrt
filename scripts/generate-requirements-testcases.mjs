@@ -371,7 +371,7 @@ function makeXmind(cases, summary) {
     id: 'root-misectel-7621-requirements',
     class: 'topic',
     title: `Misectel 7621EVB 需求测试用例（${summary.total}）`,
-    structureClass: 'org.xmind.ui.logic.right',
+    structureClass: 'org.xmind.ui.map',
     children: { attached: [summaryTopic, environmentTopic, ...categoryTopics] }
   };
   return [{
