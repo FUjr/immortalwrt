@@ -73,9 +73,13 @@ The requirement-traceable test suite is available as a balanced left/right
 [`Markdown`](docs/testcases/7621-nat-gateway-requirements-testcases.md), with a
 separate [`coverage report`](docs/testcases/7621-nat-gateway-coverage.md).
 The main delivery report records the recoverable security-feature validation,
-bidirectional multicast NAT proof, and the RTL8152 performance run. The strict
-15Kpps, 100 Mbps and sub-1 ms performance targets were not met; raw test output
-is shipped with the delivery archive rather than treated as a release gate.
+bidirectional multicast NAT proof, and RTL8152 performance runs. The 2026-08-07
+regression passed 15Kpps with stimulus margin and found no measurable MAC-policy
+throughput regression; 100 Mbps payload and sub-1 ms targets remain unmet. The
+optimization comparison is documented in
+[`docs/nat-performance-optimization-20260807.md`](docs/nat-performance-optimization-20260807.md).
+Raw test output is shipped with the delivery archive rather than treated as a
+release gate.
 The image includes the Misectel-styled `System > Upgrade` page for authenticated
 firmware upload, device compatibility validation, SHA-256 review, optional
 configuration preservation, confirmation, and automatic reconnect after

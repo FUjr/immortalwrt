@@ -271,6 +271,15 @@
   Gateway CPU busy averaged 15.82% and peaked at 45%. The strict 15K pps,
   100 Mbps and sub-1 ms requirements all failed; raw JSON and ping output are
   retained in the delivery archive.
+- The 2026-08-07 RTL8152 regression isolated the LAN adapter in a separate
+  network namespace and corrected the small-packet stimulus to exceed the
+  acceptance threshold. The default policy measured 15,134.87 pps with zero
+  loss, 94.78/94.76 Mbps forward/reverse, and 1.222 ms average RTT. Enabling a
+  one-MAC allow list and limit plus bridge IP-MAC enforcement measured
+  15,134.68 pps, 94.76/94.77 Mbps and 1.178 ms; no sustained MAC-policy
+  regression was observed. RPS disablement and UDP GRO forwarding both
+  regressed results and were restored rather than committed as data-plane
+  tuning. See `docs/nat-performance-optimization-20260807.md`.
 - After a clean ramips kernel rebuild, the 7621EVB DTB reports the native I2C
   controller enabled and `nxp,pcf85063a` at address `0x51`. Kernel configuration
   has `CONFIG_RTC_DRV_PCF85063=m`, `CONFIG_RTC_DRV_DS1307` disabled, and produced

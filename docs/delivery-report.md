@@ -162,6 +162,20 @@ WAN `10.96.210.253`。构建同时补齐 `kmod-sched`，正式镜像启动后自
 `iperf3 --json`、Ping 输出及机器生成报告随交付包提供。首次反向并发测试的
 控制连接被重置，该错误原样保留；隔离重试成功并用于上表。
 
+#### 2026-08-07 调优与 MAC 策略回归
+
+本轮将 RTL8152 放入独立网络命名空间并连接 LAN2/VRF2，避免同一主机的
+WAN/LAN 地址在本地协议栈短路。小包激励提高到约 15137 pps，并在 iperf
+会话间等待 2 秒。默认策略测得 15134.87 pps、正反向 94.78/94.76 Mbps、
+平均时延 1.222 ms；15Kpps 通过，其余严格门槛仍未通过。
+
+启用 LAN2 单 MAC 允许列表、`mac_limit=1` 和 enforcement 模式 IP-MAC
+防欺骗后，测得 15134.68 pps、94.76/94.77 Mbps、平均时延 1.178 ms。
+与默认策略的差值处于测量噪声范围，未观察到 MAC 策略导致持续性能回退。
+关闭 RPS 和启用 UDP GRO forwarding 均使吞吐或时延变差，测试后已撤销，
+保留当前 IRQ/RPS/XPS 分核方案。完整数据和边界见
+`docs/nat-performance-optimization-20260807.md`。
+
 ### 3.3 PCF85063AT RTC 适配交付
 
 本版本按实际硬件选用 PCF85063AT，使用 MT7621 原生 I2C 控制器：
@@ -264,7 +278,7 @@ WAN `10.96.210.253`。构建同时补齐 `kmod-sched`，正式镜像启动后自
 | NAT | 1:1、端口 1:N、NAT/NAPT、双向 | 基本需求 | 1 | VRF NAT API/UI v6 |
 | NAT | 映射表不少于 64 条 | 基本需求 | 1 | API 限制 64 条 |
 | NAT | 组播 NAT、SNAT | 基本需求 | 1 | IPv4 UDP组地址双向静态转换和SNAT已实现；不含IPv6/动态IGMP建表 |
-| NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | RTL8152实测14998.02pps、正/反向92.85/93.20Mbps、平均2.673ms，严格判定未达标 |
+| NAT | 每秒 15K 包、100 Mbps、延迟小于 1 ms | 基本需求 | 2 | 2026-08-07 RTL8152实测15134.87pps（通过）、正/反向94.78/94.76Mbps、平均1.222ms；MAC策略组合无可测回退，吞吐和时延门槛仍未通过 |
 | NAT | ALG 报文穿透 | 兴奋需求 | 2 | 基础 conntrack helper 可用，完整 ALG 管理/协议验收待补 |
 | DHCP | WAN DHCP Client | 基本需求 | 1 | WAN Network 页面支持 |
 | DHCP | LAN DHCP Server 跟随内网段 | 基本需求 | 1 | API/UI v6 每 VRF独立地址池、网关、1-2个 DNS 和静态租约；VRF2/LAN2 实机静态租约已验证 |
