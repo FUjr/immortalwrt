@@ -17,6 +17,11 @@ VRF bridges preserve an FDB and allow MAC admission controls. An interface can
 be reassigned but cannot belong to two VRFs; `wan` is never a VRF member. A
 subnet and gateway address may be reused across VRFs. Devices sharing one VRF
 must still use unique addresses.
+Each managed bridge is assigned a stable locally administered MAC derived from
+the WAN hardware address and the VRF's unique routing-table number. Endpoint
+frames retain their source and destination MAC addresses. When two MT7530 DSA
+ports belong to one VRF bridge, same-subnet unicast is eligible for switch-chip
+offload; routed, NAT, and gateway-destined traffic still traverses the CPU.
 
 API/UCI v8 optionally treats one selected VRF definition as an ordinary LAN.
 When the global HNAT switch is enabled, the manager creates `lan-<name>` in the

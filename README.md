@@ -71,6 +71,9 @@ runtime API. It also supports one ordinary HNAT LAN, with its LuCI controls
 shown only when the UCI/NMS visibility policy permits them. Core Web workflows
 and screenshots are documented in
 [`docs/delivery-report.md`](docs/delivery-report.md).
+Managed VRF and ordinary-LAN bridges use stable local MAC addresses distinct
+from WAN. Multiple MT7530 ports in one VRF therefore share one DSA bridge domain
+without causing WAN MAC movement and are eligible for same-subnet L2 offload.
 SNMP MIB inventory, configuration examples, live OID/Trap evidence, and the
 current SET/PEN limitations are documented in
 [`docs/snmp-mib-delivery-report.md`](docs/snmp-mib-delivery-report.md).
