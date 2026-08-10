@@ -56,8 +56,11 @@ To re-compose an already-built image without rebuilding:
 The profile contains HTTPS LuCI, the Misectel theme/dashboard, the netifd WAN
 page, the VRF NAT manager and UI, the branded Web firmware upgrade page, the
 BusyBox `udhcpd` applet, VRF/bridge support, and PCF85063AT RTC support. It
-deliberately does not include hardware or software flow offload. Performance
-results are reported separately and are not build acceptance gates.
+keeps firewall4 global hardware and software flow offload disabled. The VRF
+manager depends on `kmod-nft-offload` so API/UCI v8 can create one restricted
+hardware flowtable for an explicitly selected ordinary LAN. Isolated VRFs do
+not enter that flowtable. Performance results are reported separately and are
+not build acceptance gates.
 The build script stops before compilation if the expanded BusyBox configuration
 does not contain `CONFIG_BUSYBOX_CONFIG_UDHCPD=y`.
 It also rejects an image whose manifest omits `luci-app-misectel-system`, which

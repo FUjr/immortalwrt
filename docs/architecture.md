@@ -18,6 +18,15 @@ be reassigned but cannot belong to two VRFs; `wan` is never a VRF member. A
 subnet and gateway address may be reused across VRFs. Devices sharing one VRF
 must still use unique addresses.
 
+API/UCI v8 optionally treats one selected VRF definition as an ordinary LAN.
+When the global HNAT switch is enabled, the manager creates `lan-<name>` in the
+main routing table instead of `vrf-<name>` plus `br-<name>`. That LAN must use
+exclusive physical members and a prefix that overlaps neither WAN nor another
+enabled VRF; VRF NAT mappings cannot target it. Turning the global switch off
+preserves the selection but recreates the definition as an isolated VRF.
+`hnat_ui_visible` is writable through UCI/NMS only and determines whether LuCI
+shows the global and per-VRF HNAT controls.
+
 The image uses the standalone `misectel,7621evb` device tree for a 256 MiB DDR3
 and 16 MiB SPI NOR design. The RAM device is rated for a 933 MHz clock; U-Boot
 uses the MT7621-supported DDR3-1200 controller profile (600 MHz clock), which is
@@ -62,7 +71,9 @@ process, and lease state is under `/tmp/misectel-vrf-dhcp`; no DHCP database is
 persisted. Different VRFs may reuse the same pool because each server binds its
 isolated bridge and runs through `ip vrf exec` for that routing domain. At the
 local input hook Linux exposes the VRF master, so firewall4 admits only DHCP
-client UDP 68 to server UDP 67 on manager-created `vrf-*` interfaces.
+client UDP 68 to server UDP 67 on manager-created `vrf-*` interfaces. The HNAT
+LAN DHCP process remains in the main routing domain and binds its `lan-<name>`
+bridge; the same scoped firewall include admits that bridge pattern.
 
 The same feed provides `misectel-switch-manager` and
 `luci-app-misectel-switch`. The manager owns fixed-port administrative and PHY
@@ -95,8 +106,12 @@ gateway does not need to synthesize ARP replies for every translated host.
 The manager owns a dedicated nftables table. A small firewall4 include admits
 outbound traffic from dynamically named VRF masters and inbound connections
 that the manager DNATed; firewall4 continues to protect the management plane.
-WAN masquerading and flow offload are disabled to prevent a second translation
-or bypass of VRF policy routing.
+WAN masquerading and firewall4 global flow offload are disabled to prevent a
+second translation or bypass of VRF policy routing. An active HNAT LAN instead
+uses manager-owned SNAT and an nftables flowtable whose ingress devices are
+limited to WAN and that LAN's physical members. Only established TCP/UDP flows
+between the selected bridge and WAN are submitted with the hardware-offload
+flag. Other VRFs retain their software path, marks and independent tables.
 
 ## Control Plane
 

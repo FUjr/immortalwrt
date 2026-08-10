@@ -11,10 +11,12 @@ architecture, build constraints, and the
 acceptance matrix are maintained in [`docs/requirements.md`](docs/requirements.md)
 and [`docs/architecture.md`](docs/architecture.md).
 
-The gateway intentionally uses the Linux software forwarding path. Hardware
-and software flow offload are disabled so that VRF policy routing and NAT rule
-selection remain observable and deterministic. Performance measurements are
-reported but are not release gates.
+The isolated VRF paths intentionally use Linux software forwarding so policy
+routing and NAT selection remain observable and deterministic. Firewall4's
+global flow offload stays disabled. API/UCI v8 can convert exactly one selected
+VRF definition into a non-overlapping ordinary LAN and install a hardware
+flowtable restricted to that LAN and WAN. Performance measurements remain
+non-gating and hardware acceleration requires device-side counter verification.
 
 The target is `misectel_7621evb`, with 256 MiB DDR3 SDRAM and 16 MiB SPI NOR.
 Its Ethernet layout exposes MT7530 port 0 as the actual WAN, ports 1-3 as
@@ -59,11 +61,13 @@ administratively enabled WAN/LAN links, and HTTP to HTTPS management
 redirection with TLS 1.2 and TLS 1.3. The exact tested scope and remaining
 LAN3/LAN4, UDP, routed-prefix, rollback, certificate provisioning, and
 performance gaps are recorded in the validation document.
-API/UCI v6 keeps editable VRF/interface membership, adds an optional lightweight
+API/UCI v8 keeps editable VRF/interface membership, adds an optional lightweight
 DHCP server and static reservations per VRF bridge, and leaves WAN protocol,
 address, gateway, DNS and link ownership with `network.wan`/netifd. The gateway
 homepage reads WAN state from netifd and member carrier/speed from the VRF
-runtime API. Core Web workflows and screenshots are documented in
+runtime API. It also supports one ordinary HNAT LAN, with its LuCI controls
+shown only when the UCI/NMS visibility policy permits them. Core Web workflows
+and screenshots are documented in
 [`docs/delivery-report.md`](docs/delivery-report.md).
 SNMP MIB inventory, configuration examples, live OID/Trap evidence, and the
 current SET/PEN limitations are documented in

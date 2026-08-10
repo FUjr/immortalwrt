@@ -24,7 +24,7 @@
 | DEC-005 | Management | WAN-side management IP, forced to static `192.168.1.1/24` until first-run setup completes; later upgrades preserve the configured WAN |
 | DEC-006 | NAT 1:N meaning | One external IP split by protocol/port ranges to multiple internal devices |
 | DEC-007 | IPv6 boundary | Management and ACL may be dual stack; VRF NAT is IPv4 only |
-| DEC-008 | Acceleration | Software and hardware flow offload disabled |
+| DEC-008 | Acceleration | Isolated VRF paths and firewall4 global flow offload remain software-only; one explicitly selected ordinary LAN may use a WAN/LAN-restricted MT7621 hardware flowtable |
 | DEC-009 | Performance | Measured and reported, never a release blocker |
 | DEC-010 | Storage policy | Core image first; lower-priority features may be declared unsupported when the 16 MiB limit is exceeded |
 | DEC-011 | Initial authentication | One-time HTTPS setup requires setting the administrator password before forwarding is enabled |
@@ -51,6 +51,7 @@
 | NAT-007 | Safe configuration | Validate, apply, confirm, timeout rollback, and reboot rollback | HTTPS validate/apply/confirm and reboot persistence verified; timeout and explicit rollback pending |
 | NAT-008 | Web and NMS management | Misectel LuCI and versioned HTTPS JSON-RPC expose the same model | HTTPS API and Playwright desktop/mobile page flow verified |
 | NAT-009 | Bidirectional subnet 1:1 NAT | Equal internal/external prefix lengths preserve host bits and select the configured VRF in both directions | two-VRF duplicate-address ICMP/TCP and source translation verified; routed-prefix delivery pending |
+| NAT-010 | Optional ordinary HNAT LAN | A global enable converts exactly one selected VRF definition to a main-table LAN; ports and prefixes cannot overlap WAN/other VRFs, mappings cannot target it, and only UCI/NMS controls whether LuCI exposes HNAT controls | API/UCI v8 and static validation implemented; target PPE/throughput verification pending |
 | DHCP-002 | Per-VRF lightweight DHCP | Each VRF can independently distribute IPv4 address, mask, gateway and up to two DNS servers, with static MAC/address reservations | verified on VRF2/LAN2 with USB0 client static lease, gateway, DNS and reload recovery |
 | SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | verified on device |
 | SEC-002 | TLS management | HTTP redirects to HTTPS; TLS 1.2 minimum and TLS 1.3 are tested | self-signed device certificate and both TLS versions verified; production certificate provisioning pending |
