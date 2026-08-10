@@ -37,7 +37,7 @@
 | DEC-018 | Programmer image | Exactly 16 MiB; production composition requires a unique unicast base MAC and supports per-device Factory/WOEM/LEDEINFO blobs |
 | DEC-019 | Ethernet port order | MT7530 port 0 is WAN; MT7530 ports 1-3 are LAN1-3; the separate `gmac1`/PHY4 interface is LAN4 |
 | DEC-020 | Subnet NAT delivery | Equal-length IPv4 prefixes preserve host bits; the upstream router routes each external prefix through the gateway WAN address |
-| DEC-021 | Direct port benchmark topology | Test the host-side USB Ethernet path directly against the selected gateway port on `10.96.210.0/24`; terminate traffic on the gateway bridge/CPU and do not route the benchmark through USB5 or another downstream simulator |
+| DEC-021 | Same-VRF port benchmark topology | Attach the host-side USB Ethernet adapter to LAN2 and the `10.96.210.0/24` network to LAN3, place both ports in one VRF bridge, and keep both traffic endpoints external; do not terminate the benchmark on the gateway CPU or use USB5 as an endpoint |
 
 ## Milestone 1: VRF NAT Vertical Slice
 
@@ -62,7 +62,7 @@
 | SYS-004 | Programmer artifact | Reproducibly compose and checksum an exact 16 MiB full-flash image without overwriting partition boundaries | verified |
 | SYS-005 | Web firmware upgrade | Authenticated `System > Upgrade` accepts a RAM upload, validates device compatibility, displays SHA-256, supports preserving settings, and requires confirmation before sysupgrade | verified with Playwright upload/validation and a preserving hardware upgrade |
 | SYS-002 | Startup | Power-on to ping is measured on hardware; 30 seconds is a target, not yet verified | regular reboot recovery measured at 38.67 and 53 seconds; target not met |
-| PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | direct USB-Ethernet-to-LAN3 baseline verified at 94.2/87.5 Mbit/s TCP and 20K pps zero-loss minimum frames; NAT and full CPU/latency matrix remain pending |
+| PERF-001 | Traffic benchmark | PPS, throughput, loss, CPU, and latency are recorded without pass/fail thresholds | LAN2-LAN3 same-VRF topology configured; the host USB Ethernet endpoint is not currently enumerated, so the direct external-endpoint benchmark remains pending |
 | PERF-002 | Network and management CPU separation | Dynamically place the Ethernet IRQ on CPU1, RPS on CPU2, spread XPS queue selection across CPUs, and constrain low-priority switch/LLDP/SNMP monitoring to CPU3; restore settings after network reload | verified on hardware with switch manager release 13 |
 
 ## Milestone 2: Switch Operations and Security
