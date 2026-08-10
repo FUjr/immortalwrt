@@ -238,7 +238,7 @@ WAN/LAN 地址在本地协议栈短路。小包激励提高到约 15137 pps，�
 | CLI | 厂家调试 CLI | 基本需求 | 1 | BusyBox/OpenWrt shell |
 | CLI | SSHv2 加密访问 | 基本需求 | 1 | Dropbear，默认按安全策略关闭/启用 |
 | CLI | 备份恢复、批量脚本、实时状态 | 基本需求 | 1 | sysupgrade/ubus/ip/nft/tc 工具 |
-| HTTPS/TLS | HTTP/HTTPS | 基本需求 | 1 | HTTP 307 跳转 HTTPS |
+| HTTPS/TLS | HTTP/HTTPS | 基本需求 | 1 | WAN 默认独立开放 HTTP/80 与 HTTPS/443，不强制跳转 |
 | HTTPS/TLS | SSL/TLS | 基本需求 | 1 | uHTTPd OpenSSL |
 | HTTPS/TLS | TLS 1.2/1.3 | 基本需求 | 1 | 两个版本均已握手验证 |
 | HTTPS/TLS | HTTPS 升级、备份、监控 | 基本需求 | 1 | LuCI 管理面 |

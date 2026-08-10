@@ -63,7 +63,9 @@ LAN3/LAN4, UDP, routed-prefix, rollback, certificate provisioning, and
 performance gaps are recorded in the validation document.
 API/UCI v8 keeps editable VRF/interface membership, adds an optional lightweight
 DHCP server and static reservations per VRF bridge, and leaves WAN protocol,
-address, gateway, DNS and link ownership with `network.wan`/netifd. The gateway
+address, gateway, DNS and link ownership with `network.wan`/netifd. HTTP and
+HTTPS management are both reachable from WAN by default, without forcing port
+80 to redirect to TLS. The gateway
 homepage reads WAN state from netifd and member carrier/speed from the VRF
 runtime API. It also supports one ordinary HNAT LAN, with its LuCI controls
 shown only when the UCI/NMS visibility policy permits them. Core Web workflows
