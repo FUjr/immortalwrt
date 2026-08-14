@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Misectel <fjr@misectel>
+Date: Fri Aug 14 00:00:00 2026 +0000
+Subject: [PATCH] net: dsa: mt7530: mt7621: program GPHY DSP tuning after reset
+
+The MT7621 integrated GPHY exposes its 100_mse_threshold (0x123) and MCC
+near-echo/TX-power (0xa6) registers in MMD device 0x1e (VEND2), and the
+SoC MDIO controller has no clause-45 support. The generic phy_modify_mmd()
+path is therefore a no-op, and config_init runs before the switch reset
+(MTRAP indirect PHY access is not yet enabled), leaving the analog
+front-end untuned and making the 100BASE-TX full-duplex link flap.
+
+Program the two registers over clause-22 indirect access from
+mt7530_setup(), after the switch reset and MTRAP setup, for every PHY.
+
+Verified on the Misectel 7621EVB (4-wire, 100BASE-TX only).
+
+Signed-off-by: fjr <fjrcn@outlook.com>
+---
+ drivers/net/dsa/mt7530.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2321,6 +2321,15 @@
+ 	return ret;
+ }
+ 
++static void mt7530_mdio_mmd_write(struct mt7530_priv *priv, int port,
++				  int devad, u16 regnum, u16 val)
++{
++	mt7530_phy_write_c22(priv, port, MII_MMD_CTRL, devad);
++	mt7530_phy_write_c22(priv, port, MII_MMD_DATA, regnum);
++	mt7530_phy_write_c22(priv, port, MII_MMD_CTRL, MII_MMD_CTRL_NOINCR | devad);
++	mt7530_phy_write_c22(priv, port, MII_MMD_DATA, val);
++}
++
+ static int
+ mt7530_setup(struct dsa_switch *ds)
+ {
+@@ -2435,6 +2444,14 @@
+ 	/* Enable and reset MIB counters */
+ 	mt7530_mib_reset(ds);
+ 
++	/* MT7621 GPHY DSP tuning: 100_mse (0x123) and MCC near-echo (0xa6)
++	 * live in MMD VEND2; the SoC MDIO has no C45, so use C22 indirect.
++	 */
++	for (i = 0; i < MT7530_NUM_PHYS; i++) {
++		mt7530_mdio_mmd_write(priv, i, MDIO_MMD_VEND2, 0x123, 0xffff);
++		mt7530_mdio_mmd_write(priv, i, MDIO_MMD_VEND2, 0xa6, 0x0300);
++	}
++
+ 	for (i = 0; i < priv->ds->num_ports; i++) {
+ 		/* Clear link settings and enable force mode to force link down
+ 		 * on all ports until they're enabled later.
