@@ -46,6 +46,17 @@ enumeration. MT7530 port 0 is the actual `wan`; ports 1, 2, and 3 are `lan1`,
 The VRF manager reserves `wan` for upstream traffic and assigns LAN interfaces
 to VRFs independently of this physical enumeration.
 
+The 7621EVB RJ45 is wired with only four pins (two pairs), so the ports are
+100BASE-TX only and 1000BASE-T is physically unreachable regardless of the link
+partner. The full-duplex 100M WAN link used to flap after boot because the
+MT7621 switch PHYs could advertise EEE before the generic PHY layer applied the
+device-tree broken-EEE flags. Target patch
+`140-net-dsa-mt7530-do-not-advertise-EEE-on-MT7621-switch.patch` clears the EEE
+advertisement for all integrated switch PHYs in `mt7530_setup()`, before the
+PHY devices are attached for the first time. On the 7621EVB this kept WAN at
+100Mbps/full duplex continuously from its first link-up; the previous DSP,
+TRGMII/P5 and delayed WAN-reinitialisation workarounds are not used.
+
 The NOR layout follows the metadata convention used by Misectel MT7981 boards:
 
 | Offset | Size | Partition |
