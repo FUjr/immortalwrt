@@ -63,6 +63,7 @@ mediatek_setup_interfaces()
 	livinet,li320|\
 	livinet,zr-3020|\
 	livinet,zr-3020-ubootmod|\
+	misectel,m02k45|\
 	netis,nx32u|\
 	qihoo,360t7|\
 	qihoo,360t7-ubi|\

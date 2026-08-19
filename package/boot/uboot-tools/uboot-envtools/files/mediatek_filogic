@@ -40,6 +40,7 @@ imou,hx21|\
 jcg,q30-pro|\
 livinet,zr-3020-ubootmod|\
 mercusys,mr90x-v1-ubi|\
+misectel,m02k45|\
 netcore,n60|\
 netcore,n60-pro|\
 netis,eap930-v1|\
@@ -78,6 +79,9 @@ glinet,gl-xe3000|\
 huasifei,wh3000-emmc|\
 nradio,c8-668gl)
 	ubootenv_add_mmc "u-boot-env" "" "0x0" "0x80000"
+	;;
+misectel,m02k45-emmc)
+	ubootenv_add_mmc_default
 	;;
 asiarf,ap7986-003|\
 cetron,ct3003|\

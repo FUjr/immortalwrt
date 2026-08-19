@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2026 ImmortalWrt.org
+ */
+
+/dts-v1/;
+#include "mt7988d-misectel_m02k45-common.dtsi"
+
+/ {
+	model = "Misectel M02K45 eMMC";
+	compatible = "misectel,m02k45-emmc", "misectel,m02k45", "mediatek,mt7988d";
+
+	chosen {
+		rootdisk = <&emmc_rootdisk>;
+	};
+};
+
+&pio {
+	mmc0_pins_emmc_51: mmc0-emmc-51-pins {
+		mux {
+			function = "flash";
+			groups = "emmc_51";
+		};
+	};
+};
+
+&mmc0 {
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc0_pins_emmc_51>;
+	pinctrl-1 = <&mmc0_pins_emmc_51>;
+	bus-width = <8>;
+	max-frequency = <52000000>;
+	cap-mmc-highspeed;
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&reg_1p8v>;
+	non-removable;
+	no-sd;
+	no-sdio;
+	status = "okay";
+
+	card@0 {
+		compatible = "mmc-card";
+		reg = <0>;
+
+		block {
+			compatible = "block-device";
+
+			partitions {
+				block-partition-env {
+					partname = "ubootenv";
+
+					nvmem-layout {
+						compatible = "u-boot,env";
+					};
+				};
+
+				block-partition-factory {
+					partname = "factory";
+
+					nvmem-layout {
+						compatible = "fixed-layout";
+						#address-cells = <1>;
+						#size-cells = <1>;
+
+						eeprom_factory_0: eeprom@0 {
+							reg = <0x0 0x1e00>;
+						};
+
+						macaddr_factory_1e001c: eeprom@1e001c {
+							compatible = "mac-base";
+							reg = <0x1e001c 0x6>;
+							#nvmem-cell-cells = <1>;
+						};
+					};
+				};
+
+				block-partition-recovery {
+					partname = "recovery";
+				};
+
+				emmc_rootdisk: block-partition-production {
+					partname = "production";
+				};
+			};
+		};
+	};
+};

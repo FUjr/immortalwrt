@@ -180,6 +180,9 @@ mercusys,mr90x-v1-ubi)
 	ucidef_set_led_netdev "lan-2" "lan-2" "green:lan-2" "lan2" "link tx rx"
 	ucidef_set_led_netdev "wan" "wan" "green:wan" "eth1" "link tx rx"
 	;;
+misectel,m02k45)
+	ucidef_set_led_netdev "wlan5g" "WLAN5G" "wifi" "phy0.1-ap0"
+	;;
 netcore,n60)
 	ucidef_set_led_netdev "wan" "WAN" "mdio-bus:06:green:wan" "eth1" "link tx rx"
 	;;

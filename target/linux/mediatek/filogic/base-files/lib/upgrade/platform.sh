@@ -131,6 +131,8 @@ platform_do_upgrade() {
 	mediatek,mt7981-rfb|\
 	mediatek,mt7988a-rfb|\
 	mercusys,mr90x-v1-ubi|\
+	misectel,m02k45|\
+	misectel,m02k45-emmc|\
 	netis,eap930-v1|\
 	netis,nx30v2|\
 	netis,nx31|\
@@ -343,6 +345,7 @@ platform_check_image() {
 	mediatek,mt7981-rfb|\
 	mediatek,mt7988a-rfb|\
 	mercusys,mr90x-v1-ubi|\
+	misectel,m02k45|\
 	nokia,ea0326gmp|\
 	netis,eap930-v1|\
 	netis,nx32u|\
