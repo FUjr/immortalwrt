@@ -813,6 +813,23 @@ define Device/misectel_7621evb
 	misectel-security-manager luci-app-misectel-security misectel-system-manager
 endef
 TARGET_DEVICES += misectel_7621evb
+define Device/nex905_f-405
+  $(Device/dsa-migration)
+  DEVICE_VENDOR := NEX905
+  DEVICE_MODEL := F-405
+  DEVICE_VARIANT := NAT Gateway
+  DEVICE_DTS := mt7621_nex905_f-405
+  IMAGE_SIZE := 15936k
+  SUPPORTED_DEVICES += misectel,7621evb misectel_7621evb
+	DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
+	kmod-rtc-pcf85063 luci-ssl-openssl luci-base-misectel \
+	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
+	luci-app-misectel-vrf luci-app-misectel-system \
+	misectel-switch-manager luci-app-misectel-switch \
+	misectel-security-manager luci-app-misectel-security misectel-system-manager \
+	misectel-watchdog mdio-tools
+endef
+TARGET_DEVICES += nex905_f-405
 
 define Device/cudy_wr1300-v1
   $(Device/dsa-migration)
