@@ -1864,6 +1864,21 @@ define Device/huasifei_wh3000r-nand
 endef
 TARGET_DEVICES += huasifei_wh3000r-nand
 
+define Device/huasifei_ws3006
+  DEVICE_VENDOR := Huasifei
+  DEVICE_MODEL := WS3006
+  DEVICE_DTS := mt7981b-huasifei-ws3006
+  DEVICE_DTS_DIR := ../dts
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 112640k
+  KERNEL_IN_UBI := 1
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+endef
+TARGET_DEVICES += huasifei_ws3006
+
 define Device/imou_hx21
   DEVICE_VENDOR := Imou
   DEVICE_MODEL := HX21

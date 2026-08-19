@@ -153,6 +153,9 @@ mediatek_setup_interfaces()
 	huasifei,wh3000-pro-nand)
 		ucidef_set_interfaces_lan_wan eth0 eth1
 		;;
+	huasifei,ws3006)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 eth1" wan
+		;;
 	bazis,ax3000wm|\
 	cudy,m3000-v1|\
 	cudy,m3000-v2-yt8821|\
