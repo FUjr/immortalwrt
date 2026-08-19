@@ -1,5 +1,27 @@
 # 7621EVB Build Validation
 
+## NEX905-F-405 Build Validation
+
+- `./scripts/build-nex905-f-405.sh` selects `nex905_f-405`, builds, and verifies
+  the sysupgrade image fits the 15936 KiB partition and the manifest contains
+  `misectel-switch-manager`, `misectel-security-manager`,
+  `misectel-system-manager`, `misectel-watchdog`, `kmod-sched` and
+  `kmod-rtc-pcf85063`.
+- The kernel DTB for `nex905,f-405` labels MT7530 port 0 as `wan`, ports 1-3 as
+  `lan1`-`lan3`, `gmac1`/PHY4 as `lan4`, and muxes the `uart2` pin
+  group to GPIO for the system light (gpio12); the watchdog feed uses the wdt group pin gpio18.
+- Factory defaults verify: management address `192.168.1.99/24` with gateway
+  `192.168.1.1`, hostname `NEX905-F-40`, Web login `admin`/`Admin@123`, no
+  setup-wizard redirect, and `misectel.setup.completed=1`.
+- Web verification covers the neutral `NAT Gateway NEX905-F-40` login/header
+  brand, `NAT Gateway NEX905-F-405` model name, SNMP user `User`, LLDP/SNMP
+  system description, NTP server + manual time on Administration, and the WAN
+  save notification.
+- GPIO verification: gpio12 blinks at 1 Hz and gpio18 produces a 1 Hz square
+  wave while `misectel-watchdog` runs; both pins export through sysfs.
+- Device identity: `snmpwalk entPhysicalSerialNum` equals the WAN MAC and the
+  snmpd engine ID derives from the WAN interface.
+
 ## Verified In Build Environment
 
 - The target profile and sysupgrade metadata identify `misectel,7621evb`.

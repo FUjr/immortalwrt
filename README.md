@@ -26,6 +26,11 @@ the Misectel MT7981 convention, and adds VRF/bridge modules plus support for an
 externally wired PCF85063AT RTC. Its first-milestone image includes HTTPS LuCI,
 the Misectel theme, and the dedicated VRF NAT manager and application. Use
 `scripts/build-misectel-7621evb.sh` for a size-checked reproducible build.
+The customer delivery profile `nex905_f-405` (`NAT Gateway NEX905-F-405`)
+shares this layout and adds neutral Web branding, factory
+`admin`/`Admin@123`, management `192.168.1.99/24` (gateway `192.168.1.1`),
+SN = WAN MAC, and gpio12/gpio18 system-light/watchdog-feed; build with
+`scripts/build-nex905-f-405.sh`.
 The current switch-operations release also includes a Misectel LuCI frontend
 and backend for fixed-port state/rate/flow control, MAC security, passive
 performance and error monitoring, searchable volatile events, SNMPv3

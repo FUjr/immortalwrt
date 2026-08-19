@@ -72,6 +72,20 @@ The base MAC is stored at Factory offset `0xE000`; WAN derives the following
 address. A production programmer image must therefore contain per-device
 Factory data rather than a shared blank or example Factory partition.
 
+### NEX905-F-405 Product Profile
+
+The `nex905,f-405` device profile (`Device/nex905_f-405`) is the customer
+delivery variant of the same 16 MiB layout. It shares the `misectel,7621evb`
+U-Boot, flash map and physical port tracing, but carries neutral Web branding
+(`NAT Gateway NEX905-F-405`), factory `admin`/`Admin@123` login, management
+address `192.168.1.99/24` with gateway `192.168.1.1`, SN = WAN MAC, and an
+additional `misectel-watchdog` service that blinks gpio12 (system light) and
+pulses gpio18 (external watchdog feed). The DTS muxes the `uart2` pin group to
+GPIO for the system light; the watchdog feed reuses the already-GPIO `wdt`
+group pin (io18) because the RGMII2 group (io22-33) is required by the
+embedded switch CPU port. See
+[`docs/nex905-f-405-web-rebrand-design.md`](nex905-f-405-web-rebrand-design.md).
+
 The image integrates `misectel-vrf-manager`, `luci-app-misectel-vrf`, and
 `luci-app-misectel-network` from the independent local feed.
 `luci-ssl-openssl` supplies the HTTPS management endpoint. netifd owns

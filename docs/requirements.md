@@ -21,13 +21,13 @@
 | DEC-002 | RTC | PCF85063AT on native `I2C_SD`/`I2C_SCLK` (GPIO3/GPIO4), address `0x51`; DTS/module enabled, but both boards return no ACK and require hardware inspection |
 | DEC-003 | Device identity | IP addresses must be unique within one port/VRF; addresses may repeat across VRFs |
 | DEC-004 | WAN mapping delivery | Static addresses from the WAN subnet, advertised with ARP |
-| DEC-005 | Management | WAN-side management IP, forced to static `192.168.1.1/24` until first-run setup completes; later upgrades preserve the configured WAN |
+| DEC-005 | Management | WAN-side management IP, factory static `192.168.1.99/24` with default gateway `192.168.1.1`; later upgrades preserve the configured WAN |
 | DEC-006 | NAT 1:N meaning | One external IP split by protocol/port ranges to multiple internal devices |
 | DEC-007 | IPv6 boundary | Management and ACL may be dual stack; VRF NAT is IPv4 only |
 | DEC-008 | Acceleration | Isolated VRF paths and firewall4 global flow offload remain software-only; one explicitly selected ordinary LAN may use a WAN/LAN-restricted MT7621 hardware flowtable |
 | DEC-009 | Performance | Measured and reported, never a release blocker |
 | DEC-010 | Storage policy | Core image first; lower-priority features may be declared unsupported when the 16 MiB limit is exceeded |
-| DEC-011 | Initial authentication | One-time HTTPS setup requires setting the administrator password before forwarding is enabled |
+| DEC-011 | Initial authentication | Factory Web account `admin` with default password `Admin@123`; the first-run setup wizard is removed and forwarding is enabled by default |
 | DEC-012 | NMS | HTTPS ubus JSON-RPC; SNMP is primarily monitoring and traps |
 | DEC-013 | Legacy security | HTTP, SNMPv1/v2c, and weak authentication are disabled by default |
 | DEC-014 | Compliance | IEC 62443-4-2 gap assessment only; no certification claim |
@@ -55,7 +55,7 @@
 | NAT-010 | Optional ordinary HNAT LAN | A global enable converts exactly one selected VRF definition to a main-table LAN; ports and prefixes cannot overlap WAN/other VRFs, mappings cannot target it, and only UCI/NMS controls whether LuCI exposes HNAT controls | API/UCI v8 and static validation implemented; target PPE/throughput verification pending |
 | L2-008 | Same-VRF hardware switching | Multiple MT7530 member ports in one VRF share a DSA bridge, use a bridge MAC distinct from WAN, and offload same-subnet unicast in the switch chip | verified between isolated external USB-Ethernet endpoints on LAN3-LAN2: 94.2 Mbit/s TCP in both directions; 30K pps minimum frames sustained zero loss in four bidirectional runs, 50K pps was near-lossless, and line-rate pressure reached 145K-147K pps with low loss |
 | DHCP-002 | Per-VRF lightweight DHCP | Each VRF can independently distribute IPv4 address, mask, gateway and up to two DNS servers, with static MAC/address reservations | verified on VRF2/LAN2 with USB0 client static lease, gateway, DNS and reload recovery |
-| SEC-001 | Safe factory state | WAN and LAN links are administratively up, but no default route or forwarding exists until one-time password setup completes | verified on device |
+| SEC-001 | Safe factory state | WAN and LAN links are administratively up; forwarding is enabled by default after the NEX905-F-405 web rebrand (default password `Admin@123`) | verified on device |
 | SEC-002 | Web management | HTTP/80 and HTTPS/443 are both accepted from WAN by default without forced redirect; TLS 1.2 minimum and TLS 1.3 remain available | direct WAN HTTP returned 200 after the same-VRF bridge deployment; static checks complete |
 | SYS-001 | Flashable image | Image exists, is at most `15936k`, and passes manifest/checksum checks | verified |
 | SYS-003 | Bootloader artifact | Standalone MT7621 SPI NOR U-Boot uses 256 MiB DDR3 timing and boots firmware from `0x70000` | build and device boot verified |
@@ -146,6 +146,14 @@ is exercised on the target; build or API checks alone are not hardware proof.
   loss, and security alarms; local/remote logs and SNMP counters/traps.
 - `DIAG-001..003`: live link/speed/duplex/error query, filtered log search, and
   security event tracing.
+
+## NEX905-F-405 Product Web and Identity
+
+The `nex905,f-405` device profile rebrands the Misectel 7621EVB NAT gateway as
+the NAT Gateway NEX905-F-405 product: neutral Web branding, default
+`admin`/`Admin@123`, management address `192.168.1.99`, SN = WAN MAC, SNMP
+user `User`, NTP manual time and server settings, WAN save notification, and
+gpio12 system-light / gpio18 watchdog-feed. Design: [`docs/nex905-f-405-web-rebrand-design.md`](nex905-f-405-web-rebrand-design.md).
 
 ## Capacity and Release Gates
 
