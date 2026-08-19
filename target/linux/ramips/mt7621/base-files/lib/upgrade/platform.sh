@@ -24,10 +24,40 @@ platform_check_image() {
 	return 0
 }
 
+misectel_7621evb_32m_upgrade() {
+	# Write the image to the inactive slot first. Only when the write
+	# succeeds do we point U-Boot at it via try_slot; a power loss during
+	# the write therefore keeps the previously active slot selected and the
+	# overlay (first "rootfs_data") preserves the user configuration. If the
+	# new slot still fails to boot, U-Boot exhausts boot_attempts and
+	# reverts to active_slot.
+	local active target
+	active="$(fw_printenv -n active_slot 2>/dev/null)"
+	[ -n "$active" ] || active=A
+
+	if [ "$active" = "A" ]; then
+		target=firmware_b
+	else
+		target=firmware_a
+	fi
+	PART_NAME=$target
+	default_do_upgrade "$1" || return 1
+
+	if [ "$active" = "A" ]; then
+		fw_setenv try_slot B || return 1
+	else
+		fw_setenv try_slot A || return 1
+	fi
+	fw_setenv boot_attempts 2 || return 1
+}
+
 platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+	misectel,7621evb-32m)
+		misectel_7621evb_32m_upgrade "$1"
+		;;
 	alfa-network,quad-e4g)
 		[ "$(fw_printenv -n dual_image 2>/dev/null)" = "1" ] &&\
 		[ -n "$(find_mtd_part backup)" ] && {

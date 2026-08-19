@@ -810,9 +810,11 @@ define Device/misectel_7621evb
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
 	luci-app-misectel-vrf luci-app-misectel-system \
 	misectel-switch-manager luci-app-misectel-switch \
-	misectel-security-manager luci-app-misectel-security misectel-system-manager
+	misectel-security-manager luci-app-misectel-security misectel-system-manager \
+	mdio-tools
 endef
 TARGET_DEVICES += misectel_7621evb
+
 define Device/nex905_f-405
   $(Device/dsa-migration)
   DEVICE_VENDOR := NEX905
@@ -830,6 +832,22 @@ define Device/nex905_f-405
 	misectel-watchdog mdio-tools
 endef
 TARGET_DEVICES += nex905_f-405
+
+define Device/misectel_7621evb-32m
+  $(Device/dsa-migration)
+  DEVICE_VENDOR := Misectel
+  DEVICE_MODEL := 7621EVB
+  DEVICE_VARIANT := 32M Dual Slot
+  DEVICE_DTS := mt7621_misectel_7621evb-32m
+  IMAGE_SIZE := 15936k
+	DEVICE_PACKAGES := uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
+	kmod-rtc-pcf85063 luci-ssl-openssl luci-base-misectel \
+	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
+	luci-app-misectel-vrf luci-app-misectel-system \
+	misectel-switch-manager luci-app-misectel-switch \
+	misectel-security-manager luci-app-misectel-security misectel-system-manager
+endef
+TARGET_DEVICES += misectel_7621evb-32m
 
 define Device/cudy_wr1300-v1
   $(Device/dsa-migration)

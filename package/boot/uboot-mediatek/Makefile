@@ -75,6 +75,15 @@ define U-Boot/mt7621_misectel_7621evb
   UBOOT_IMAGE:=u-boot-mt7621.bin
 endef
 
+define U-Boot/mt7621_misectel_7621evb-32m
+  NAME:=Misectel 7621EVB (32M Dual Slot)
+  UBOOT_CONFIG:=mt7621_misectel_7621evb-32m
+  BUILD_DEVICES:=misectel_7621evb-32m
+  BUILD_TARGET:=ramips
+  BUILD_SUBTARGET:=mt7621
+  UBOOT_IMAGE:=u-boot-mt7621.bin
+endef
+
 define U-Boot/mt7621_nand_rfb
   NAME:=MT7621 Reference Board (NAND)
   UBOOT_CONFIG:=mt7621_nand_rfb
@@ -1351,6 +1360,7 @@ UBOOT_TARGETS := \
 	mt7620_mt7530_rfb \
 	mt7620_rfb \
 	mt7621_misectel_7621evb \
+	mt7621_misectel_7621evb-32m \
 	mt7621_nand_rfb \
 	mt7621_rfb \
 	mt7621_zbtlink_zbt-wg3526-16m \

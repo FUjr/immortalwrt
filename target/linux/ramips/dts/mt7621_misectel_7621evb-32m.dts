@@ -1,0 +1,144 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "mt7621.dtsi"
+
+/ {
+	compatible = "misectel,7621evb-32m", "mediatek,mt7621-soc";
+	model = "Misectel 7621EVB NAT Gateway (32M dual slot)";
+
+	aliases {
+		label-mac-device = &gmac0;
+	};
+
+	chosen {
+		/delete-property/ bootargs;
+	};
+};
+
+&spi0 {
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <25000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x030000>;
+				read-only;
+			};
+
+			partition@30000 {
+				label = "u-boot-env";
+				reg = <0x030000 0x010000>;
+			};
+
+			factory: partition@40000 {
+				label = "factory";
+				reg = <0x040000 0x010000>;
+				read-only;
+
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					macaddr_factory_e000: macaddr@e000 {
+						compatible = "mac-base";
+						reg = <0xe000 0x6>;
+						#nvmem-cell-cells = <1>;
+					};
+				};
+			};
+
+			partition@50000 {
+				label = "woem";
+				reg = <0x050000 0x010000>;
+				read-only;
+			};
+
+			partition@60000 {
+				label = "ledeinfo";
+				reg = <0x060000 0x010000>;
+			};
+
+			partition@70000 {
+				compatible = "denx,uimage";
+				label = "firmware_a";
+				reg = <0x070000 0xf90000>;
+			};
+
+			partition@1000000 {
+				compatible = "denx,uimage";
+				label = "firmware_b";
+				reg = <0x1000000 0xf90000>;
+			};
+		};
+	};
+};
+
+&i2c {
+	status = "okay";
+
+	rtc@51 {
+		compatible = "nxp,pcf85063a";
+		reg = <0x51>;
+	};
+};
+
+&gmac0 {
+	nvmem-cells = <&macaddr_factory_e000 0>;
+	nvmem-cell-names = "mac-address";
+};
+
+&gmac1 {
+	status = "okay";
+	label = "lan4";
+	phy-handle = <&ethphy4>;
+
+	nvmem-cells = <&macaddr_factory_e000 1>;
+	nvmem-cell-names = "mac-address";
+};
+
+&ethphy4 {
+	/delete-property/ interrupts;
+};
+
+&switch0 {
+	ports {
+		/delete-node/ port@4;
+
+		port@0 {
+			status = "okay";
+			label = "wan";
+		};
+
+		port@1 {
+			status = "okay";
+			label = "lan1";
+		};
+
+		port@2 {
+			status = "okay";
+			label = "lan2";
+		};
+
+		port@3 {
+			status = "okay";
+			label = "lan3";
+		};
+	};
+};
+
+&state_default {
+	gpio {
+		groups = "jtag", "uart3", "wdt";
+		function = "gpio";
+	};
+};

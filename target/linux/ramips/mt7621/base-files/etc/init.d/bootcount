@@ -4,6 +4,25 @@ START=99
 
 boot() {
 	case $(board_name) in
+	misectel,7621evb-32m)
+		# Dual-slot A/B: commit the slot this boot came from when it was a
+		# pending (just-upgraded) slot.  Reaching START=99 means the system
+		# booted far enough to be considered healthy; otherwise U-Boot
+		# exhausts boot_attempts and reverts to active_slot automatically.
+		local arg slot try
+		for arg in $(cat /proc/cmdline); do
+			case "$arg" in
+			slot=*) slot="${arg#slot=}" ;;
+			esac
+		done
+		[ -n "$slot" ] || return 0
+		try="$(fw_printenv -n try_slot 2>/dev/null)"
+		[ -n "$try" ] && [ "$try" = "$slot" ] || return 0
+		fw_setenv active_slot "$slot"
+		fw_setenv try_slot ''
+		fw_setenv boot_attempts 2
+		logger -t misectel-ab "committed active slot $slot"
+		;;
 	alfa-network,quad-e4g)
 		[ -n "$(fw_printenv bootcount bootchanged 2>/dev/null)" ] &&\
 			echo -e "bootcount\nbootchanged\n" | /usr/sbin/fw_setenv -s -
