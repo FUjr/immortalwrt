@@ -1,0 +1,22 @@
+{
+  "base_url": "https://192.168.1.1",
+  "mapping_persisted": true,
+  "mapping_deleted": true,
+  "page_errors": [
+    "[pageerror] https://192.168.1.1/cgi-bin/luci/admin/misectel-dashboard: RPC call to uci/get failed with error -32002: Access denied\n  at ClassConstructor.handleCallReply (https://192.168.1.1/luci-static/resources/rpc.js?v=26.203.15235~5d8f03d-1786364845:11:3)"
+  ],
+  "screenshots": [
+    "01-dashboard.png",
+    "02-wan-network.png",
+    "03-vrf-overview.png",
+    "04-mapping-editor-empty.png",
+    "05-mapping-editor-filled.png",
+    "06-mapping-persisted.png",
+    "07-mapping-deleted.png",
+    "08-switch-operations.png",
+    "09-security.png",
+    "10-system-management.png",
+    "11-upgrade.png",
+    "12-dashboard-mobile.png"
+  ]
+}

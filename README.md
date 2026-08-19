@@ -102,6 +102,12 @@ Before first-run setup completes, the gateway overrides the board-generated
 DHCP WAN with static `192.168.1.1/24`, so management login does not require an
 upstream DHCP server. Upgrades preserve the selected WAN configuration after
 setup completion.
+A 32 MiB SPI NOR variant `misectel_7621evb-32m` adds a second firmware slot and
+boot-time rollback: sysupgrade writes the inactive slot and then points U-Boot
+at it via `try_slot`; a failed or interrupted upgrade reverts to the previous
+`active_slot` and the shared overlay keeps the user configuration. See
+`docs/architecture.md` and the `AB-*` rows in `docs/requirements.md`. Use
+`scripts/build-misectel-7621evb-32m.sh` to build it.
 
 ImmortalWrt is a fork of [OpenWrt](https://openwrt.org), with more packages ported, more devices supported, default optimized profiles and localization modifications for mainland China users.<br/>
 Compared to upstream, we allow to use (non-upstreamable) modifications/hacks to provide better feature/performance/support.

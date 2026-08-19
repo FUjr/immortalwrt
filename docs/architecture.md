@@ -86,6 +86,56 @@ group pin (io18) because the RGMII2 group (io22-33) is required by the
 embedded switch CPU port. See
 [`docs/nex905-f-405-web-rebrand-design.md`](nex905-f-405-web-rebrand-design.md).
 
+### 32M Dual-Slot Variant
+
+A 32 MiB SPI NOR variant (`misectel,7621evb-32m`) adds a second firmware slot
+and boot-time rollback so a failed or interrupted upgrade boots the previous
+image and keeps the user configuration.
+
+| Partition | Offset | Size | Notes |
+| --- | --- | ---: | --- |
+| `u-boot` | `0x000000` | `0x030000` | read-only |
+| `u-boot-env` | `0x030000` | `0x010000` | U-Boot env plus A/B flags |
+| `factory` | `0x040000` | `0x010000` | read-only, base MAC |
+| `woem` | `0x050000` | `0x010000` | read-only |
+| `ledeinfo` | `0x060000` | `0x010000` | |
+| `firmware_a` | `0x070000` | `0xf90000` | slot A, `denx,uimage` |
+| `firmware_b` | `0x1000000` | `0xf90000` | slot B, `denx,uimage` |
+
+Each slot is the same 15936 KiB uImage-plus-squashfs image as the 16 MiB
+variant, so `IMAGE_SIZE` and the sysupgrade format are unchanged. mtdsplit
+splits both slots into `kernel`/`rootfs`/`rootfs_data`; the first `rootfs_data`
+(slot A's) is therefore always the overlay, which makes configuration follow
+the active slot and survive a rollback. The kernel mounts the active slot's
+`rootfs` (`/dev/mtdblock6` for slot A, `/dev/mtdblock9` for slot B when both
+slots are valid) because the DTS `chosen` carries no `bootargs` and U-Boot
+supplies the per-slot command line.
+
+The 32M device uses a dedicated U-Boot that owns the A/B selection in the
+default environment. Three variables implement the protocol:
+
+- `active_slot` (`A`/`B`): the last confirmed-good slot, booted on every normal
+  boot.
+- `try_slot`: set by sysupgrade to the just-written slot; U-Boot boots it while
+  `boot_attempts` remains positive.
+- `boot_attempts` (default `2`): on each boot of a pending slot U-Boot
+  decrements it and `saveenv`s; when it reaches zero, or when `bootm` rejects
+  the image, U-Boot clears `try_slot` and reverts to `active_slot`.
+
+sysupgrade for this board writes the image to the inactive slot and only then
+sets `try_slot` plus `boot_attempts=2`. A power loss during the write leaves
+`try_slot` unset, so the old slot boots. A power loss during the first boot of
+the new slot, a kernel panic (`panic=1`), or an invalid image makes U-Boot
+exhaust the attempts and revert to `active_slot`. The init script
+`bootcount` commits a pending slot by copying `try_slot` into `active_slot`
+once the system reaches START=99.
+
+The U-Boot binary, env defaults and DTS for the 32M board are added by
+`patches/423-add-misectel-7621evb-32m.patch`. The `u-boot-envtools` package
+provides `fw_printenv`/`fw_setenv` on the device for sysupgrade and commit.
+The 32 MiB programmer image writes the same firmware into both slots so a
+factory board can boot either slot and roll back between them.
+
 The image integrates `misectel-vrf-manager`, `luci-app-misectel-vrf`, and
 `luci-app-misectel-network` from the independent local feed.
 `luci-ssl-openssl` supplies the HTTPS management endpoint. netifd owns

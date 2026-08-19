@@ -47,14 +47,17 @@
 | 管理/LAN 设备地址 | `192.168.1.99/24` | vrf-gateway 出厂 `network.wan` |
 | 网关地址 | `192.168.1.1` | vrf-gateway 出厂 `network.wan.gateway` |
 | 设备名称 | `NEX905-F-40` | vrf-gateway 出厂 `system.hostname` |
-| WEB 账号 | `admin` | vrf-gateway 出厂 `rpcd` `login` 段（无 Linux 用户） |
-| WEB 密码 | `Admin@123` | vrf-gateway 出厂设置 root 密码并创建 `admin` rpcd 登录 |
+| WEB 账号 | `admin` | 将 root-backed `rpcd` 登录项的 Web 用户名映射为 `admin`（无 Linux 用户） |
+| WEB 密码 | `Admin@123` | vrf-gateway 出厂设置 root 密码，Web 登录通过 `$p$root` 校验 |
 
 说明：vrf_gateway 模式下 `network.lan` 桥被删除，物理 WAN 即管理口，出厂
 静态地址 `192.168.1.99/24`、默认网关 `192.168.1.1`，满足「LAN 设备地址
-192.168.1.99、网关 192.168.1.1」的出厂要求。WEB 账号 `admin` 通过
-`/etc/config/rpcd` 的 `login` 段实现（复用 `misectel-system-manager` 的
-Web/NMS 账号机制），不创建 SSH 可用账号；root 保留为系统/SSH 账号。
+192.168.1.99、网关 192.168.1.1」的出厂要求。WEB 账号 `admin` 复用
+`/etc/config/rpcd` 原生 root-backed `login` 段：用户名映射为 `admin`，
+密码保持 `$p$root`，读写 ACL 保持 wildcard list。这样新安装包增加的 ACL
+组会自动纳入管理员会话，不需要逐项同步权限。升级时删除旧版独立哈希的
+`rpcd.admin` 段，避免两套管理员凭据和 ACL 漂移。该映射不创建 SSH 可用
+账号；root 保留为系统/SSH 账号。
 同一套默认值也保留在 `misectel-oem-defaults` 的 `99_misectel-oem-defaults`
 中，供包含该 OEM 包的镜像使用。
 
@@ -75,6 +78,7 @@ Web 端去除公司英文品牌信息，改用中性名词：
 | --- | --- | --- |
 | 登录页标题 / 顶栏品牌 / 浏览器 title | `Misectel VRF NAT Gateway` | `NAT Gateway NEX905-F-40` |
 | 页脚品牌 | `Misectel LuCI Theme` | `NAT Gateway` |
+| 产品页面 URL 前缀 | `misectel-*` | `gateway-*`，例如 `/admin/gateway-dashboard/overview` |
 | 页脚「Powered by github」链接 | 存在 | 移除 |
 | 交换机拓扑本机名回退 | `Misectel Gateway` | `NAT Gateway` |
 | 主题登录标题回退 | `Misectel` | `NAT Gateway` |
@@ -82,6 +86,11 @@ Web 端去除公司英文品牌信息，改用中性名词：
 默认值同步中性化：SNMPv3 用户名 `misectel` → `User`；LLDP 系统描述
 `Misectel 7621EVB NAT Gateway` → `NAT Gateway NEX905-F-405`；SNMP
 `sysDescr` 同值。
+
+Dashboard ACL 必须覆盖页面及共享客户端模块实际调用的 UCI、网络状态和
+`misectel.dhcp_leases` 方法。VRF 网关不加载未安装的 `qmodem` 配置。
+Overview 验证需要同时检查浏览器 `pageerror` 和 RPC Access denied，不能
+只检查 HTTP 200 或空白状态卡是否存在。
 
 ## 6 SNMP / LLDP 页面
 

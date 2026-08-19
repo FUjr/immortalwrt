@@ -1,8 +1,31 @@
 # Misectel 7621EVB VRF NAT 网关交付报告
 
-交付日期：2026-08-05
+交付日期：2026-08-14（第二轮）
 设备：`misectel,7621evb`，MT7621，256 MiB DDR3，16 MiB SPI NOR  
 软件路径：Linux 软件转发，不启用硬件或软件 flow offload
+
+## 0. 第二轮交付摘要（2026-08-14）
+
+本轮在首轮基础上完成以下增强与验证：
+
+1. **SNMP 能力补齐**：企业 `sysObjectID`（`1.3.6.1.4.1.62446.6.1.905.1`）、
+   SNMP Set（`sysContact/sysName/sysLocation` 经 VACM 写视图可写）、
+   ENTITY-MIB `entPhysicalTable`、BRIDGE-MIB `dot1dBaseBridgeAddress`（VRF 桥 MAC）、
+   SNMP-TARGET-MIB（`target` 模块），并修正 pass_persist 三处缺陷
+   （`asc2bin` 需空格分隔、BusyBox `sort` 排序、前导点）。详见
+   [`docs/snmp-mib-design.md`](snmp-mib-design.md)。
+2. **私有 MIB 迁移**：`MISECTEL-SWITCH-MIB` 从 Net-SNMP 实验 OID `8072.9999`
+   迁移到汇川企业 OID `1.3.6.1.4.1.62446`，并补齐 CONTACT-INFO/REVISION。
+3. **32M 双分区变体**：新增 `misectel_7621evb-32m`，双固件槽位 + 升级断电自动回滚
+   （`active_slot/try_slot/boot_attempts` U-Boot 环境变量）。详见
+   [`docs/architecture.md`](architecture.md)。
+4. **Web 管理界面 Playwright 验证**：全部配置页面 + NAT 映射增删（立即落盘）实机
+   验证，见 [`docs/web-config-delivery.md`](web-config-delivery.md)。
+5. **应用层缺陷修复**：映射/VRF 弹窗"保存/删除"由"仅内存暂存"改为立即落盘
+   （新增 `misectel.vrf commit_config`），删除 VRF 同步清理引用映射。
+
+测试用例（xmind/markdown/PDF）、覆盖率与测试配置说明见
+[`docs/testcases/`](testcases/) 与 [`docs/test-config-guide.md`](test-config-guide.md)。
 
 ## 1. 交付范围
 
@@ -245,9 +268,9 @@ WAN/LAN 地址在本地协议栈短路。小包激励提高到约 15137 pps，�
 | 日志 | 记录关键事件 | 基本需求 | 1 | logd 与交换机事件环 |
 | 日志 | 日志导出 | 基本需求 | 1 | Web 检索和导出 |
 | 日志 | Syslog over TLS 和 IP 白名单 | 期望需求 | 1 | 轻量TLS 1.2/1.3转发、CA/名称校验、固定IPv4目标白名单，无明文降级 |
-| SNMP | v1/v2c/v3 Get/GetNext/Set/BulkGet | 基本需求 | 2 | Get/GetNext/BulkGet实机通过；当前用户只读，SET返回`noAccess`，v1/v2c默认关闭 |
+| SNMP | v1/v2c/v3 Get/GetNext/Set/BulkGet | 基本需求 | 1 | Get/GetNext/BulkGet/Set 实机通过；Set 仅限 sysContact/sysName/sysLocation 三个管理标签（VACM 写视图），其余只读；v1/v2c 默认关闭 |
 | SNMP | Link/CPU/端口错误 Trap | 期望需求 | 1 | SNMPv3实机收到私有事件、端口错误和标准linkDown通知；真实拔线待窗口复测 |
-| SNMP | RFC1213、EtherLike、IF、LLDP MIB | 期望需求 | 1 | SNMPv3实机查询及真实LLDP邻居通过；私有MIB正式PEN待申请 |
+| SNMP | RFC1213、EtherLike、IF、LLDP MIB | 期望需求 | 1 | MIB-II/IF-MIB/EtherLike/LLDP-MIB + ENTITY-MIB + BRIDGE-MIB 实机查询通过；私有 MIB 已迁移到汇川企业 OID 1.3.6.1.4.1.62446 |
 | SNMPv3 | SHA-256/AES-256 | 期望需求 | 1 | authPriv 实机查询通过，不声明 IEC 认证 |
 | NTP | 多 NTP 主备和自动切换 | 期望需求 | 1 | 系统 NTP 客户端多服务器 |
 | NTP | RTC 失联回退 | 期望需求 | 2 | PCF85063AT驱动和I2C `0x51`节点已生效，但两台实机均无ACK并返回`-145`；需检查供电、上拉、焊接和`I2C_SD`/`I2C_SCLK`走线 |

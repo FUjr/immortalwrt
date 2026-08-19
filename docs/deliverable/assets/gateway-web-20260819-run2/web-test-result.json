@@ -1,0 +1,72 @@
+{
+  "base_url": "https://192.168.1.99",
+  "username": "admin",
+  "target_hostname": "NEX905-F-40",
+  "checks": [
+    {
+      "name": "login",
+      "ok": true,
+      "detail": "user=admin"
+    },
+    {
+      "name": "web_configure_hostname",
+      "ok": true,
+      "detail": "hostname=NEX905-F-40"
+    },
+    {
+      "name": "web_configure_nat_mapping_add",
+      "ok": true,
+      "detail": "count=1"
+    },
+    {
+      "name": "web_configure_nat_mapping_delete",
+      "ok": true,
+      "detail": "count=0"
+    },
+    {
+      "name": "web_configure_lldp_system_name",
+      "ok": true,
+      "detail": "system_name=7621 vrf evb"
+    },
+    {
+      "name": "web_configure_binding_add",
+      "ok": false,
+      "detail": "count=0"
+    },
+    {
+      "name": "binding_row_delete_button_present",
+      "ok": false,
+      "detail": "delete_buttons=0"
+    },
+    {
+      "name": "binding_delete_via_rpc",
+      "ok": false,
+      "detail": "{\"ok\":false,\"after_total\":0}"
+    }
+  ],
+  "page_errors": [
+    "[pageerror] https://192.168.1.99/cgi-bin/luci/: RPC call to uci/get failed with error -32002: Access denied\n  at ClassConstructor.handleCallReply (https://192.168.1.99/luci-static/resources/rpc.js?v=26.203.15235~5d8f03d-1787114049:11:3)"
+  ],
+  "screenshots": [
+    "01-dashboard.png",
+    "14-administration.png",
+    "15-administration-hostname-filled.png",
+    "02-wan-network.png",
+    "03-vrf-overview.png",
+    "04-mapping-editor-empty.png",
+    "05-mapping-editor-filled.png",
+    "06-mapping-persisted.png",
+    "07-mapping-deleted.png",
+    "08-switch-operations.png",
+    "08b-switch-snmp-lldp.png",
+    "09-security.png",
+    "10-binding-editor-filled.png",
+    "11-binding-persisted.png",
+    "12-binding-actions-broken.png",
+    "13-system-management.png",
+    "16-access-security.png",
+    "17-upgrade.png",
+    "18-system-log.png",
+    "19-dashboard-mobile.png"
+  ]
+}

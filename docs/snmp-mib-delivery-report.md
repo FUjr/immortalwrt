@@ -83,17 +83,19 @@ single-collision 对象返回 `No Such Instance`。这表示 MIB 表已注册，
 当前根 OID：
 
 ```text
-1.3.6.1.4.1.8072.9999
+1.3.6.1.4.1.62446.6.1.905.1
 ```
+
+（已迁移到汇川企业号 62446；原 Net-SNMP 实验 OID `8072.9999` 不再使用。）
 
 通知 OID 与字段：
 
 | 名称 | OID | 内容 |
 | --- | --- | --- |
-| `misectelSecurityEvent` | `.1.3.6.1.4.1.8072.9999.2.1` | 通用事件通知 |
-| `misectelEventType` | `.1.3.6.1.4.1.8072.9999.1.1` | 事件类型 |
-| `misectelEventPort` | `.1.3.6.1.4.1.8072.9999.1.2` | 端口或子系统 |
-| `misectelEventMessage` | `.1.3.6.1.4.1.8072.9999.1.3` | 可读事件说明 |
+| `misectelSecurityEvent` | `.1.3.6.1.4.1.62446.6.1.905.1.2.1` | 通用事件通知 |
+| `misectelEventType` | `.1.3.6.1.4.1.62446.6.1.905.1.1.1` | 事件类型 |
+| `misectelEventPort` | `.1.3.6.1.4.1.62446.6.1.905.1.1.2` | 端口或子系统 |
+| `misectelEventMessage` | `.1.3.6.1.4.1.62446.6.1.905.1.1.3` | 可读事件说明 |
 
 链路 UP/DOWN 使用标准 `linkUp`/`linkDown` Trap OID；CPU 高负载、端口
 错误、带宽阈值、广播/多播阈值、新 MAC、非法 MAC、端口安全关断和 LLDP
@@ -164,9 +166,8 @@ export MIBS='+MISECTEL-SWITCH-MIB'
 snmptranslate -On MISECTEL-SWITCH-MIB::misectelSecurityEvent
 ```
 
-当前版本会返回 `.1.3.6.1.4.1.8072.9999.2.1`，同时 Net-SNMP 会提示
-`Expected CONTACT-INFO`。正式发布私有 MIB 前应补齐 MODULE-IDENTITY 的
-CONTACT-INFO、REVISION 等信息，并替换为正式申请的企业 OID。
+迁移后返回 `.1.3.6.1.4.1.62446.6.1.905.1.2.1`，并已补齐 MODULE-IDENTITY 的
+CONTACT-INFO、REVISION 等元数据，替换为汇川企业 OID `1.3.6.1.4.1.62446`。
 
 ### 4.4 接收 SNMPv3 Trap
 
@@ -259,7 +260,7 @@ Reason: noAccess
 SNMPv3 接收端成功解密收到：
 
 ```text
-snmpTrapOID.0 = 1.3.6.1.4.1.8072.9999.2.1
+snmpTrapOID.0 = 1.3.6.1.4.1.62446.6.1.905.1.2.1
 eventType     = "delivery_test"
 eventPort     = "snmp"
 eventMessage  = "MIB delivery trap verification"
@@ -289,10 +290,14 @@ eventMessage  = "MIB delivery trap verification"
 ## 6. 已知问题与后续整改
 
 1. 向 IANA 申请或确认 Misectel 企业号，替换 `8072.9999`。
+   （已完成：迁移到汇川企业 OID `1.3.6.1.4.1.62446.6.1.905.1`。）
 2. 补齐私有 MIB 的 CONTACT-INFO、REVISION、合规描述并通过严格 SMIv2 lint。
 3. 为 Trap 发送方提供固定、可查询的 EngineID，并在 Web/API 中展示。
 4. 如果客户要求 SNMP Set，先定义可写对象、角色权限、事务回滚和审计，
    不能简单开放当前 `.1` 全视图写权限。
+   （已实现：`sysContact`/`sysName`/`sysLocation` 通过 VACM 写视图开放 Set，
+   并设置企业 `sysObjectID`、BRIDGE-MIB、ENTITY-MIB、SNMP-TARGET-MIB，见
+   `docs/snmp-mib-design.md`。）
 5. 为 VRF/NAT、端口配置、告警历史等产品对象设计正式私有标量和表；当前
    私有 MIB 只有通知，不支持轮询这些业务配置。
 6. 修正配置应用期间出现的一次非致命 `Command failed: Not found`，虽然

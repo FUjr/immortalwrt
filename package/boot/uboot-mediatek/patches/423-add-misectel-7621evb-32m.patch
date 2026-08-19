@@ -1,0 +1,263 @@
+--- /dev/null
++++ b/configs/mt7621_misectel_7621evb-32m_defconfig
+@@ -0,0 +1,100 @@
++CONFIG_MIPS=y
++CONFIG_SYS_HAS_NONCACHED_MEMORY=y
++CONFIG_SYS_MALLOC_LEN=0x100000
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_SF_DEFAULT_SPEED=20000000
++CONFIG_ENV_SIZE=0x10000
++CONFIG_ENV_OFFSET=0x30000
++CONFIG_DEFAULT_DEVICE_TREE="misectel,7621evb-32m"
++CONFIG_SPL_SERIAL=y
++CONFIG_TPL_SYS_MALLOC_F_LEN=0x1000
++CONFIG_SPL_SYS_MALLOC_F_LEN=0x40000
++CONFIG_SPL_BSS_START_ADDR=0x80140000
++CONFIG_SPL_BSS_MAX_SIZE=0x80000
++CONFIG_SYS_BOOTM_LEN=0x2000000
++CONFIG_SYS_LOAD_ADDR=0x83000000
++CONFIG_SPL=y
++CONFIG_DEBUG_UART_BASE=0xbe000c00
++CONFIG_DEBUG_UART_CLOCK=50000000
++CONFIG_ARCH_MTMIPS=y
++CONFIG_SOC_MT7621=y
++CONFIG_MT7621_DRAM_FREQ_1200=y
++CONFIG_MT7621_DRAM_DDR3_2048M=y
++CONFIG_SYS_MIPS_TIMER_FREQ=440000000
++# CONFIG_MIPS_CACHE_SETUP is not set
++# CONFIG_MIPS_CACHE_DISABLE is not set
++CONFIG_RESTORE_EXCEPTION_VECTOR_BASE=y
++CONFIG_MIPS_BOOT_FDT=y
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++# CONFIG_BOOTSTD is not set
++CONFIG_BOOTDELAY=3
++# CONFIG_ARCH_FIXUP_FDT_MEMORY is not set
++CONFIG_SYS_CONSOLE_INFO_QUIET=y
++CONFIG_SPL_MAX_SIZE=0x30000
++CONFIG_SPL_SYS_MALLOC_SIMPLE=y
++CONFIG_SPL_NOR_SUPPORT=y
++CONFIG_TPL=y
++# CONFIG_TPL_FRAMEWORK is not set
++CONFIG_HUSH_PARSER=y
++# CONFIG_BOOTM_NETBSD is not set
++# CONFIG_BOOTM_PLAN9 is not set
++# CONFIG_BOOTM_RTEMS is not set
++# CONFIG_BOOTM_VXWORKS is not set
++CONFIG_CMD_BOOTMENU=y
++# CONFIG_CMD_ELF is not set
++CONFIG_CMD_ERASEENV=y
++CONFIG_CMD_GPIO=y
++# CONFIG_CMD_LOADS is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_MTD=y
++CONFIG_CMD_PART=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_SF_TEST=y
++CONFIG_CMD_HASH=y
++CONFIG_DOS_PARTITION=y
++# CONFIG_SPL_DOS_PARTITION is not set
++# CONFIG_ISO_PARTITION is not set
++CONFIG_ENV_IS_IN_MTD=y
++CONFIG_ENV_RELOC_GD_ENV_ADDR=y
++CONFIG_ENV_MTD_DEV="nor0"
++CONFIG_ENV_USE_DEFAULT_ENV_TEXT_FILE=y
++CONFIG_ENV_DEFAULT_ENV_TEXT_FILE="defenvs/misectel_7621evb_32m_env"
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_VERSION_VARIABLE=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_BOOTP_SEND_HOSTNAME=y
++# CONFIG_I2C is not set
++# CONFIG_INPUT is not set
++CONFIG_MMC=y
++# CONFIG_MMC_QUIRKS is not set
++# CONFIG_MMC_HW_PARTITIONING is not set
++CONFIG_MMC_MTK=y
++CONFIG_DM_MTD=y
++CONFIG_SPI_FLASH_BAR=y
++CONFIG_SPI_FLASH_EON=y
++CONFIG_SPI_FLASH_GIGADEVICE=y
++CONFIG_SPI_FLASH_ISSI=y
++CONFIG_SPI_FLASH_MACRONIX=y
++CONFIG_SPI_FLASH_SPANSION=y
++CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_SPI_FLASH_WINBOND=y
++CONFIG_SPI_FLASH_XMC=y
++CONFIG_SPI_FLASH_XTX=y
++CONFIG_SPI_FLASH_MTD=y
++CONFIG_MEDIATEK_ETH=y
++CONFIG_PHY=y
++CONFIG_PHY_MTK_TPHY=y
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SPI=y
++CONFIG_MT7621_SPI=y
++CONFIG_SYSRESET=y
++CONFIG_SYSRESET_RESETCTL=y
++CONFIG_WDT=y
++CONFIG_WDT_MT7621=y
++# CONFIG_BINMAN_FDT is not set
++CONFIG_LZMA=y
++# CONFIG_GZIP is not set
++CONFIG_SPL_LZMA=y
+--- /dev/null
++++ b/defenvs/misectel_7621evb_32m_env
+@@ -0,0 +1,39 @@
++ethaddr_factory=mtd read factory $loadaddr 0x0 0x10000 ; setexpr macoffs $loadaddr + 0xe000 ; env readmem -b ethaddr $macoffs 0x6 ; setenv ethaddr_factory
++ipaddr=192.168.1.1
++serverip=192.168.1.254
++loadaddr=0x83000000
++bootcmd=run ethaddr_factory ; run boot_ab
++bootdelay=3
++bootfile=immortalwrt-ramips-mt7621-misectel_7621evb-32m-initramfs-kernel.bin
++bootfile_uboot=immortalwrt-ramips-mt7621-misectel_7621evb-32m-u-boot.bin
++bootfile_upg=immortalwrt-ramips-mt7621-misectel_7621evb-32m-squashfs-sysupgrade.bin
++bootmenu_default=0
++bootmenu_delay=3
++bootmenu_title=Misectel 7621EVB 32M
++bootmenu_0=Boot system from active slot.=run boot_nor
++bootmenu_1=Boot recovery image via TFTP.=run boot_tftp
++bootmenu_2=Write sysupgrade image to inactive slot via TFTP.=run boot_tftp_sysupgrade
++bootmenu_3=Write U-Boot via TFTP.=run boot_tftp_write_uboot
++bootmenu_4=Reset environment and reboot.=eraseenv ; reset
++bootmenu_5=Reboot.=reset
++active_slot=A
++try_slot=
++boot_attempts=2
++boot_nor=if test "$active_slot" = A ; then run boot_slot_A ; else run boot_slot_B ; fi
++boot_ab=if test -n "$try_slot" ; then if test "$boot_attempts" -gt 0 ; then setexpr boot_attempts $boot_attempts - 1 ; saveenv ; echo "A/B: trying slot $try_slot, attempts left $boot_attempts" ; if test "$try_slot" = A ; then run boot_try_A ; else run boot_try_B ; fi ; else echo "A/B: slot $try_slot failed, reverting to $active_slot" ; run boot_revert ; fi ; else if test "$active_slot" = A ; then run boot_slot_A ; else run boot_slot_B ; fi ; fi
++boot_try_A=if run boot_slot_A ; then echo "A/B: slot A is up" ; else echo "A/B: slot A failed to boot, reverting" ; run boot_revert ; fi
++boot_try_B=if run boot_slot_B ; then echo "A/B: slot B is up" ; else echo "A/B: slot B failed to boot, reverting" ; run boot_revert ; fi
++boot_revert=setenv try_slot ; setenv boot_attempts 2 ; saveenv ; echo "A/B: reverting to active slot $active_slot" ; if test "$active_slot" = A ; then run boot_slot_A ; else run boot_slot_B ; fi
++boot_slot_A=setenv bootargs console=ttyS0,115200 root=/dev/mtdblock6 rootwait panic=1 slot=A ; bootm 0x1fc70000
++boot_slot_B=setenv bootargs console=ttyS0,115200 root=/dev/mtdblock9 rootwait panic=1 slot=B ; sf probe ; sf read $loadaddr 0x1000000 0x800000 ; bootm $loadaddr
++boot_tftp=setenv bootargs console=ttyS0,115200 ; tftpboot $loadaddr $bootfile && bootm $loadaddr
++boot_tftp_sysupgrade=tftpboot $loadaddr $bootfile_upg && iminfo $loadaddr && run nor_write_inactive
++boot_tftp_write_uboot=tftpboot $loadaddr $bootfile_uboot && run nor_write_uboot
++nor_pad_size=setexpr image_eb $filesize / 0x1000 ; setexpr image_rem $filesize % 0x1000 ; test 0x$image_rem -gt 0 && setexpr image_eb $image_eb + 1 ; setexpr image_eb $image_eb * 0x1000
++nor_write_inactive=if test "$active_slot" = A ; then run nor_write_b ; else run nor_write_a ; fi
++nor_write_a=run nor_pad_size ; test 0x$image_eb -le 0xf90000 && mtd erase firmware_a 0x0 0x$image_eb && mtd write firmware_a $loadaddr 0x0 $filesize ; setenv try_slot A ; setenv boot_attempts 2 ; saveenv
++nor_write_b=run nor_pad_size ; test 0x$image_eb -le 0xf90000 && mtd erase firmware_b 0x0 0x$image_eb && mtd write firmware_b $loadaddr 0x0 $filesize ; setenv try_slot B ; setenv boot_attempts 2 ; saveenv
++nor_write_uboot=test 0x$filesize -le 0x30000 && mtd erase u-boot 0x0 0x30000 && mtd write u-boot $loadaddr 0x0 $filesize
++stdin=serial
++stdout=serial
++stderr=serial
+--- /dev/null
++++ b/arch/mips/dts/misectel,7621evb-32m.dts
+@@ -0,0 +1,115 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/dts-v1/;
++
++#include "mt7621.dtsi"
++
++/ {
++	compatible = "misectel,7621evb-32m", "mediatek,mt7621-rfb", "mediatek,mt7621-soc";
++	model = "Misectel 7621EVB 32M";
++
++	aliases {
++		ethernet0 = &eth;
++		serial0 = &uart0;
++		spi0 = &spi;
++	};
++
++	chosen {
++		stdout-path = &uart0;
++	};
++};
++
++&pinctrl {
++	state_default: pin_state {
++		gpios {
++			groups = "i2c", "uart3", "pcie reset";
++			function = "gpio";
++		};
++
++		wdt {
++			groups = "wdt";
++			function = "wdt rst";
++		};
++
++		jtag {
++			groups = "jtag";
++			function = "jtag";
++		};
++	};
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&gpio {
++	status = "okay";
++};
++
++&spi {
++	status = "okay";
++	num-cs = <2>;
++
++	spi-flash@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "jedec,spi-nor";
++		spi-max-frequency = <25000000>;
++		reg = <0>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x000000 0x030000>;
++			};
++
++			partition@30000 {
++				label = "u-boot-env";
++				reg = <0x030000 0x010000>;
++			};
++
++			partition@40000 {
++				label = "factory";
++				reg = <0x040000 0x010000>;
++				read-only;
++			};
++
++			partition@50000 {
++				label = "woem";
++				reg = <0x050000 0x010000>;
++				read-only;
++			};
++
++			partition@60000 {
++				label = "ledeinfo";
++				reg = <0x060000 0x010000>;
++			};
++
++			partition@70000 {
++				label = "firmware_a";
++				reg = <0x070000 0xf90000>;
++			};
++
++			partition@1000000 {
++				label = "firmware_b";
++				reg = <0x1000000 0xf90000>;
++			};
++		};
++	};
++};
++
++&eth {
++	status = "okay";
++};
++
++&ssusb {
++	status = "okay";
++};
++
++&u3phy {
++	status = "okay";
++};

@@ -12,11 +12,16 @@
   group to GPIO for the system light (gpio12); the watchdog feed uses the wdt group pin gpio18.
 - Factory defaults verify: management address `192.168.1.99/24` with gateway
   `192.168.1.1`, hostname `NEX905-F-40`, Web login `admin`/`Admin@123`, no
-  setup-wizard redirect, and `misectel.setup.completed=1`.
+  setup-wizard redirect, and `misectel.setup.completed=1`. The `admin` Web
+  login must be the root-backed rpcd login alias with password `$p$root` and
+  list-valued `read='*'`/`write='*'`; no independently hashed duplicate admin
+  login may remain after migration.
 - Web verification covers the neutral `NAT Gateway NEX905-F-40` login/header
   brand, `NAT Gateway NEX905-F-405` model name, SNMP user `User`, LLDP/SNMP
   system description, NTP server + manual time on Administration, and the WAN
-  save notification.
+  save notification. Product routes use the neutral `gateway-*` prefix; Overview is
+  `/admin/gateway-dashboard/overview` and must render populated system, WAN and
+  VRF data without browser page errors or RPC Access denied responses.
 - GPIO verification: gpio12 blinks at 1 Hz and gpio18 produces a 1 Hz square
   wave while `misectel-watchdog` runs; both pins export through sysfs.
 - Device identity: `snmpwalk entPhysicalSerialNum` equals the WAN MAC and the
@@ -58,8 +63,29 @@
   `0x000000`, the base MAC at `0x04E000`, erased WOEM at `0x050000`, erased
   LEDEINFO at `0x060000`, and an exact sysupgrade payload at `0x070000`.
 - After composing the standalone U-Boot and programmer image, the build script
-  refreshes the OpenWrt target checksum list. Both that list and the dedicated
+  refreshes the target-wide `sha256sums`. Both that list and the dedicated
   artifact checksum list pass `sha256sum -c`.
+
+## 32M Dual-Slot Build Validation
+
+- The 32M kernel DTB (`mt7621_misectel_7621evb-32m`) compiles with
+  `compatible = "misectel,7621evb-32m"`, an empty `chosen` node (no bootargs),
+  and two `denx,uimage` partitions `firmware_a` at `0x070000` and
+  `firmware_b` at `0x1000000`, each `0xf90000`.
+- The U-Boot DTS for `mt7621_misectel_7621evb-32m` carries the same partition
+  map; the env defaults boot `active_slot` by default and only touch `saveenv`
+  while a `try_slot` is pending.
+- The 32M device profile selects `uboot-envtools` (for `fw_printenv`/
+  `fw_setenv`) and `IMAGE_SIZE` stays 15936 KiB per slot.
+- `bootcount` and `platform.sh` handle the `misectel,7621evb-32m` board name;
+  the upgrade writes the inactive slot and only then sets `try_slot`.
+- The 32 MiB programmer image is exactly 32 MiB, contains U-Boot, base MAC in
+  Factory, and the same sysupgrade payload at both `0x070000` and `0x1000000`.
+
+Pending hardware proof on a 32 MiB 7621EVB: dual-slot factory boot, sysupgrade
+to the inactive slot, interrupted-write recovery, corrupt-slot `bootm`
+fallback, crash-loop revert via `panic=1`, config preservation across rollback,
+and `bootcount` commit.
 
 ## Verified On Hardware
 
@@ -340,9 +366,10 @@
   removal remains pending.
 - A Set request for `sysLocation.0` returned `noAccess`, so the delivered VACM
   profile is read-only and does not satisfy the customer's Set requirement.
-- The private symbols resolve to `.1.3.6.1.4.1.8072.9999`, but Net-SNMP warns
-  that `CONTACT-INFO` is missing. PEN 8072 belongs to Net-SNMP; a production PEN
-  and complete SMIv2 metadata remain required.
+- The private symbols have since been migrated to the Inovance enterprise OID
+  `.1.3.6.1.4.1.62446.6.1.905.1` with CONTACT-INFO/REVISION metadata added; the
+  2026-08-05 run below still observed the former Net-SNMP experimental OID
+  `.1.3.6.1.4.1.8072.9999`.
 - The test restored `misectel_switch`, `snmpd`, and firewall configuration,
   removed temporary credentials and receiver state, and left SNMP disabled as
   before the test. A live HTTPS RPC re-check confirmed revision, disabled agent,

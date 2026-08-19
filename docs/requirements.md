@@ -110,10 +110,13 @@ is exercised on the target; build or API checks alone are not hardware proof.
   destination IPv4 whitelist.
 - `SNMP-001..004`: v1/v2c/v3 protocol support with Get/GetNext/Set/BulkGet;
   v1/v2c disabled by default; traps, MIB-II/IF-MIB/EtherLike-MIB/LLDP-MIB and
-  advanced SNMPv3 algorithms are capability and capacity gated. Current
-  hardware validation passes Get/GetNext/BulkGet, while the read-only VACM
-  profile rejects Set with `noAccess`; writable objects and their authorization
-  model remain to be specified and implemented.
+  advanced SNMPv3 algorithms are capability and capacity gated. SNMP Set is
+  enabled for exactly the three read-write system labels (`sysContact`,
+  `sysName`, `sysLocation`) via a VACM write view; the agent `sysObjectID` is
+  set to the Inovance enterprise OID `1.3.6.1.4.1.62446.6.1.905.1`; BRIDGE-MIB
+  `dot1dBaseBridgeAddress` and ENTITY-MIB `entPhysicalTable` are served through
+  pass_persist; SNMP-TARGET-MIB is enabled through the net-snmp `target` module.
+  See [`docs/snmp-mib-design.md`](snmp-mib-design.md) for the full MIB mapping.
 - `TIME-001..006`: multiple NTP/SNTP IPv4 sources with failover, RTC fallback,
   optional authentication, and Web status containing lock state, offset, and
   active server.
@@ -147,6 +150,30 @@ is exercised on the target; build or API checks alone are not hardware proof.
 - `DIAG-001..003`: live link/speed/duplex/error query, filtered log search, and
   security event tracing.
 
+## 32M Dual-Slot Variant (Upgrade Rollback)
+
+The 32 MiB SPI NOR variant `misectel,7621evb-32m` provides two firmware slots
+and boot-time rollback, targeting the customer upgrade-robustness requirement
+"系统升级过程中异常断电能够正常启动并恢复用户配置".
+
+| ID | Requirement | Implementation | Status |
+| --- | --- | --- | --- |
+| AB-001 | 32 MB device variant | `misectel,7621evb-32m` DTS, device profile, dedicated U-Boot, seed and build script | implemented |
+| AB-002 | Dual firmware slots | `firmware_a` (0x070000) and `firmware_b` (0x1000000), both 15936 KiB `denx,uimage`; image format unchanged | implemented |
+| AB-003 | U-Boot slot selection | `active_slot`/`try_slot`/`boot_attempts` in U-Boot env; `bootm` failure or exhausted attempts reverts to the active slot | implemented |
+| AB-004 | Upgrade writes inactive slot | sysupgrade writes the image to the non-active slot, then sets `try_slot` and `boot_attempts=2` only after a successful write | implemented |
+| AB-005 | Power loss during upgrade | interrupted write leaves `try_slot` unset so the previous slot boots | implemented (design); interrupted-write hardware test pending |
+| AB-006 | Failed new slot auto-rollback | invalid image fails `bootm`; crash triggers `panic=1` reboot; attempts exhausted revert to `active_slot` | implemented (design); crash-loop hardware test pending |
+| AB-007 | Configuration preserved | first `rootfs_data` (slot A) is always the overlay, so configuration follows the active slot and survives rollback; sysupgrade also embeds preserved config | implemented (design); rollback config test pending |
+| AB-008 | Commit after healthy boot | `bootcount` init copies `try_slot` to `active_slot` at START=99 | implemented |
+| AB-009 | Runtime env tooling | `uboot-envtools` with `/etc/fw_env.config` for `misectel,7621evb-32m` | implemented |
+| AB-010 | 32 MiB programmer image | same firmware written into both slots; exact 32 MiB with base MAC and metadata regions | implemented |
+| AB-011 | Boot entry | slot `A`/`B` supplied on the kernel command line; the 32M DTS carries no `chosen` bootargs so U-Boot controls console, root and `slot=` | implemented |
+
+Hardware validation (interrupted write, corrupt-slot fallback, crash-loop
+revert, config preservation across rollback, both-slot factory boot) remains
+`deferred` until executed on a 32 MiB 7621EVB.
+
 ## NEX905-F-405 Product Web and Identity
 
 The `nex905,f-405` device profile rebrands the Misectel 7621EVB NAT gateway as
@@ -159,6 +186,10 @@ gpio12 system-light / gpio18 watchdog-feed. Design: [`docs/nex905-f-405-web-rebr
 
 - The 16 MiB NOR contains `u-boot`, `u-boot-env`, `factory`, `woem`,
   `ledeinfo`, and a 15936 KiB `firmware` partition in that order.
+- The 32 MiB dual-slot variant contains `u-boot`, `u-boot-env`, `factory`,
+  `woem`, `ledeinfo`, and two 15936 KiB `firmware_a`/`firmware_b` partitions;
+  its build gate checks the 32M device is selected and `uboot-envtools` is in
+  the image.
 - A successful `make` is insufficient: the final image must exist, fit the
   profile limit, and pass SHA-256 manifest verification.
 - A feature that does not fit must be marked `unsupported` here and removed
