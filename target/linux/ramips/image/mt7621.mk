@@ -38,13 +38,6 @@ define Build/append-netis-n6-metadata
 	rm $@.metadata.tmp
 endef
 
-define Build/misectel-m01k21-spi
-	$(TOPDIR)/scripts/pack-misectel-m01k21-spi.sh \
-		--uboot "$(UBOOT_PATH)" \
-		--firmware "$(BIN_DIR)/$(DEVICE_IMG_PREFIX)-squashfs-sysupgrade.bin" \
-		--output "$@"
-endef
-
 define Build/arcadyan-trx
 	echo -ne "hsqs" > $@.hsqs
 	$(eval trx_magic=$(word 1,$(1)))
@@ -2296,9 +2289,8 @@ define Device/misectel_m01k21
   IMAGE_SIZE := 14912k
   DEVICE_PACKAGES := kmod-mt7915-firmware uboot-envtools
   UBOOT_PATH := $(STAGING_DIR_IMAGE)/mt7621_misectel_m01k21-u-boot-mt7621.bin
-  ARTIFACTS := u-boot.bin spi-programmer.bin
+  ARTIFACTS := u-boot.bin
   ARTIFACT/u-boot.bin := append-uboot | check-size 192k
-  ARTIFACT/spi-programmer.bin := misectel-m01k21-spi
 endef
 TARGET_DEVICES += misectel_m01k21
 
