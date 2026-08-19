@@ -41,6 +41,9 @@ ramips_setup_interfaces()
 	arcadyan,we420223-99)
 		ucidef_set_interface_lan "swp0 swp1"
 		;;
+	misectel,m01k21)
+		ucidef_set_interface_lan "lan1 lan2"
+		;;
 	ampedwireless,ally-00x19k|\
 	arcadyan,we410443|\
 	asus,rp-ac56|\

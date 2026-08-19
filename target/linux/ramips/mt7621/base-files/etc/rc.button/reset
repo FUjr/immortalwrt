@@ -1,0 +1,35 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+OVERLAY="$(grep ' /overlay ' /proc/mounts)"
+BOARD="$(board_name)"
+
+case "$ACTION" in
+pressed)
+	[ -z "$OVERLAY" ] && return 0
+
+	return 5
+	;;
+timeout)
+	. /etc/diag.sh
+	set_state failsafe
+	;;
+released)
+	if [ "$BOARD" = 'misectel,m01k21' ]; then
+		[ "$SEEN" -ge 5 ] 2>/dev/null && [ -n "$OVERLAY" ] || return 0
+
+		echo "FACTORY RESET" > /dev/console
+		factoryreset -y && reboot &
+	elif [ "$SEEN" -lt 1 ]; then
+		echo "REBOOT" > /dev/console
+		sync
+		reboot
+	elif [ "$SEEN" -ge 5 ] && [ -n "$OVERLAY" ]; then
+		echo "FACTORY RESET" > /dev/console
+		factoryreset -y && reboot &
+	fi
+	;;
+esac
+
+return 0
