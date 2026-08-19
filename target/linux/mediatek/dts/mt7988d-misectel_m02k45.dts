@@ -8,7 +8,57 @@
 
 / {
 	chosen {
+		/*
+		 * Keep the SPI-NAND boot path on the UBI volume. Shipped U-Boot
+		 * selects rootdisk-spim-nand from the BootROM medium and would
+		 * otherwise override rootdisk with the eMMC production partition.
+		 */
 		rootdisk = <&ubi_rootdisk>;
+		rootdisk-spim-nand = <&ubi_rootdisk>;
+		rootdisk-emmc = <&emmc_rootdisk>;
+	};
+};
+
+&pio {
+	mmc0_pins_emmc_51: mmc0-emmc-51-pins {
+		mux {
+			function = "flash";
+			groups = "emmc_51";
+		};
+	};
+};
+
+&mmc0 {
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc0_pins_emmc_51>;
+	pinctrl-1 = <&mmc0_pins_emmc_51>;
+	bus-width = <8>;
+	max-frequency = <52000000>;
+	cap-mmc-highspeed;
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&reg_1p8v>;
+	non-removable;
+	no-sd;
+	no-sdio;
+	status = "okay";
+
+	card@0 {
+		compatible = "mmc-card";
+		reg = <0>;
+
+		block {
+			compatible = "block-device";
+
+			partitions {
+				block-partition-recovery {
+					partname = "recovery";
+				};
+
+				emmc_rootdisk: block-partition-production {
+					partname = "production";
+				};
+			};
+		};
 	};
 };
 
@@ -33,7 +83,6 @@
 			partition@0 {
 				label = "bl2";
 				reg = <0x0 0x100000>;
-				read-only;
 			};
 
 			partition@100000 {
@@ -67,7 +116,6 @@
 			partition@580000 {
 				label = "fip";
 				reg = <0x580000 0x200000>;
-				read-only;
 			};
 
 			partition@780000 {
