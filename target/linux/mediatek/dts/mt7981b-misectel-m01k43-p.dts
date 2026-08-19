@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+#include "mt7981b-misectel-m01k43.dts"
+
+/ {
+	model = "Misectel M01K43-P";
+	compatible = "misectel,m01k43-p", "misectel,m01k43", "mediatek,mt7981";
+};
+
+&switch {
+	ports {
+		port@0 {
+			reg = <0>;
+			label = "lan4";
+
+			nvmem-cell-names = "mac-address";
+			nvmem-cells = <&macaddr_factory_4 0>;
+		};
+
+		port@4 {
+			reg = <4>;
+			label = "lan5";
+
+			nvmem-cell-names = "mac-address";
+			nvmem-cells = <&macaddr_factory_4 0>;
+		};
+	};
+};

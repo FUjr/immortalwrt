@@ -2587,6 +2587,55 @@ define Device/misectel_m02k45
 endef
 TARGET_DEVICES += misectel_m02k45
 
+define Device/misectel_m01k43
+  DEVICE_VENDOR := Misectel
+  DEVICE_MODEL := M01K43
+  DEVICE_DTS := mt7981b-misectel-m01k43
+  DEVICE_DTS_DIR := ../dts
+  SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-usb
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
+	kmod-usb3 kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl \
+	kmod-mhi-wwan-mbim kmod-qrtr-mhi uboot-envtools
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 56736k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += misectel_m01k43
+
+define Device/misectel_m01k43-usb
+  $(call Device/misectel_m01k43)
+  DEVICE_MODEL := M01K43
+  DEVICE_VARIANT := USB
+  DEVICE_DTS := mt7981b-misectel-m01k43-usb
+  SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-usb
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
+	kmod-usb3 kmod-usb-net-cdc-mbim kmod-usb-net-qmi-wwan \
+	kmod-usb-serial-option uqmi uboot-envtools
+endef
+TARGET_DEVICES += misectel_m01k43-usb
+
+define Device/misectel_m01k43-usb-p
+  $(call Device/misectel_m01k43-usb)
+  DEVICE_VARIANT := USB-P
+  DEVICE_DTS := mt7981b-misectel-m01k43-usb-p
+  SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-usb-p
+endef
+TARGET_DEVICES += misectel_m01k43-usb-p
+
+define Device/misectel_m01k43-p
+  $(call Device/misectel_m01k43)
+  DEVICE_MODEL := M01K43
+  DEVICE_VARIANT := P
+  DEVICE_DTS := mt7981b-misectel-m01k43-p
+  SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-p
+endef
+TARGET_DEVICES += misectel_m01k43-p
+
 define Device/misectel_m02k45-emmc
   DEVICE_VENDOR := Misectel
   DEVICE_MODEL := M02K45 eMMC

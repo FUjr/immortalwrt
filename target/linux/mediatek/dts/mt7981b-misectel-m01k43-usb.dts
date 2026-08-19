@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+#include "mt7981b-misectel-m01k43.dts"
+
+/ {
+	compatible = "misectel,m01k43-usb", "misectel,m01k43", "mediatek,mt7981";
+};
+
+
+&pcie {
+	status = "disabled";
+};
+
+&usb_phy {
+	status = "okay";
+};
+
+&xhci {
+	phys = <&u2port0 PHY_TYPE_USB2>, <&u3port0 PHY_TYPE_USB3>;
+	mediatek,u3p-dis-msk = <0x00>;
+	status = "okay";
+};
