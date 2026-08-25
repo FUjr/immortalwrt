@@ -77,6 +77,8 @@ start_ntpd_instance() {
 		procd_add_jail_mount "/usr/bin/env"
 		procd_add_jail_mount "/usr/bin/jshn"
 		procd_add_jail_mount "/bin/ubus"
+		procd_add_jail_mount "/etc/resolv.conf"
+		procd_add_jail_mount "/tmp/resolv.conf"
 		procd_set_param capabilities /etc/capabilities/ntpd.json
 		procd_set_param user ntp
 		procd_set_param group ntp
