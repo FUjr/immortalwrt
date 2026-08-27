@@ -1,0 +1,13 @@
+--- a/agent/helpers/old_api.c
++++ b/agent/helpers/old_api.c
+@@ -441,6 +441,10 @@ netsnmp_old_api_helper(netsnmp_mib_handl
+                                              requests->requestvb->
+                                              name_length);
+             set_current_agent_session(oldasp);
++
++            if (status == SNMP_ERR_NOERROR &&
++                reqinfo->mode == MODE_SET_COMMIT)
++                snmp_store_needed(NULL);
+ 
+             if (status != SNMP_ERR_NOERROR) {
+                 netsnmp_set_request_error(reqinfo, requests, status);
