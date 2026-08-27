@@ -2648,6 +2648,16 @@ define Device/misectel_m01k43-usb-p
 endef
 TARGET_DEVICES += misectel_m01k43-usb-p
 
+define Device/misacted_7981evb
+  $(call Device/misectel_m01k43-usb-p)
+  DEVICE_VENDOR := Misacted
+  DEVICE_MODEL := 7981 EVB
+  DEVICE_VARIANT :=
+  DEVICE_DTS := mt7981b-misacted-7981evb
+  SUPPORTED_DEVICES := misacted,7981evb misectel,m01k43-usb-p
+endef
+TARGET_DEVICES += misacted_7981evb
+
 define Device/misectel_m01k43-p
   $(call Device/misectel_m01k43)
   DEVICE_MODEL := M01K43

@@ -152,6 +152,7 @@ jiorouter,ax6000-jidu6101)
 	envdev=/dev/$(nand_find_volume "$envubi" u-boot-env)
 	ubootenv_add_uci_config "$envdev" "0x0" "0x80000" "0x80000" "1"
 	;;
+misacted,7981evb|\
 misectel,m01k43|\
 misectel,m01k43-p|\
 misectel,m01k43-usb|\

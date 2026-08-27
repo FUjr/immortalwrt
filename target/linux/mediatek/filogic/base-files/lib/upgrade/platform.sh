@@ -204,6 +204,7 @@ platform_do_upgrade() {
 		CI_UBIPART="ubi"
 		nand_do_upgrade "$1"
 		;;
+	misacted,7981evb|\
 	misectel,m01k43|\
 	misectel,m01k43-p|\
 	misectel,m01k43-usb|\

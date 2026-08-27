@@ -2,6 +2,7 @@
 
 . /lib/functions.sh
 . /lib/functions/system.sh
+. /lib/functions/firmware-version.sh
 . /usr/share/libubox/jshn.sh
 
 include /lib/upgrade
@@ -72,5 +73,21 @@ json_init
 	json_add_boolean valid "$VALID"
 	json_add_boolean forceable "$FORCEABLE"
 	json_add_boolean allow_backup "$ALLOW_BACKUP"
+	current_firmware_version="$(cat /etc/osversion 2>/dev/null)"
+	target_firmware_version=''
+	metadata_file="/tmp/validate-firmware-metadata.$$"
+	if fwtool -q -i "$metadata_file" "$1" 2>/dev/null; then
+		json_set_namespace firmware_metadata metadata_old_ns
+		if json_load_file "$metadata_file" 2>/dev/null; then
+			json_get_var target_firmware_version firmware_version
+		fi
+		json_set_namespace "$metadata_old_ns"
+	fi
+	rm -f "$metadata_file"
+	json_add_object firmware_version
+		json_add_string current "$current_firmware_version"
+		json_add_string target "$target_firmware_version"
+		json_add_string relation "$(firmware_version_relation "$current_firmware_version" "$target_firmware_version")"
+	json_close_object
 json_dump -i
 json_set_namespace $old_ns

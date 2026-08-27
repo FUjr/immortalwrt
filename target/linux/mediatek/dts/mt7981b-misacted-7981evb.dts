@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+#include "mt7981b-misectel-m01k43-usb-p.dts"
+
+/ {
+	model = "Misacted 7981 EVB";
+	compatible = "misacted,7981evb", "misectel,m01k43-usb-p",
+		     "misectel,m01k43", "mediatek,mt7981";
+};

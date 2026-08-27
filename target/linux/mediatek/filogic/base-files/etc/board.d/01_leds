@@ -180,6 +180,7 @@ mercusys,mr90x-v1-ubi)
 	ucidef_set_led_netdev "lan-2" "lan-2" "green:lan-2" "lan2" "link tx rx"
 	ucidef_set_led_netdev "wan" "wan" "green:wan" "eth1" "link tx rx"
 	;;
+misacted,7981evb|\
 misectel,m01k43|\
 misectel,m01k43-p|\
 misectel,m01k43-usb|\
