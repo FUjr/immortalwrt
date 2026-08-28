@@ -165,6 +165,10 @@
 					eeprom_factory_8000: eeprom@8000 {
 						reg = <0x8000 0xe00>;
 					};
+
+					macaddr_factory_e000: macaddr@e000 {
+						reg = <0xe000 0x6>;
+					};
 				};
 			};
 
@@ -179,21 +183,11 @@
 				reg = <0xfd0000 0x10000>;
 			};
 
-			ledeinfo: partition@fe0000 {
-				label = "ledeinfo";
-				reg = <0xfe0000 0x10000>;
-				read-only;
-
-				nvmem-layout {
-					compatible = "fixed-layout";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					macaddr_ledeinfo_0: macaddr@0 {
-						reg = <0x0 0x6>;
-					};
+				partition@fe0000 {
+					label = "ledeinfo";
+					reg = <0xfe0000 0x10000>;
+					read-only;
 				};
-			};
 
 			partition@ff0000 {
 				label = "reserve";
@@ -229,7 +223,7 @@
 };
 
 &gmac0 {
-	nvmem-cells = <&macaddr_ledeinfo_0>;
+	nvmem-cells = <&macaddr_factory_e000>;
 	nvmem-cell-names = "mac-address";
 };
 
