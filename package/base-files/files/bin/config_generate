@@ -512,8 +512,10 @@ json_init
 json_load "$(cat ${CFG})"
 
 umask 077
+fresh_config=0
 
 if [ ! -s /etc/config/network ]; then
+	fresh_config=1
 	bridge_name=""
 	touch /etc/config/network
 	generate_static_network
@@ -535,6 +537,7 @@ if [ ! -s /etc/config/network ]; then
 fi
 
 if [ ! -s /etc/config/system ]; then
+	fresh_config=1
 	touch /etc/config/system
 	generate_static_system
 
@@ -547,4 +550,12 @@ if [ ! -s /etc/config/system ]; then
 	json_get_keys keys led
 	for key in $keys; do generate_led $key; done
 fi
+
+if [ "$fresh_config" = 1 ] && [ -d /lib/functions/config_generate.d ]; then
+	for script in /lib/functions/config_generate.d/*; do
+		[ -s "$script" ] || continue
+		(. "$script") || exit 1
+	done
+fi
+
 uci commit
