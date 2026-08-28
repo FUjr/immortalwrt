@@ -302,7 +302,6 @@
 			partition@300000 {
 				label = "woem";
 				reg = <0x300000 0x10000>;
-				read-only;
 			};
 
 			partition@310000 {

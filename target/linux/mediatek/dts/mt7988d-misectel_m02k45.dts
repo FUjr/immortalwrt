@@ -121,7 +121,6 @@
 			partition@780000 {
 				label = "woem";
 				reg = <0x780000 0x20000>;
-				read-only;
 			};
 
 			partition@7a0000 {

@@ -49,6 +49,13 @@ define Build/mt7988-bl31-uboot
 	cat $(STAGING_DIR_IMAGE)/mt7988_$1-u-boot.fip >> $@
 endef
 
+define Build/append-uboot-env-ubi
+	sh $(TOPDIR)/scripts/ubinize-image.sh --uboot-env $@.tmp \
+		-p $(BLOCKSIZE:%k=%KiB) -m $(PAGESIZE) $(UBINIZE_OPTS)
+	cat $@.tmp >> $@
+	rm $@.tmp
+endef
+
 define Build/simplefit
 	cp $@ $@.tmp 2>/dev/null || true
 	ptgen -g -o $@.tmp -a 1 -l 1024 \
@@ -2583,10 +2590,12 @@ define Device/misectel_m02k45
   DEVICE_DTS_DIR := ../dts 
   DEVICE_DTS_LOADADDR := 0x45f00000
   DEVICE_PACKAGES := mt7988-2p5g-phy-firmware kmod-mt7996e kmod-mt7992-23-firmware mt7988-wo-firmware kmod-usb3 kmod-hwmon-pwmfan
-  ARTIFACTS := preloader.bin bl31-uboot.fip factory.bin emmc-gpt.bin system.img.gz
+  ARTIFACTS := preloader.bin bl31-uboot.fip factory.bin spi-programmer.bin emmc-gpt.bin system.img.gz
   ARTIFACT/preloader.bin := mt7988-bl2 spim-nand-ddr4
   ARTIFACT/bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k45
   ARTIFACT/factory.bin := mt7988-bl2 spim-nand-ddr4 | pad-to 5632k | mt7988-bl31-uboot misectel_m02k45
+  ARTIFACT/spi-programmer.bin := mt7988-bl2 spim-nand-ddr4 | pad-to 5632k | \
+	mt7988-bl31-uboot misectel_m02k45 | pad-to 7936k | append-uboot-env-ubi | pad-to 128M
   ARTIFACT/emmc-gpt.bin := mt798x-gpt emmc
   ARTIFACT/system.img.gz := mt798x-gpt emmc |\
 				   pad-to 12M | append-image-stage initramfs-recovery.itb | check-size 44m |\
