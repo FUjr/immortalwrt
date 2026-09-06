@@ -1,0 +1,5 @@
+/etc/config/uhttpd
+/etc/init.d/uhttpd
+/lib/upgrade/keep.d/uhttpd
+/usr/lib/uhttpd_websocket.so
+/usr/sbin/uhttpd
