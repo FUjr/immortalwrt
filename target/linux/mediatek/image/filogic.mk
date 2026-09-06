@@ -2590,17 +2590,12 @@ define Device/misectel_m02k45
   DEVICE_DTS_DIR := ../dts 
   DEVICE_DTS_LOADADDR := 0x45f00000
   DEVICE_PACKAGES := mt7988-2p5g-phy-firmware kmod-mt7996e kmod-mt7992-23-firmware mt7988-wo-firmware kmod-usb3 kmod-hwmon-pwmfan
-  ARTIFACTS := preloader.bin bl31-uboot.fip factory.bin spi-programmer.bin emmc-gpt.bin system.img.gz
+  ARTIFACTS := preloader.bin bl31-uboot.fip factory.bin spi-programmer.bin
   ARTIFACT/preloader.bin := mt7988-bl2 spim-nand-ddr4
   ARTIFACT/bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k45
   ARTIFACT/factory.bin := mt7988-bl2 spim-nand-ddr4 | pad-to 5632k | mt7988-bl31-uboot misectel_m02k45
   ARTIFACT/spi-programmer.bin := mt7988-bl2 spim-nand-ddr4 | pad-to 5632k | \
 	mt7988-bl31-uboot misectel_m02k45 | pad-to 7936k | append-uboot-env-ubi | pad-to 128M
-  ARTIFACT/emmc-gpt.bin := mt798x-gpt emmc
-  ARTIFACT/system.img.gz := mt798x-gpt emmc |\
-				   pad-to 12M | append-image-stage initramfs-recovery.itb | check-size 44m |\
-				   pad-to 64M | append-image squashfs-sysupgrade.itb | check-size |\
-				   gzip
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048      

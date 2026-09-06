@@ -22,6 +22,15 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 include $(INCLUDE_DIR)/version.mk
 
+define Build/Prepare
+	$(call Build/Prepare/Default)
+	$(CP) ./files/websocket.c $(PKG_BUILD_DIR)/websocket.c
+endef
+
+define Build/Compile
+	$(call Build/Compile/Default)
+endef
+
 define Package/uhttpd/default
   SECTION:=net
   CATEGORY:=Network
@@ -86,11 +95,12 @@ ifneq ($(CONFIG_USE_GLIBC),)
 endif
 
 define Package/uhttpd/install
-	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/usr/sbin
+	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/usr/sbin $(1)/usr/lib
 	$(INSTALL_BIN) ./files/uhttpd.init $(1)/etc/init.d/uhttpd
 	$(INSTALL_CONF) ./files/uhttpd.config $(1)/etc/config/uhttpd
 	$(VERSION_SED_SCRIPT) $(1)/etc/config/uhttpd
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/uhttpd $(1)/usr/sbin/uhttpd
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/uhttpd_websocket.so $(1)/usr/lib/
 endef
 
 define Package/uhttpd-mod-lua/install

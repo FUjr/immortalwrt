@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -88,6 +88,10 @@ IF(UBUS_SUPPORT)
+ 	TARGET_LINK_LIBRARIES(uhttpd_ubus ${ubus} ${ubox} ${blobmsg_json} ${libjson})
+ ENDIF()
+ 
++SET(PLUGINS ${PLUGINS} uhttpd_websocket)
++ADD_LIBRARY(uhttpd_websocket MODULE websocket.c)
++TARGET_LINK_LIBRARIES(uhttpd_websocket ${ubox})
++
+ IF(PLUGINS)
+ 	SET_TARGET_PROPERTIES(${PLUGINS} PROPERTIES
+ 		PREFIX ""

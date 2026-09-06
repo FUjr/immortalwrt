@@ -1,0 +1,11 @@
+--- a/main.c
++++ b/main.c
+@@ -627,6 +627,9 @@ int main(int argc, char **argv)
+ 	if (conf.ubus_prefix && uh_plugin_init("uhttpd_ubus.so"))
+ 		return 1;
+ #endif
++	if (!access("/usr/lib/uhttpd_websocket.so", R_OK) &&
++	    uh_plugin_init("uhttpd_websocket.so"))
++		return 1;
+ 
+ 	/* fork (if disabled) */
