@@ -1,5 +1,5 @@
 #!/usr/bin/env ucode
-import { popen, readfile } from "fs";
+import { readfile } from "fs";
 import * as uci from 'uci';
 
 const bands_order = [ "6G", "5G", "2G" ];
@@ -13,29 +13,6 @@ let idx = 0;
 let commit;
 
 let config = uci.cursor().get_all("wireless") ?? {};
-
-function read_oem_wifi_default(name) {
-	let pipe = popen(`/usr/sbin/oem-env get ${name} 2>/dev/null`);
-	if (!pipe)
-		return null;
-
-	let value = trim(pipe.read("all") ?? "");
-	pipe.close();
-
-	return length(value) ? value : null;
-}
-
-let oem_defaults_loaded = false;
-let oem_ssid, oem_key;
-
-function load_oem_wifi_defaults() {
-	if (oem_defaults_loaded)
-		return;
-
-	oem_ssid = read_oem_wifi_default("misectel_ssid");
-	oem_key = read_oem_wifi_default("misectel_key");
-	oem_defaults_loaded = true;
-}
 
 function radio_exists(path, macaddr, phy, radio) {
 	for (let name, s in config) {
@@ -94,7 +71,6 @@ for (let phy_name, phy in board.wlan) {
 		let macaddr = trim(readfile(`/sys/class/ieee80211/${phy_name}/macaddress`));
 		if (radio_exists(phy.path, macaddr, phy_name, radio.index))
 			continue;
-		load_oem_wifi_defaults();
 
 		let id = `phy='${phy_name}'`;
 		if (match(phy_name, /^phy[0-9]/))
@@ -116,16 +92,6 @@ for (let phy_name, phy in board.wlan) {
 				defaults = null;
 			num_global_macaddr = board.wlan.defaults.ssids?.[band_name]?.mac_count;
 		}
-		if (oem_ssid || oem_key) {
-			defaults ??= {};
-			if (oem_ssid)
-				defaults.ssid = oem_ssid;
-			if (oem_key) {
-				defaults.key = oem_key;
-				defaults.encryption = "psk2";
-			}
-		}
-
 		if (length(info.radios) > 0)
 			id += `\nset ${s}.radio='${radio.index}'`;
 

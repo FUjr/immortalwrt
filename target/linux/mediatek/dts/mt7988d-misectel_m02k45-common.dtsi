@@ -374,6 +374,8 @@
 			#size-cells = <0>;
 			nvmem-cells = <&eeprom_factory_0>;
 			nvmem-cell-names = "eeprom";
+			/* M02K45 is a dual-band 2.4 GHz + 5 GHz product. */
+			ieee80211-freq-limit = <2400000 2500000>, <5170000 5835000>;
 
 			band@0 {
 				reg = <0>;
