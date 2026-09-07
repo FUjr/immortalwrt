@@ -806,7 +806,7 @@ define Device/misectel_7621evb
   DEVICE_DTS := mt7621_misectel_7621evb
   IMAGE_SIZE := 15936k
 	DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
-	kmod-rtc-pcf85063 luci-ssl-openssl luci-base-misectel \
+	kmod-rtc-pcf85063 luci-light libustream-openssl openssl-util luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
 	luci-app-misectel-vrf luci-app-misectel-system \
 	misectel-switch-manager luci-app-misectel-switch \
@@ -824,7 +824,7 @@ define Device/nex905_f-405
   IMAGE_SIZE := 15936k
   SUPPORTED_DEVICES += misectel,7621evb misectel_7621evb
 	DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
-	kmod-rtc-pcf85063 luci-ssl-openssl luci-base-misectel \
+	kmod-rtc-pcf85063 luci-light libustream-openssl openssl-util luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
 	luci-app-misectel-vrf luci-app-misectel-system \
 	misectel-switch-manager luci-app-misectel-switch \
@@ -841,7 +841,7 @@ define Device/misectel_7621evb-32m
   DEVICE_DTS := mt7621_misectel_7621evb-32m
   IMAGE_SIZE := 15936k
 	DEVICE_PACKAGES := uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
-	kmod-rtc-pcf85063 luci-ssl-openssl luci-base-misectel \
+	kmod-rtc-pcf85063 luci-light libustream-openssl openssl-util luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
 	luci-app-misectel-vrf luci-app-misectel-system \
 	misectel-switch-manager luci-app-misectel-switch \
