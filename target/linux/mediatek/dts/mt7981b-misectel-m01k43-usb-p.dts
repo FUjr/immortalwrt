@@ -6,6 +6,17 @@
 / {
 	model = "Misectel M01K43 USB-P";
 	compatible = "misectel,m01k43-usb-p", "misectel,m01k43", "mediatek,mt7981";
+
+	gpio-export {
+		compatible = "gpio-export";
+
+		rs485_en {
+			gpio-export,name = "rs485_en";
+			gpio-export,direction_may_change;
+			gpio-export,output = <0>;
+			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
 
 &pcie {
