@@ -9,6 +9,7 @@
 
 	aliases {
 		label-mac-device = &gmac0;
+		led-upgrade = &watchdog_feed;
 	};
 
 	chosen {
@@ -22,6 +23,15 @@
 			label = "reset";
 			gpios = <&gpio 18 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_RESTART>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		watchdog_feed: watchdog-feed {
+			label = "watchdog-feed";
+			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
 		};
 	};
 };
