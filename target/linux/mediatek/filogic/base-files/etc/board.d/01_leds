@@ -188,7 +188,7 @@ misectel,m01k43-usb-p)
 	ucidef_set_led_netdev "wlan" "WLAN" "blue:wlan" "phy0-ap0"
 	;;
 misectel,m02k45)
-	# Bind to the mt76 PHY throughput trigger; AP netdevs are recreated by wifi reload.
+	# Both 2.4 GHz and 5 GHz interfaces belong to phy0.
 	ucidef_set_led_wlan "wlan" "WLAN" "wifi" "phy0tpt"
 	;;
 netcore,n60)

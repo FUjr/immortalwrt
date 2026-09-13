@@ -1,0 +1,59 @@
+From: FUjr <fujr@example.com>
+Subject: [PATCH] wifi: mt76: register throughput trigger without hardware LED
+
+GPIO LEDs can consume the mac80211 throughput trigger even when an mt76
+subdriver does not provide hardware LED callbacks. Create the trigger for each
+independently registered ieee80211 hardware instance before mt76 attempts to
+register an optional hardware LED and before ieee80211_register_hw(). Shared
+secondary radios do not register the hardware again, so they cannot create
+duplicate triggers.
+
+--- a/mac80211.c
++++ b/mac80211.c
+@@ -193,6 +193,15 @@ static const struct cfg80211_sar_capa mt
+ 	.freq_ranges = &mt76_sar_freq_ranges[0],
+ };
+ 
++static void mt76_led_init_tpt_trigger(struct mt76_phy *phy)
++{
++	phy->leds.cdev.default_trigger =
++		ieee80211_create_tpt_led_trigger(phy->hw,
++					IEEE80211_TPT_LEDTRIG_FL_RADIO,
++					mt76_tpt_blink,
++					ARRAY_SIZE(mt76_tpt_blink));
++}
++
+ static int mt76_led_init(struct mt76_phy *phy)
+ {
+ 	struct mt76_dev *dev = phy->dev;
+@@ -228,11 +236,6 @@ static int mt76_led_init(struct mt76_phy
+ 		 wiphy_name(hw->wiphy));
+ 
+ 	phy->leds.cdev.name = phy->leds.name;
+-	phy->leds.cdev.default_trigger =
+-		ieee80211_create_tpt_led_trigger(hw,
+-					IEEE80211_TPT_LEDTRIG_FL_RADIO,
+-					mt76_tpt_blink,
+-					ARRAY_SIZE(mt76_tpt_blink));
+ 
+ 	dev_info(dev->dev,
+ 		"registering led '%s'\n", phy->leds.name);
+@@ -575,6 +578,9 @@ int mt76_register_phy(struct mt76_phy *p
+ 			return ret;
+ 	}
+ 
++	if ((void *)phy == phy->hw->priv)
++		mt76_led_init_tpt_trigger(phy);
++
+ 	if (IS_ENABLED(CONFIG_MT76_LEDS)) {
+ 		ret = mt76_led_init(phy);
+ 		if (ret)
+@@ -780,6 +786,8 @@ int mt76_register_device(struct mt76_dev
+ 	mt76_check_sband(&dev->phy, &phy->sband_5g, NL80211_BAND_5GHZ);
+ 	mt76_check_sband(&dev->phy, &phy->sband_6g, NL80211_BAND_6GHZ);
+ 
++	mt76_led_init_tpt_trigger(phy);
++
+ 	if (IS_ENABLED(CONFIG_MT76_LEDS)) {
+ 		ret = mt76_led_init(phy);
+ 		if (ret)

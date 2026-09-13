@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ "$(board_name)" = "misectel,m02k45" ] || exit 0
+
+# Correct legacy fixed and bridge triggers to the radio throughput trigger.
+if [ "$(uci -q get system.led_wlan.trigger)" != 'phy0tpt' ]; then
+	uci set system.led_wlan.trigger='phy0tpt'
+	uci -q delete system.led_wlan.device
+	uci -q delete system.led_wlan.mode
+	uci commit system
+fi
+
+exit 0
