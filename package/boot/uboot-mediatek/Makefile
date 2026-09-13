@@ -69,7 +69,7 @@ endef
 define U-Boot/mt7621_misectel_7621evb
   NAME:=Misectel 7621EVB
   UBOOT_CONFIG:=mt7621_misectel_7621evb
-  BUILD_DEVICES:=misectel_7621evb
+  BUILD_DEVICES:=misectel_7621evb nex905_f-405
   BUILD_TARGET:=ramips
   BUILD_SUBTARGET:=mt7621
   UBOOT_IMAGE:=u-boot-mt7621.bin
