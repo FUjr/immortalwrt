@@ -1,0 +1,5 @@
+--- /dev/null
++++ b/configs/nex905_f-405.config
+@@ -0,0 +1,2 @@
++CONFIG_MT7621_CPU_FREQ=1100
++CONFIG_SYS_MIPS_TIMER_FREQ=550000000
