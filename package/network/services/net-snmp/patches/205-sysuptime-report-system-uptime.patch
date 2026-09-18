@@ -1,0 +1,30 @@
+--- a/agent/mibgroup/mibII/system_mib.c
++++ b/agent/mibgroup/mibII/system_mib.c
+@@ -44,6 +44,7 @@
+ #include <net-snmp/net-snmp-includes.h>
+ #include <net-snmp/agent/net-snmp-agent-includes.h>
+ #include <net-snmp/agent/sysORTable.h>
++#include <net-snmp/library/system.h>
+ 
+ #include "util_funcs.h"
+ #include "system_mib.h"
+@@ -229,8 +230,17 @@
+                    netsnmp_agent_request_info *reqinfo,
+                    netsnmp_request_info *requests)
+ {
+-    snmp_set_var_typed_integer(requests->requestvb, ASN_TIMETICKS,
+-                               netsnmp_get_agent_uptime());
++    /*
++     * Report the time since the system booted instead of the agent uptime:
++     * the management UI shows the system uptime, and restarting snmpd (for
++     * example after a configuration change) must not reset sysUpTime to zero.
++     */
++    long            uptime = get_uptime();
++
++    if (uptime <= 0)
++        uptime = (long) netsnmp_get_agent_uptime();
++
++    snmp_set_var_typed_integer(requests->requestvb, ASN_TIMETICKS, uptime);
+     return SNMP_ERR_NOERROR;
+ }
+ 
