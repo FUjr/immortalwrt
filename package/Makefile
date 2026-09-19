@@ -54,9 +54,9 @@ $(curdir)/merge:
 	rm -rf $(PACKAGE_DIR_ALL)
 	mkdir -p $(PACKAGE_DIR_ALL)
 ifneq ($(CONFIG_USE_APK),)
-	-$(foreach pdir,$(PACKAGE_SUBDIRS),$(if $(wildcard $(pdir)/*.apk),ln -s $(pdir)/*.apk $(PACKAGE_DIR_ALL);))
+	$(SCRIPT_DIR)/package-merge $(PACKAGE_DIR_ALL) apk $(PACKAGE_SUBDIRS)
 else
-	-$(foreach pdir,$(PACKAGE_SUBDIRS),$(if $(wildcard $(pdir)/*.ipk),ln -s $(pdir)/*.ipk $(PACKAGE_DIR_ALL);))
+	$(SCRIPT_DIR)/package-merge $(PACKAGE_DIR_ALL) ipk $(PACKAGE_SUBDIRS)
 endif
 
 $(BUILD_KEY_APK_SEC):

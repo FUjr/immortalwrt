@@ -1,0 +1,45 @@
+#!/bin/sh
+
+set -eu
+
+usage() {
+	echo "Usage: $0 <destination> <extension> <source>..." >&2
+	exit 2
+}
+
+[ "$#" -ge 3 ] || usage
+
+destination="$1"
+extension="$2"
+shift 2
+
+case "$extension" in
+	apk|ipk) ;;
+	*) usage ;;
+esac
+
+mkdir -p "$destination"
+
+for source_dir in "$@"; do
+	[ -d "$source_dir" ] || continue
+	for source in "$source_dir"/*."$extension"; do
+		[ -e "$source" ] || continue
+		name="${source##*/}"
+		target="$destination/$name"
+		if [ -e "$target" ] || [ -L "$target" ]; then
+			if cmp -s "$source" "$target"; then
+				continue
+			fi
+			existing="$(readlink "$target" 2>/dev/null || printf '%s' "$target")"
+			case "$existing" in
+				/*) ;;
+				*) existing="$destination/$existing" ;;
+			esac
+			echo "package merge: conflicting package basename: $name" >&2
+			echo "package merge: first:  $existing" >&2
+			echo "package merge: second: $source" >&2
+			exit 1
+		fi
+		ln -s "$source" "$target"
+	done
+done
