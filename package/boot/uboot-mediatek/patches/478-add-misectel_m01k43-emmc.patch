@@ -127,20 +127,159 @@
 +CONFIG_HEXDUMP=y
 --- /dev/null
 +++ b/arch/arm/dts/mt7981-misectel-m01k43-emmc.dts
-@@ -0,0 +1,14 @@
+@@ -0,0 +1,153 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +/dts-v1/;
 +
-+#include "mt7981-cmcc-rax3000m-emmc.dts"
++#include "mt7981.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/linux-event-codes.h>
++#include <dt-bindings/pinctrl/mt65xx.h>
 +
 +/ {
++	#address-cells = <1>;
++	#size-cells = <1>;
 +	model = "Misectel M01K43 eMMC";
 +	compatible = "misectel,m01k43-emmc", "mediatek,mt7981";
++
++	chosen {
++		stdout-path = &uart0;
++		tick-timer = &timer0;
++	};
 +
 +	memory@40000000 {
 +		device_type = "memory";
 +		reg = <0x40000000 0x80000000>;
 +	};
++
++	reg_3p3v: regulator-3p3v {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	keys {
++		compatible = "gpio-keys";
++
++		button-internet {
++			label = "internet";
++			linux,code = <BTN_0>;
++			linux,input-type = <EV_SW>;
++			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
++		};
++
++		button-reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led-wifi {
++			label = "blue:wifi";
++			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-4g-blue {
++			label = "blue:4g";
++			gpios = <&pio 13 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-4g-yellow {
++			label = "yellow:4g";
++			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-5g-blue {
++			label = "blue:5g";
++			gpios = <&pio 11 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-5g-yellow {
++			label = "yellow:5g";
++			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-internet-blue {
++			label = "blue:internet";
++			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-internet-red {
++			label = "red:internet";
++			gpios = <&pio 6 GPIO_ACTIVE_HIGH>;
++		};
++	};
++};
++
++&eth {
++	status = "okay";
++	mediatek,gmac-id = <0>;
++	phy-mode = "2500base-x";
++	mediatek,switch = "mt7531";
++	reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
++
++	fixed-link {
++		speed = <2500>;
++		full-duplex;
++	};
++};
++
++&mmc0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mmc0_pins_default>;
++	max-frequency = <52000000>;
++	bus-width = <8>;
++	cap-mmc-highspeed;
++	cap-mmc-hw-reset;
++	vmmc-supply = <&reg_3p3v>;
++	non-removable;
++	status = "okay";
++};
++
++&pio {
++	mmc0_pins_default: mmc0default {
++		mux {
++			function = "flash";
++			groups = "emmc_45";
++		};
++
++		conf-cmd-dat {
++			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO",
++			       "SPI0_CS", "SPI0_HOLD", "SPI0_WP",
++			       "SPI1_CLK", "SPI1_MOSI", "SPI1_MISO";
++			input-enable;
++			drive-strength = <MTK_DRIVE_4mA>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
++		};
++
++		conf-clk {
++			pins = "SPI1_CS";
++			drive-strength = <MTK_DRIVE_6mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
++		};
++
++		conf-rst {
++			pins = "PWM0";
++			drive-strength = <MTK_DRIVE_4mA>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
++		};
++	};
++};
++
++&uart0 {
++	mediatek,force-highspeed;
++	status = "okay";
++};
++
++&watchdog {
++	status = "disabled";
 +};
 --- /dev/null
 +++ b/defenvs/misectel_m01k43-emmc_env
