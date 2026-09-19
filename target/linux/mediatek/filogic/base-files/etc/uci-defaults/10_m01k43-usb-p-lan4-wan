@@ -1,0 +1,103 @@
+#!/bin/sh
+
+# Move only the known legacy USB-P default layout to its physical LAN4 WAN port.
+
+board_name="$(cat /tmp/sysinfo/board_name 2>/dev/null)"
+[ "$board_name" = "misectel,m01k43-usb-p" ] || exit 0
+
+network_show="$(uci -q show network)" || exit 0
+
+bridge_section=""
+for section in $(printf '%s\n' "$network_show" | sed -n 's/^network\.\([^.=]*\)=device$/\1/p'); do
+	[ "$(uci -q get "network.$section.name")" = "br-lan" ] || continue
+	[ "$(uci -q get "network.$section.type")" = "bridge" ] || continue
+	[ -z "$bridge_section" ] || exit 0
+	bridge_section="$section"
+done
+[ -n "$bridge_section" ] || exit 0
+
+ports_are_legacy_default() {
+	local port count=0 lan1=0 lan2=0 lan3=0 lan4=0
+
+	for port in $1; do
+		count=$((count + 1))
+		case "$port" in
+		lan1) lan1=$((lan1 + 1)) ;;
+		lan2) lan2=$((lan2 + 1)) ;;
+		lan3) lan3=$((lan3 + 1)) ;;
+		lan4) lan4=$((lan4 + 1)) ;;
+		*) return 1 ;;
+		esac
+	done
+
+	[ "$count" -eq 4 ] && [ "$lan1" -eq 1 ] && [ "$lan2" -eq 1 ] && \
+		[ "$lan3" -eq 1 ] && [ "$lan4" -eq 1 ]
+}
+
+section_is_enabled() {
+	local disabled enabled
+
+	disabled="$(uci -q get "network.$1.disabled")"
+	enabled="$(uci -q get "network.$1.enabled")"
+	case "$disabled" in ''|0) ;; *) return 1 ;; esac
+	case "$enabled" in ''|1) ;; *) return 1 ;; esac
+}
+
+ports="$(uci -q get "network.$bridge_section.ports")" || exit 0
+ports_are_legacy_default "$ports" || exit 0
+
+[ "$(uci -q get network.lan)" = "interface" ] || exit 0
+[ "$(uci -q get network.lan.device)" = "br-lan" ] || exit 0
+[ "$(uci -q get network.lan.proto)" = "static" ] || exit 0
+[ "$(uci -q get network.wan)" = "interface" ] || exit 0
+[ "$(uci -q get network.wan.proto)" = "dhcp" ] || exit 0
+[ "$(uci -q get network.wan.device)" = "wan" ] || exit 0
+section_is_enabled wan || exit 0
+
+wan6_device=""
+if [ -n "$(uci -q get network.wan6)" ]; then
+	[ "$(uci -q get network.wan6)" = "interface" ] || exit 0
+	[ "$(uci -q get network.wan6.proto)" = "dhcpv6" ] || exit 0
+	wan6_device="$(uci -q get network.wan6.device)"
+	case "$wan6_device" in wan|@wan) ;; *) exit 0 ;; esac
+	section_is_enabled wan6 || exit 0
+fi
+
+# VLANs or another reference to either affected port make this a custom setup.
+printf '%s\n' "$network_show" | grep -Eq "=bridge-vlan$|\.type='(8021q|8021ad)'$" && exit 0
+while IFS= read -r line; do
+	case "$line" in
+	*lan4*)
+		case "$line" in "network.$bridge_section.ports="*) ;; *) exit 0 ;; esac
+		;;
+	*"='wan'"*|*"='@wan'"*|*"='wan."*|*"='@wan."*)
+		case "$line" in
+		"network.wan.device='wan'"|\
+		"network.wan6.device='wan'"|\
+		"network.wan6.device='@wan'") ;;
+		*) exit 0 ;;
+		esac
+		;;
+	esac
+done <<EOF
+$network_show
+EOF
+
+# No UCI state is changed until every compatibility check above has succeeded.
+uci -q del_list "network.$bridge_section.ports=lan4" || {
+	uci -q revert network
+	exit 0
+}
+uci -q set "network.wan.device=lan4" || {
+	uci -q revert network
+	exit 0
+}
+if [ "$wan6_device" = "wan" ]; then
+	uci -q set "network.wan6.device=lan4" || {
+		uci -q revert network
+		exit 0
+	}
+fi
+uci -q commit network || uci -q revert network
+
+exit 0
