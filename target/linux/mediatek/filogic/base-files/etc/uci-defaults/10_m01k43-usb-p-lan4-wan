@@ -43,6 +43,49 @@ section_is_enabled() {
 	case "$enabled" in ''|1) ;; *) return 1 ;; esac
 }
 
+misectel_defaults_are_legacy() {
+	local section wan_role wan_device optional_wan optional_wan_mode
+
+	section="$(uci -q get misectel.network_defaults)"
+	case "$section" in ''|network) ;; *) return 1 ;; esac
+
+	wan_role="$(uci -q get misectel.network_defaults.wan_role)"
+	wan_device="$(uci -q get misectel.network_defaults.wan_device)"
+	optional_wan="$(uci -q get misectel.network_defaults.optional_wan)"
+	optional_wan_mode="$(uci -q get misectel.network_defaults.optional_wan_mode)"
+	case "$wan_role" in ''|wan) ;; *) return 1 ;; esac
+	case "$wan_device" in ''|wan) ;; *) return 1 ;; esac
+	case "$optional_wan" in ''|wan) ;; *) return 1 ;; esac
+	case "$optional_wan_mode" in ''|wan) ;; *) return 1 ;; esac
+}
+
+revert_migration() {
+	uci -q revert network
+	uci -q revert misectel
+	exit 0
+}
+
+restore_network_after_oem_commit_failure() {
+	local port
+
+	# network was committed before the OEM metadata.  If that second commit
+	# fails, reconstruct the known legacy list instead of leaving LAN4 removed.
+	uci -q delete "network.$bridge_section.ports" || revert_migration
+	for port in $ports; do
+		uci -q add_list "network.$bridge_section.ports=$port" || revert_migration
+	done
+	uci -q set "network.wan.device=wan" || revert_migration
+	if [ "$wan6_device" = "wan" ]; then
+		uci -q set "network.wan6.device=wan" || revert_migration
+	fi
+	if ! uci -q commit network; then
+		uci -q revert misectel
+		exit 1
+	fi
+	uci -q revert misectel
+	exit 0
+}
+
 ports="$(uci -q get "network.$bridge_section.ports")" || exit 0
 ports_are_legacy_default "$ports" || exit 0
 
@@ -53,6 +96,7 @@ ports_are_legacy_default "$ports" || exit 0
 [ "$(uci -q get network.wan.proto)" = "dhcp" ] || exit 0
 [ "$(uci -q get network.wan.device)" = "wan" ] || exit 0
 section_is_enabled wan || exit 0
+misectel_defaults_are_legacy || exit 0
 
 wan6_device=""
 if [ -n "$(uci -q get network.wan6)" ]; then
@@ -85,19 +129,22 @@ EOF
 
 # No UCI state is changed until every compatibility check above has succeeded.
 uci -q del_list "network.$bridge_section.ports=lan4" || {
-	uci -q revert network
-	exit 0
+	revert_migration
 }
 uci -q set "network.wan.device=lan4" || {
-	uci -q revert network
-	exit 0
+	revert_migration
 }
 if [ "$wan6_device" = "wan" ]; then
 	uci -q set "network.wan6.device=lan4" || {
-		uci -q revert network
-		exit 0
+		revert_migration
 	}
 fi
-uci -q commit network || uci -q revert network
+uci -q set misectel.network_defaults=network || revert_migration
+uci -q set misectel.network_defaults.wan_role=wan || revert_migration
+uci -q set misectel.network_defaults.wan_device=lan4 || revert_migration
+uci -q set misectel.network_defaults.optional_wan=lan4 || revert_migration
+uci -q set misectel.network_defaults.optional_wan_mode=wan || revert_migration
+uci -q commit network || revert_migration
+uci -q commit misectel || restore_network_after_oem_commit_failure
 
 exit 0
