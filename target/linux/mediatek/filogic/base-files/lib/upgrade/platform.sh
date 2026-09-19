@@ -133,6 +133,7 @@ platform_do_upgrade() {
 	mercusys,mr90x-v1-ubi|\
 	misectel,m02k45|\
 	misectel,m02k45-emmc|\
+	misectel,m01k43-emmc|\
 	netis,eap930-v1|\
 	netis,nx30v2|\
 	netis,nx31|\

@@ -86,6 +86,19 @@ define Build/mt798x-gpt
 	rm $@.tmp
 endef
 
+define Build/misectel-m01k43-emmc-gpt
+	cp $@ $@.tmp 2>/dev/null || true
+	ptgen -g -o $@.tmp -a 1 -l 1024 \
+		-t 0x83 -N uboot-env -r -p 512k@4M \
+		-t 0x83 -N factory   -r -p 2M@4608k \
+		-t 0xef -N uboot     -r -p 4M@6656k \
+		-t 0x83 -N ledeinfo  -r -p 64k@10752k \
+		-t 0x83 -N woem      -r -p 64k@10816k \
+		-t 0x2e -N rootfs       -p $(CONFIG_TARGET_ROOTFS_PARTSIZE)M@12M
+	cat $@.tmp >> $@
+	rm $@.tmp
+endef
+
 # Variation of the normal partition table to account
 # for factory and mfgdata partition
 #
@@ -2670,6 +2683,37 @@ define Device/misectel_m01k43-p
   SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-p
 endef
 TARGET_DEVICES += misectel_m01k43-p
+
+define Device/misectel_m01k43-emmc
+  DEVICE_VENDOR := Misectel
+  DEVICE_MODEL := M01K43 eMMC
+  DEVICE_DTS := mt7981b-misectel-m01k43-emmc
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTC_FLAGS := --pad 4096
+  DEVICE_DTS_LOADADDR := 0x43f00000
+  SUPPORTED_DEVICES := misectel,m01k43-emmc
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
+	kmod-usb3 kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl \
+	kmod-mhi-wwan-mbim kmod-qrtr-mhi uboot-envtools mmc-utils lsblk partx-utils
+  KERNEL_LOADADDR := 0x44000000
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  IMAGE_SIZE := $$(shell expr 12 + $$(CONFIG_TARGET_ROOTFS_PARTSIZE))m
+  IMAGES := sysupgrade.itb
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | \
+	pad-rootfs | append-metadata
+  ARTIFACTS := emmc-preloader.bin emmc-bl31-uboot.fip emmc-gpt.bin programmer.img.gz
+  ARTIFACT/emmc-preloader.bin := mt7981-bl2 emmc-ddr4
+  ARTIFACT/emmc-bl31-uboot.fip := mt7981-bl31-uboot misectel_m01k43-emmc
+  ARTIFACT/emmc-gpt.bin := misectel-m01k43-emmc-gpt
+  ARTIFACT/programmer.img.gz := misectel-m01k43-emmc-gpt | \
+	pad-to 6656k | mt7981-bl31-uboot misectel_m01k43-emmc | \
+	pad-to 12M | append-image squashfs-sysupgrade.itb | check-size | gzip
+endef
+TARGET_DEVICES += misectel_m01k43-emmc
 
 define Device/misectel_m02k45-emmc
   DEVICE_VENDOR := Misectel

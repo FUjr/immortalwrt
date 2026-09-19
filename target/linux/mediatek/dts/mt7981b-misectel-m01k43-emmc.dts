@@ -1,0 +1,140 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+#include "mt7981b-misectel-m01k43.dts"
+
+/ {
+	model = "Misectel M01K43 eMMC";
+	compatible = "misectel,m01k43-emmc", "mediatek,mt7981";
+
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	chosen {
+		/delete-property/ bootargs-append;
+		bootargs-override = "root=/dev/fit0 rootwait";
+		rootdisk = <&emmc_rootdisk>;
+	};
+
+	memory@40000000 {
+		reg = <0 0x40000000 0 0x80000000>;
+	};
+};
+
+&pio {
+	mmc0_pins_default: mmc0-pins-default {
+		mux {
+			function = "flash";
+			groups = "emmc_45";
+		};
+	};
+
+	mmc0_pins_uhs: mmc0-pins-uhs {
+		mux {
+			function = "flash";
+			groups = "emmc_45";
+		};
+	};
+};
+
+&mmc0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc0_pins_default>;
+	pinctrl-1 = <&mmc0_pins_uhs>;
+	bus-width = <8>;
+	max-frequency = <52000000>;
+	cap-mmc-highspeed;
+	cap-mmc-hw-reset;
+	vmmc-supply = <&reg_3p3v>;
+	non-removable;
+	no-sd;
+	no-sdio;
+	status = "okay";
+
+	card@0 {
+		compatible = "mmc-card";
+		reg = <0>;
+
+		block {
+			compatible = "block-device";
+
+			partitions {
+				block-partition-env {
+					partname = "uboot-env";
+
+					nvmem-layout {
+						compatible = "u-boot,env";
+					};
+				};
+
+				block-partition-factory {
+					partname = "factory";
+
+					nvmem-layout {
+						compatible = "fixed-layout";
+						#address-cells = <1>;
+						#size-cells = <1>;
+
+						emmc_eeprom_factory_0: eeprom@0 {
+							reg = <0x0 0x1000>;
+						};
+
+						emmc_macaddr_factory_4: macaddr@4 {
+							compatible = "mac-base";
+							reg = <0x4 0x6>;
+							#nvmem-cell-cells = <1>;
+						};
+					};
+				};
+
+				emmc_rootdisk: block-partition-rootfs {
+					partname = "rootfs";
+				};
+			};
+		};
+	};
+};
+
+&spi0 {
+	status = "disabled";
+};
+
+&spi2 {
+	status = "disabled";
+};
+
+&gmac0 {
+	nvmem-cells = <&emmc_macaddr_factory_4 0>;
+};
+
+&switch {
+	ports {
+		port@1 {
+			nvmem-cells = <&emmc_macaddr_factory_4 0>;
+		};
+
+		port@2 {
+			nvmem-cells = <&emmc_macaddr_factory_4 0>;
+		};
+
+		port@3 {
+			nvmem-cells = <&emmc_macaddr_factory_4 0>;
+		};
+
+		port@5 {
+			nvmem-cells = <&emmc_macaddr_factory_4 1>;
+		};
+	};
+};
+
+&wifi {
+	nvmem-cells = <&emmc_eeprom_factory_0>;
+};

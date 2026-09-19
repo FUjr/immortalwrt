@@ -481,6 +481,18 @@ define U-Boot/mt7981_glinet_gl-mt2500
   DEPENDS:=+trusted-firmware-a-mt7981-emmc-ddr4
 endef
 
+define U-Boot/mt7981_misectel_m01k43-emmc
+  NAME:=Misectel M01K43 eMMC
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=misectel_m01k43-emmc
+  UBOOT_CONFIG:=mt7981_misectel_m01k43-emmc
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=emmc
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr4
+  DEPENDS:=+trusted-firmware-a-mt7981-emmc-ddr4
+endef
+
 define U-Boot/mt7981_glinet_gl-x3000
   NAME:=GL.iNet GL-X3000
   BUILD_SUBTARGET:=filogic
@@ -1418,6 +1430,7 @@ UBOOT_TARGETS := \
 	mt7981_cudy_wr3000p-v1 \
 	mt7981_gatonetworks_gdsp \
 	mt7981_glinet_gl-mt2500 \
+	mt7981_misectel_m01k43-emmc \
 	mt7981_glinet_gl-x3000 \
 	mt7981_glinet_gl-xe3000 \
 	mt7981_h3c_magic-nx30-pro \
