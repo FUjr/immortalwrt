@@ -1,0 +1,76 @@
+From e1d532b6b056bc72c51523aeb2187e9f5142f75f Mon Sep 17 00:00:00 2001
+From: Daniel Golle <daniel@makrotopia.org>
+Date: Mon, 31 Aug 2026 16:39:13 +0100
+Subject: [PATCH] net: dsa: mt7530: implement port_fast_age
+
+Implement the .port_fast_age DSA operation by flushing all non-static
+(dynamically learned) MAC address entries from the address table.
+
+The switch does not offer a combined "non-static AND per-port" match
+mode, so the flush is global and the port argument is not used. Unlike
+b53 and realtek, which flush the dynamic entries of the affected port
+only, an STP topology change on one port therefore also flushes the
+dynamically learned entries of the other ports; they are quickly
+relearned.
+
+Access the address table control register under priv->reg_mutex, as done
+by all other ATC users (FDB and MDB add/del/dump), to serialise the
+write-then-poll command sequence, and log a message should the command
+fail.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/60f83ade0e371dfe2d974d5d192056935c3ab5c9.1788190568.git.daniel@makrotopia.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/dsa/mt7530.c | 21 +++++++++++++++++++++
+ drivers/net/dsa/mt7530.h |  1 +
+ 2 files changed, 22 insertions(+)
+
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -302,6 +302,26 @@ mt7530_fdb_cmd(struct mt7530_priv *priv,
+ 	return 0;
+ }
+ 
++static void mt7530_port_fast_age(struct dsa_switch *ds, int port)
++{
++	struct mt7530_priv *priv = ds->priv;
++	u32 val;
++	int ret;
++
++	mutex_lock(&priv->reg_mutex);
++
++	/* Flush all non-static MAC address entries */
++	val = ATC_BUSY | ATC_MAT_NON_STATIC_MAC | MT7530_FDB_FLUSH;
++	ret = regmap_write(priv->regmap, MT7530_ATC, val);
++	if (!ret)
++		ret = regmap_read_poll_timeout(priv->regmap, MT7530_ATC, val,
++					       !(val & ATC_BUSY), 20, 20000);
++	if (ret < 0)
++		dev_err(priv->dev, "fast age failed: %d\n", ret);
++
++	mutex_unlock(&priv->reg_mutex);
++}
++
+ static void
+ mt7530_fdb_read(struct mt7530_priv *priv, struct mt7530_fdb *fdb)
+ {
+@@ -3195,6 +3215,7 @@ const struct dsa_switch_ops mt7530_switch
+ 	.port_bridge_flags	= mt7530_port_bridge_flags,
+ 	.port_bridge_join	= mt7530_port_bridge_join,
+ 	.port_bridge_leave	= mt7530_port_bridge_leave,
++	.port_fast_age		= mt7530_port_fast_age,
+ 	.port_fdb_add		= mt7530_port_fdb_add,
+ 	.port_fdb_del		= mt7530_port_fdb_del,
+ 	.port_fdb_dump		= mt7530_port_fdb_dump,
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -155,6 +155,7 @@ enum mt753x_to_cpu_fw {
+ #define  ATC_INVALID			BIT(12)
+ #define  ATC_MAT(x)			(((x) & 0xf) << 8)
+ #define  ATC_MAT_MACTAB			ATC_MAT(0)
++#define  ATC_MAT_NON_STATIC_MAC		ATC_MAT(4)
+ 
+ enum mt7530_fdb_cmd {
+ 	MT7530_FDB_READ	= 0,
