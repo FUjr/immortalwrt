@@ -1,0 +1,82 @@
+Subject: [PATCH] bridge: add vlan_default_pvid option
+
+Allow a bridge device to select the kernel bridge default PVID before any
+member is attached. This is useful for VLAN-aware bridges that must not
+temporarily place a newly attached port in VLAN 1.
+
+Keep the existing default of 1 when the option is absent or outside the
+kernel-supported range of 0 through 4094.
+---
+ bridge.c       | 13 +++++++++++++
+ system-linux.c |  1 +
+ system.h       |  1 +
+ 3 files changed, 15 insertions(+)
+
+--- a/bridge.c
++++ b/bridge.c
+@@ -40,6 +40,7 @@
+ 	BRIDGE_ATTR_QUERY_RESPONSE_INTERVAL,
+ 	BRIDGE_ATTR_LAST_MEMBER_INTERVAL,
+ 	BRIDGE_ATTR_VLAN_FILTERING,
++	BRIDGE_ATTR_VLAN_DEFAULT_PVID,
+ 	BRIDGE_ATTR_HAS_VLANS,
+ 	BRIDGE_ATTR_STP_KERNEL,
+ 	BRIDGE_ATTR_STP_PROTO,
+@@ -63,6 +64,7 @@
+ 	[BRIDGE_ATTR_QUERY_RESPONSE_INTERVAL] = { "query_response_interval", BLOBMSG_TYPE_INT32 },
+ 	[BRIDGE_ATTR_LAST_MEMBER_INTERVAL] = { "last_member_interval", BLOBMSG_TYPE_INT32 },
+ 	[BRIDGE_ATTR_VLAN_FILTERING] = { "vlan_filtering", BLOBMSG_TYPE_BOOL },
++	[BRIDGE_ATTR_VLAN_DEFAULT_PVID] = { "vlan_default_pvid", BLOBMSG_TYPE_INT32 },
+ 	[BRIDGE_ATTR_HAS_VLANS] = { "__has_vlans", BLOBMSG_TYPE_BOOL }, /* internal */
+ 	[BRIDGE_ATTR_STP_KERNEL] = { "stp_kernel", BLOBMSG_TYPE_BOOL },
+ 	[BRIDGE_ATTR_STP_PROTO] = { "stp_proto", BLOBMSG_TYPE_STRING },
+@@ -1126,6 +1128,7 @@
+ 	blobmsg_add_u32(b, "query_response_interval", cfg->query_response_interval);
+ 	blobmsg_add_u32(b, "last_member_interval", cfg->last_member_interval);
+ 	blobmsg_add_u8(b, "vlan_filtering", cfg->vlan_filtering);
++	blobmsg_add_u32(b, "vlan_default_pvid", cfg->vlan_default_pvid);
+ 	blobmsg_add_u8(b, "stp_kernel", cfg->stp_kernel);
+ 	if (cfg->stp_proto)
+ 		blobmsg_add_string(b, "stp_proto", cfg->stp_proto);
+@@ -1195,6 +1198,7 @@
+ 	cfg->bridge_empty = false;
+ 	cfg->priority = 0x7FFF;
+ 	cfg->vlan_filtering = false;
++	cfg->vlan_default_pvid = 1;
+ 
+ 	cfg->forward_delay = 8;
+ 	cfg->max_age = 10;
+@@ -1260,6 +1264,13 @@
+ 
+ 	if ((cur = tb[BRIDGE_ATTR_VLAN_FILTERING]))
+ 		cfg->vlan_filtering = blobmsg_get_bool(cur);
++
++	if ((cur = tb[BRIDGE_ATTR_VLAN_DEFAULT_PVID])) {
++		uint32_t pvid = blobmsg_get_u32(cur);
++
++		if (pvid <= 4094)
++			cfg->vlan_default_pvid = pvid;
++	}
+ }
+ 
+ static enum dev_change_type
+--- a/system-linux.c
++++ b/system-linux.c
+@@ -1558,6 +1558,7 @@
+ 	}
+ 
+ 	nla_put_u8(msg, IFLA_BR_VLAN_FILTERING, !!cfg->vlan_filtering);
++	nla_put_u16(msg, IFLA_BR_VLAN_DEFAULT_PVID, cfg->vlan_default_pvid);
+ 	nla_put_u16(msg, IFLA_BR_PRIORITY, cfg->priority);
+ 	nla_put_u32(msg, IFLA_BR_HELLO_TIME, sec_to_jiffies(cfg->hello_time));
+ 	nla_put_u32(msg, IFLA_BR_MAX_AGE, sec_to_jiffies(cfg->max_age));
+--- a/system.h
++++ b/system.h
+@@ -139,6 +139,7 @@
+ 	int hash_max;
+ 
+ 	bool vlan_filtering;
++	uint16_t vlan_default_pvid;
+ };
+ 
+ enum macvlan_opt {
