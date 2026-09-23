@@ -99,27 +99,20 @@
 
 &gmac1 {
 	status = "okay";
-	label = "lan4";
-	phy-handle = <&ethphy4>;
+	label = "wan";
+	phy-handle = <&ethphy0>;
 
-	nvmem-cells = <&macaddr_factory_e000 0>;
+	nvmem-cells = <&macaddr_factory_e000 1>;
 	nvmem-cell-names = "mac-address";
 };
 
-&ethphy4 {
+&ethphy0 {
 	/delete-property/ interrupts;
 };
 
 &switch0 {
 	ports {
-		/delete-node/ port@4;
-
-		port@0 {
-			status = "okay";
-			label = "wan";
-			nvmem-cells = <&macaddr_factory_e000 1>;
-			nvmem-cell-names = "mac-address";
-		};
+		/delete-node/ port@0;
 
 		port@1 {
 			status = "okay";
@@ -138,6 +131,13 @@
 		port@3 {
 			status = "okay";
 			label = "lan3";
+			nvmem-cells = <&macaddr_factory_e000 0>;
+			nvmem-cell-names = "mac-address";
+		};
+
+		port@4 {
+			status = "okay";
+			label = "lan4";
 			nvmem-cells = <&macaddr_factory_e000 0>;
 			nvmem-cell-names = "mac-address";
 		};
