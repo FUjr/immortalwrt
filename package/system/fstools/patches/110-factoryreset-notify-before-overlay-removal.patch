@@ -1,0 +1,21 @@
+From: Misectel <support@misectel.com>
+Subject: [PATCH] fstools: notify factoryreset hooks before removing the overlay
+
+Allow platform services to prepare for reset while their programs and
+configuration are still available. This also covers -r, which calls reboot(2)
+directly instead of going through procd's shutdown hooks.
+
+--- a/factoryreset.c
++++ b/factoryreset.c
+@@ -47,6 +47,11 @@ static int jffs2_reset(struct volume *v, int reset, int keep)
+ {
+ 	char *mp;
+ 
++	if (!access("/sbin/hotplug-call", X_OK) &&
++	    system("ACTION=reset /sbin/hotplug-call factoryreset"))
++		ULOG_WARN("factoryreset preparation hook failed\n");
++
++	/* Notify before overlay_delete removes hook programs and configuration. */
+ 	mp = find_mount_point(v->blk, 1);
+ 	if (mp) {
+ 		ULOG_INFO("%s is mounted as %s, only erasing files\n", v->blk, mp);
