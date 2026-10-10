@@ -49,6 +49,13 @@ generate_keys() {
 		case "$result" in
 			0) UHTTPD_PRODUCT_CERT=1; return 0 ;;
 			2) ;;
+			3)
+				UHTTPD_CERT=/usr/share/uhttpd/fallback.crt
+				UHTTPD_KEY=/usr/share/uhttpd/fallback.key
+				[ -s "$UHTTPD_CERT" ] && [ -s "$UHTTPD_KEY" ] || { UHTTPD_CERT_FAILED=1; return 1; }
+				UHTTPD_PRODUCT_CERT=1
+				return 0
+				;;
 			*) UHTTPD_CERT_FAILED=1; return 1 ;;
 		esac
 	fi
@@ -224,8 +231,8 @@ start_instance()
 
 	[ -f /lib/libustream-ssl.so ] && [ -n "$https" ] && {
 		[ -f "$UHTTPD_CERT" -a -f "$UHTTPD_KEY" ] && {
-			append_arg "$cfg" cert "-C"
-			append_arg "$cfg" key  "-K"
+			procd_append_param command -C "$UHTTPD_CERT"
+			procd_append_param command -K "$UHTTPD_KEY"
 
 			procd_append_param file "$UHTTPD_CERT"
 			procd_append_param file "$UHTTPD_KEY"
