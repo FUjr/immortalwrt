@@ -7,6 +7,11 @@
 	model = "Misectel M01K43 eMMC";
 	compatible = "misectel,m01k43-emmc", "mediatek,mt7981";
 
+	/* GPIO25 is the eMMC clock, not the NAND modem power control. */
+	gpio-export {
+		/delete-node/ 5gpower;
+	};
+
 	reg_3p3v: regulator-3p3v {
 		compatible = "regulator-fixed";
 		regulator-name = "fixed-3.3V";
