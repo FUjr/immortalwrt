@@ -1,0 +1,22 @@
+#!/bin/sh
+
+. /lib/functions.sh
+. /lib/functions/system.sh
+
+case "$(board_name)" in
+misectel,m02k45|misectel,m02k45-emmc) ;;
+*) exit 0 ;;
+esac
+
+# GPIO58/59 use software triggers because their PHY LED1 outputs are crossed.
+for port in lan2 lan3; do
+	uci -q batch <<-EOF
+		set system.${port}_amber=led
+		set system.${port}_amber.name='${port} (amber)'
+		set system.${port}_amber.sysfs='amber:${port}'
+		set system.${port}_amber.trigger='netdev'
+		set system.${port}_amber.dev='${port}'
+		set system.${port}_amber.mode='link tx rx'
+	EOF
+done
+uci commit system
