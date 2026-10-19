@@ -1232,7 +1232,7 @@ endef
 define U-Boot/mt7988_misectel_m02k45
   NAME:=Misectel M02K45
   BUILD_SUBTARGET:=filogic
-  BUILD_DEVICES:=misectel_m02k45
+  BUILD_DEVICES:=misectel_m02k45 misectel_m02k88
   UBOOT_CONFIG:=mt7988d_misectel_m02k45 
   UBOOT_IMAGE:=u-boot.fip
   BL2_BOOTDEV:=spim-nand
