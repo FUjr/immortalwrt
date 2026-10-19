@@ -127,7 +127,7 @@
 +CONFIG_HEXDUMP=y
 --- /dev/null
 +++ b/arch/arm/dts/mt7981-misectel-m01k43-emmc.dts
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,158 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +/dts-v1/;
 +
@@ -220,14 +220,19 @@
 +
 +&eth {
 +	status = "okay";
-+	mediatek,gmac-id = <0>;
-+	phy-mode = "2500base-x";
-+	mediatek,switch = "mt7531";
-+	reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
++	mediatek,gmac-id = <1>;
++	phy-mode = "gmii";
++	phy-handle = <&int_gbe_phy>;
 +
-+	fixed-link {
-+		speed = <2500>;
-+		full-duplex;
++	mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		int_gbe_phy: ethernet-phy@0 {
++			compatible = "ethernet-phy-id03a2.9461";
++			reg = <0>;
++			phy-mode = "gmii";
++		};
 +	};
 +};
 +

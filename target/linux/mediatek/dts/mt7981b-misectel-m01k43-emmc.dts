@@ -7,7 +7,11 @@
 	model = "Misectel M01K43 eMMC";
 	compatible = "misectel,m01k43-emmc", "mediatek,mt7981";
 
-	/* GPIO25 is the eMMC clock, not the NAND modem power control. */
+	aliases {
+		label-mac-device = &gmac1;
+	};
+
+	/* GPIO25 is the eMMC clock, not the NAND variant's modem power GPIO. */
 	gpio-export {
 		/delete-node/ 5gpower;
 	};
@@ -116,28 +120,23 @@
 	status = "disabled";
 };
 
-&gmac0 {
-	nvmem-cells = <&emmc_macaddr_factory_4 0>;
+/* This eMMC variant has one port on the MT7981 integrated GbE PHY. */
+&eth {
+	/delete-node/ mac@0;
+
+	gmac1: mac@1 {
+		compatible = "mediatek,eth-mac";
+		reg = <1>;
+		phy-mode = "gmii";
+		phy-handle = <&int_gbe_phy>;
+		nvmem-cell-names = "mac-address";
+		nvmem-cells = <&emmc_macaddr_factory_4 0>;
+	};
 };
 
-&switch {
-	ports {
-		port@1 {
-			nvmem-cells = <&emmc_macaddr_factory_4 0>;
-		};
-
-		port@2 {
-			nvmem-cells = <&emmc_macaddr_factory_4 0>;
-		};
-
-		port@3 {
-			nvmem-cells = <&emmc_macaddr_factory_4 0>;
-		};
-
-		port@5 {
-			nvmem-cells = <&emmc_macaddr_factory_4 1>;
-		};
-	};
+&mdio_bus {
+	/delete-node/ phy@6;
+	/delete-node/ switch@1f;
 };
 
 &wifi {
