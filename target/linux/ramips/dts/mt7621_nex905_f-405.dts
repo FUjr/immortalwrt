@@ -32,6 +32,8 @@
 		watchdog_feed: watchdog-feed {
 			label = "watchdog-feed";
 			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+			led-pattern = <1000 1000>;
 		};
 	};
 };
