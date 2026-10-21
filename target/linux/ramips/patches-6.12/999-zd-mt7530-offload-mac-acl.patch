@@ -1,0 +1,371 @@
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -21,6 +21,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/gpio/driver.h>
+ #include <net/dsa.h>
++#include <net/pkt_cls.h>
+ 
+ #include "mt7530.h"
+ 
+@@ -3198,7 +3199,326 @@
+ 	return mt7531_setup_common(ds);
+ }
+ 
++
++/* MT7530/MT7621 ACL RAM shares VTCR/VAWD with the VLAN table. All table
++ * transactions and the software shadow are protected by reg_mutex.
++ * Only exact L2 MAC matches are exposed; unsupported keys never fall back
++ * silently when userspace requests skip_sw.
++ */
++#define MT7530_ACL_ENABLE BIT(10)
++#define MT7530_ACL_PATTERN_EN BIT(19)
++#define MT7530_ACL_GUARD_PATTERN 62
++#define MT7530_ACL_NEVER_PATTERN 63
++#define MT7530_ACL_DROP 7
++#define MT7530_ACL_CPU_ONLY 6
++
++static int mt7530_acl_write(struct mt7530_priv *priv, unsigned int cmd,
++			    unsigned int index, u32 low, u32 high)
++{
++	u32 val;
++	int err;
++
++	err = regmap_read_poll_timeout(priv->regmap, MT7530_VTCR, val,
++				       !(val & VTCR_BUSY), 20, 20000);
++	if (err)
++		return err;
++	err = regmap_write(priv->regmap, MT7530_VAWD1, low);
++	if (err)
++		return err;
++	err = regmap_write(priv->regmap, MT7530_VAWD2, high);
++	if (err)
++		return err;
++	err = regmap_write(priv->regmap, MT7530_VTCR,
++			   VTCR_BUSY | VTCR_FUNC(cmd) | index);
++	if (err)
++		return err;
++	err = regmap_read_poll_timeout(priv->regmap, MT7530_VTCR, val,
++				       !(val & VTCR_BUSY), 20, 20000);
++	return err ?: ((val & VTCR_INVALID) ? -EIO : 0);
++}
++
++static int mt7530_acl_mask(struct mt7530_priv *priv, int index, u64 mask)
++{
++	return mt7530_acl_write(priv, 9, index, lower_32_bits(mask),
++				upper_32_bits(mask));
++}
++
++static int mt7530_acl_init(struct mt7530_priv *priv)
++{
++	u32 val;
++	int port, i, err;
++
++	if (priv->mac_acl_ready)
++		return 0;
++	/* Refuse to take over an ACL table programmed by an external owner. */
++	for (port = 0; port < MT7530_NUM_PORTS; port++) {
++		err = regmap_read(priv->regmap, MT7530_PCR_P(port), &val);
++		if (err)
++			return err;
++		if (val & MT7530_ACL_ENABLE)
++			return -EBUSY;
++	}
++	err = mt7530_acl_write(priv, 5, MT7530_ACL_NEVER_PATTERN, 0, 0);
++	if (err)
++		return err;
++	/* A zero rule mask matches everything, so unused entries reference a
++	 * permanently disabled pattern instead.
++	 */
++	for (i = 0; i < 32; i++) {
++		err = mt7530_acl_mask(priv, i, BIT_ULL(MT7530_ACL_NEVER_PATTERN));
++		if (err)
++			return err;
++	}
++	priv->mac_acl_ready = true;
++	return 0;
++}
++
++static u8 mt7530_acl_ports(const struct mt7530_mac_acl *rules, int count)
++{
++	u8 ports = 0;
++	int i;
++
++	for (i = 0; i < count; i++)
++		ports |= BIT(rules[i].port);
++	return ports;
++}
++
++static int mt7530_acl_program(struct mt7530_priv *priv,
++			      const struct mt7530_mac_acl *rules, int count, u8 extra_ports)
++{
++	u8 ports = mt7530_acl_ports(rules, count);
++	u8 affected = extra_ports | ports | mt7530_acl_ports(priv->mac_acl, priv->mac_acl_count);
++	u64 mask;
++	u32 value, descriptor;
++	int i, j, err;
++
++	/* Drop all ingress on affected ports while rewriting shared ACL RAM.
++	 * Guard both ends of the rule table; remove guards only after the new
++	 * table and per-port enables have been successfully installed.
++	 */
++	err = mt7530_acl_write(priv, 11, 0, MT7530_ACL_DROP, 0);
++	if (err)
++		return err;
++	err = mt7530_acl_write(priv, 11, 31, MT7530_ACL_DROP, 0);
++	if (err)
++		return err;
++	err = mt7530_acl_write(priv, 5, MT7530_ACL_GUARD_PATTERN, 0,
++				MT7530_ACL_PATTERN_EN | (affected << 8));
++	if (err)
++		return err;
++	err = mt7530_acl_mask(priv, 0, BIT_ULL(MT7530_ACL_GUARD_PATTERN));
++	if (err)
++		return err;
++	err = mt7530_acl_mask(priv, 31, BIT_ULL(MT7530_ACL_GUARD_PATTERN));
++	if (err)
++		return err;
++	for (i = 0; i < MT7530_NUM_PORTS; i++) {
++		if (!(affected & BIT(i)))
++			continue;
++		err = regmap_update_bits(priv->regmap, MT7530_PCR_P(i),
++					 MT7530_ACL_ENABLE, MT7530_ACL_ENABLE);
++		if (err)
++			return err;
++	}
++	for (i = 0; i < MT7530_MAC_ACL_MAX; i++) {
++		mask = 0;
++		if (i < count) {
++			for (j = 0; j < 6; j++) {
++				const u8 *addr = j < 3 ? rules[i].dst : rules[i].src;
++				bool used = j < 3 ? rules[i].match_dst : rules[i].match_src;
++				int offset = (j % 3) * 2;
++
++				if (!used)
++					continue;
++				value = 0xffff0000 | (addr[offset] << 8) | addr[offset + 1];
++				descriptor = MT7530_ACL_PATTERN_EN |
++					     (BIT(rules[i].port) << 8) | (j << 1);
++				err = mt7530_acl_write(priv, 5, i * 6 + j,
++						value, descriptor);
++				if (err)
++					return err;
++				mask |= BIT_ULL(i * 6 + j);
++			}
++			err = mt7530_acl_write(priv, 11, i + 1,
++						rules[i].action, 0);
++			if (err)
++				return err;
++		}
++		err = mt7530_acl_mask(priv, i + 1,
++				      mask ?: BIT_ULL(MT7530_ACL_NEVER_PATTERN));
++		if (err)
++			return err;
++	}
++	for (i = 0; i < MT7530_NUM_PORTS; i++) {
++		if (!(affected & BIT(i)))
++			continue;
++		err = regmap_update_bits(priv->regmap, MT7530_PCR_P(i),
++					 MT7530_ACL_ENABLE,
++					 ports & BIT(i) ? MT7530_ACL_ENABLE : 0);
++		if (err)
++			return err;
++	}
++	err = mt7530_acl_mask(priv, 31, BIT_ULL(MT7530_ACL_NEVER_PATTERN));
++	if (err)
++		return err;
++	return mt7530_acl_mask(priv, 0, BIT_ULL(MT7530_ACL_NEVER_PATTERN));
++}
++
++static int mt7530_acl_parse(struct flow_cls_offload *cls, int port,
++			    struct mt7530_mac_acl *acl)
++{
++	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
++	struct netlink_ext_ack *extack = cls->common.extack;
++	struct flow_match_eth_addrs eth;
++
++	if (cls->common.chain_index ||
++	    rule->match.dissector->used_keys &
++	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
++	      BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
++	      BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS))) {
++		NL_SET_ERR_MSG_MOD(extack, "Only chain 0 exact MAC ACL is supported");
++		return -EOPNOTSUPP;
++	}
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
++		struct flow_match_basic basic;
++
++		flow_rule_match_basic(rule, &basic);
++		if (basic.mask->n_proto || basic.mask->ip_proto)
++			return -EOPNOTSUPP;
++	}
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
++		struct flow_match_control control;
++
++		flow_rule_match_control(rule, &control);
++		if (control.mask->flags || control.mask->addr_type)
++			return -EOPNOTSUPP;
++	}
++	if (!flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS))
++		return -EOPNOTSUPP;
++	flow_rule_match_eth_addrs(rule, &eth);
++	acl->match_src = !is_zero_ether_addr(eth.mask->src);
++	acl->match_dst = !is_zero_ether_addr(eth.mask->dst);
++	if ((!acl->match_src && !acl->match_dst) ||
++	    (acl->match_src && !is_broadcast_ether_addr(eth.mask->src)) ||
++	    (acl->match_dst && !is_broadcast_ether_addr(eth.mask->dst))) {
++		NL_SET_ERR_MSG_MOD(extack, "At least one exact source/destination MAC is required");
++		return -EOPNOTSUPP;
++	}
++	if (rule->action.num_entries != 1 ||
++	    (rule->action.entries[0].id != FLOW_ACTION_ACCEPT &&
++	     rule->action.entries[0].id != FLOW_ACTION_DROP &&
++	     rule->action.entries[0].id != FLOW_ACTION_TRAP)) {
++		NL_SET_ERR_MSG_MOD(extack, "MAC ACL supports accept/drop/trap only");
++		return -EOPNOTSUPP;
++	}
++	/* The chip counters cannot be reliably associated with flower rules. */
++	if (!flow_action_hw_stats_check(&rule->action, extack,
++					 FLOW_ACTION_HW_STATS_DISABLED_BIT))
++		return -EOPNOTSUPP;
++	acl->cookie = cls->cookie;
++	acl->priority = cls->common.prio;
++	acl->port = port;
++	ether_addr_copy(acl->src, eth.key->src);
++	ether_addr_copy(acl->dst, eth.key->dst);
++	switch (rule->action.entries[0].id) {
++	case FLOW_ACTION_DROP:
++		acl->action = MT7530_ACL_DROP;
++		break;
++	case FLOW_ACTION_TRAP:
++		acl->action = MT7530_ACL_CPU_ONLY;
++		break;
++	default:
++		acl->action = 0;
++		break;
++	}
++	return 0;
++}
++
++static int mt7530_cls_flower_add(struct dsa_switch *ds, int port,
++				struct flow_cls_offload *cls, bool ingress)
++{
++	struct mt7530_priv *priv = ds->priv;
++	struct mt7530_mac_acl next[MT7530_MAC_ACL_MAX], acl = {};
++	int i, pos, count, err;
++
++	if (!ingress || (priv->id != ID_MT7530 && priv->id != ID_MT7621))
++		return -EOPNOTSUPP;
++	err = mt7530_acl_parse(cls, port, &acl);
++	if (err)
++		return err;
++	mutex_lock(&priv->reg_mutex);
++	err = mt7530_acl_init(priv);
++	if (err)
++		goto out;
++	count = 0;
++	for (i = 0; i < priv->mac_acl_count; i++) {
++		if (priv->mac_acl[i].cookie == cls->cookie &&
++		    priv->mac_acl[i].port == port)
++			continue;
++		if (priv->mac_acl[i].port == port &&
++		    priv->mac_acl[i].priority == acl.priority) {
++			err = -EOPNOTSUPP;
++			NL_SET_ERR_MSG_MOD(cls->common.extack, "Use a distinct priority per MAC rule on a port");
++			goto out;
++		}
++		next[count++] = priv->mac_acl[i];
++	}
++	if (count == MT7530_MAC_ACL_MAX) {
++		err = -ENOSPC;
++		NL_SET_ERR_MSG_MOD(cls->common.extack, "MT7530 supports at most 10 MAC ACL rules across all ports");
++		goto out;
++	}
++	for (pos = count; pos > 0 && next[pos - 1].priority > acl.priority; pos--)
++		next[pos] = next[pos - 1];
++	next[pos] = acl;
++	count++;
++	err = mt7530_acl_program(priv, next, count, 0);
++	if (err) {
++		if (mt7530_acl_program(priv, priv->mac_acl, priv->mac_acl_count,
++				       mt7530_acl_ports(next, count)))
++			dev_err(priv->dev, "ACL restore failed; hardware state uncertain\n");
++		goto out;
++	}
++	memcpy(priv->mac_acl, next, sizeof(next[0]) * count);
++	priv->mac_acl_count = count;
++out:
++	mutex_unlock(&priv->reg_mutex);
++	return err;
++}
++
++static int mt7530_cls_flower_del(struct dsa_switch *ds, int port,
++				struct flow_cls_offload *cls, bool ingress)
++{
++	struct mt7530_priv *priv = ds->priv;
++	struct mt7530_mac_acl next[MT7530_MAC_ACL_MAX];
++	int count = 0, i, err = 0;
++
++	if (!ingress || (priv->id != ID_MT7530 && priv->id != ID_MT7621))
++		return -EOPNOTSUPP;
++	mutex_lock(&priv->reg_mutex);
++	for (i = 0; i < priv->mac_acl_count; i++)
++		if (priv->mac_acl[i].cookie != cls->cookie ||
++		    priv->mac_acl[i].port != port)
++			next[count++] = priv->mac_acl[i];
++	if (count == priv->mac_acl_count)
++		goto out;
++	err = mt7530_acl_program(priv, next, count, 0);
++	if (err) {
++		if (mt7530_acl_program(priv, priv->mac_acl, priv->mac_acl_count,
++				       mt7530_acl_ports(next, count)))
++			dev_err(priv->dev, "ACL restore failed; hardware state uncertain\n");
++		goto out;
++	}
++	memcpy(priv->mac_acl, next, sizeof(next[0]) * count);
++	priv->mac_acl_count = count;
++out:
++	mutex_unlock(&priv->reg_mutex);
++	return err;
++}
++
+ const struct dsa_switch_ops mt7530_switch_ops = {
++	.cls_flower_add		= mt7530_cls_flower_add,
++	.cls_flower_del		= mt7530_cls_flower_del,
+ 	.get_tag_protocol	= mtk_get_tag_protocol,
+ 	.setup			= mt753x_setup,
+ 	.preferred_default_local_cpu_port = mt753x_preferred_default_local_cpu_port,
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -811,6 +811,21 @@
+  * @active_cpu_ports:	Holding the active CPU ports
+  * @mdiodev:		The pointer to the MDIO device structure
+  */
++/* Six patterns per exact source/destination MAC rule; two guard rules and
++ * two patterns are reserved for fail-closed table updates.
++ */
++#define MT7530_MAC_ACL_MAX 10
++struct mt7530_mac_acl {
++	unsigned long cookie;
++	u32 priority;
++	u8 port;
++	u8 src[ETH_ALEN];
++	u8 dst[ETH_ALEN];
++	bool match_src;
++	bool match_dst;
++	u8 action;
++};
++
+ struct mt7530_priv {
+ 	struct device		*dev;
+ 	struct dsa_switch	*ds;
+@@ -835,6 +850,9 @@
+ 	struct irq_domain *irq_domain;
+ 	u32 irq_enable;
+ 	int (*create_sgmii)(struct mt7530_priv *priv);
++	bool mac_acl_ready;
++	u8 mac_acl_count;
++	struct mt7530_mac_acl mac_acl[MT7530_MAC_ACL_MAX];
+ 	u8 active_cpu_ports;
+ 	struct mdio_device *mdiodev;
+ };
