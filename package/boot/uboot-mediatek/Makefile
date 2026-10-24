@@ -1241,6 +1241,18 @@ define U-Boot/mt7988_misectel_m02k45
   DEPENDS:=+trusted-firmware-a-mt7988-spim-nand-ddr4
 endef  
 
+define U-Boot/mt7988_misectel_m02k88
+  NAME:=Misectel M02K88
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=misectel_m02k88
+  UBOOT_CONFIG:=mt7988d_misectel_m02k88
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand
+  BL2_SOC:=mt7988
+  BL2_DDRTYPE:=ddr4
+  DEPENDS:=+trusted-firmware-a-mt7988-spim-nand-ddr4
+endef
+
 define U-Boot/mt7988_misectel_m02k45-emmc
   NAME:=Misectel M02K45 eMMC
   BUILD_SUBTARGET:=filogic
@@ -1495,6 +1507,7 @@ UBOOT_TARGETS := \
 	mt7988_bananapi_bpi-r4-poe-sdmmc \
 	mt7988_bananapi_bpi-r4-poe-snand \
 	mt7988_misectel_m02k45 \
+	mt7988_misectel_m02k88 \
 	mt7988_misectel_m02k45-emmc \
 	mt7988_tplink_tl-7dr7230-v1 \
 	mt7988_tplink_tl-7dr7230-v2 \

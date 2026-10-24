@@ -2625,6 +2625,17 @@ define Device/misectel_m02k45
 endef
 TARGET_DEVICES += misectel_m02k45
 
+define Device/misectel_m02k88
+  $(call Device/misectel_m02k45)
+  DEVICE_MODEL := M02K88
+  DEVICE_DTS := mt7988d-misectel_m02k88
+  SUPPORTED_DEVICES := misectel,m02k88
+  DEVICE_PACKAGES += kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl
+  ARTIFACTS := preloader.bin bl31-uboot.fip
+  ARTIFACT/bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k88
+endef
+TARGET_DEVICES += misectel_m02k88
+
 define Device/misectel_m01k43
   DEVICE_VENDOR := Misectel
   DEVICE_MODEL := M01K43
