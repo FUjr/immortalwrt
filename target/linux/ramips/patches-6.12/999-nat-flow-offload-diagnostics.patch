@@ -1,0 +1,86 @@
+--- a/net/netfilter/nft_flow_offload.c
++++ b/net/netfilter/nft_flow_offload.c
+@@ -46,6 +46,10 @@
+ 	return true;
+ }
+ 
++static bool path_debug;
++module_param(path_debug, bool, 0600);
++MODULE_PARM_DESC(path_debug, "Log unresolved flow offload paths");
++
+ static int nft_dev_fill_forward_path(const struct nf_flow_route *route,
+ 				     const struct dst_entry *dst_cache,
+ 				     const struct nf_conn *ct,
+@@ -201,13 +205,21 @@
+ 	struct net_device_path_stack stack;
+ 	struct nft_forward_info info = {};
+ 	unsigned char ha[ETH_ALEN];
+-	int i;
+-
+-	if (nft_dev_fill_forward_path(route, dst, ct, dir, ha, &stack) >= 0)
++	int i, path_err;
++
++	path_err = nft_dev_fill_forward_path(route, dst, ct, dir, ha, &stack);
++	if (path_err >= 0)
+ 		nft_dev_path_info(&stack, &info, ha, &ft->data);
+ 
+-	if (!info.indev || !nft_flowtable_find_dev(info.indev, ft))
++	if (!info.indev || !nft_flowtable_find_dev(info.indev, ft)) {
++		if (path_debug)
++			pr_info_ratelimited("nft_flow_path: dir=%u dst=%s err=%d indev=%s sport=%u dport=%u\n",
++				dir, dst->dev->name, path_err,
++				info.indev ? info.indev->name : "none",
++				ntohs(ct->tuplehash[dir].tuple.src.u.all),
++				ntohs(ct->tuplehash[dir].tuple.dst.u.all));
+ 		return;
++	}
+ 
+ 	route->tuple[!dir].in.ifindex = info.indev->ifindex;
+ 	for (i = 0; i < info.num_encaps; i++) {
+--- a/net/netfilter/nf_flow_table_offload.c
++++ b/net/netfilter/nf_flow_table_offload.c
+@@ -12,6 +12,10 @@
+ #include <net/netfilter/nf_conntrack_acct.h>
+ #include <net/netfilter/nf_conntrack_core.h>
+ #include <net/netfilter/nf_conntrack_tuple.h>
++
++static bool hw_debug;
++module_param(hw_debug, bool, 0600);
++MODULE_PARM_DESC(hw_debug, "Log hardware flow offload failures");
+ 
+ #define NF_FLOW_RULE_ACTION_MAX	24
+ 
+@@ -919,8 +923,15 @@
+ 	list_for_each_entry(block_cb, block_cb_list, list) {
+ 		err = block_cb->cb(TC_SETUP_CLSFLOWER, &cls_flow,
+ 				   block_cb->cb_priv);
+-		if (err < 0)
++		if (err < 0) {
++			if (hw_debug && cmd == FLOW_CLS_REPLACE)
++				pr_info_ratelimited("nf_flow_hw: reject dir=%u err=%d iif=%d xmit=%u sport=%u dport=%u\n",
++					dir, err, flow->tuplehash[dir].tuple.iifidx,
++					flow->tuplehash[dir].tuple.xmit_type,
++					ntohs(flow->tuplehash[dir].tuple.src_port),
++					ntohs(flow->tuplehash[dir].tuple.dst_port));
+ 			continue;
++		}
+ 
+ 		i++;
+ 	}
+@@ -974,8 +985,15 @@
+ 	int err;
+ 
+ 	err = nf_flow_offload_alloc(offload, flow_rule);
+-	if (err < 0)
++	if (err < 0) {
++		if (hw_debug)
++			pr_info_ratelimited("nf_flow_hw: rule allocation/action failed err=%d xmit=%u/%u sport=%u dport=%u\n",
++				err, offload->flow->tuplehash[0].tuple.xmit_type,
++				offload->flow->tuplehash[1].tuple.xmit_type,
++				ntohs(offload->flow->tuplehash[0].tuple.src_port),
++				ntohs(offload->flow->tuplehash[0].tuple.dst_port));
+ 		return;
++	}
+ 
+ 	err = flow_offload_rule_add(offload, flow_rule);
+ 	if (err < 0)
