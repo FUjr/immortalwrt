@@ -25,6 +25,7 @@ include $(INCLUDE_DIR)/version.mk
 define Build/Prepare
 	$(call Build/Prepare/Default)
 	$(CP) ./files/websocket.c $(PKG_BUILD_DIR)/websocket.c
+	$(CP) ./files/misectel-debug.c $(PKG_BUILD_DIR)/misectel-debug.c
 endef
 
 define Build/Compile
@@ -131,3 +132,17 @@ $(eval $(call BuildPackage,uhttpd))
 $(eval $(call BuildPackage,uhttpd-mod-lua))
 $(eval $(call BuildPackage,uhttpd-mod-ubus))
 $(eval $(call BuildPackage,uhttpd-mod-ucode))
+
+# Installed only by diagnostic products; ordinary uhttpd behavior is unchanged.
+define Package/uhttpd-mod-misectel-debug
+  $(Package/uhttpd/default)
+  TITLE+= (Misectel diagnostic stream proxy)
+  DEPENDS:=uhttpd +libubox
+endef
+
+define Package/uhttpd-mod-misectel-debug/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/uhttpd_misectel_debug.so $(1)/usr/lib/
+endef
+
+$(eval $(call BuildPackage,uhttpd-mod-misectel-debug))

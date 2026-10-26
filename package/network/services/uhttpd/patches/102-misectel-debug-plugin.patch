@@ -1,0 +1,25 @@
+--- a/main.c
++++ b/main.c
+@@ -627,6 +627,9 @@ int main(int argc, char **argv)
+ 	if (conf.ubus_prefix && uh_plugin_init("uhttpd_ubus.so"))
+ 		return 1;
+ #endif
++	if (!access("/usr/lib/uhttpd_misectel_debug.so", R_OK) &&
++	    uh_plugin_init("uhttpd_misectel_debug.so"))
++		return 1;
+ 	if (!access("/usr/lib/uhttpd_websocket.so", R_OK) &&
+ 	    uh_plugin_init("uhttpd_websocket.so"))
+ 		return 1;
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -92,6 +92,10 @@ ENDIF()
+ ADD_LIBRARY(uhttpd_websocket MODULE websocket.c)
+ TARGET_LINK_LIBRARIES(uhttpd_websocket ${ubox})
+ 
++SET(PLUGINS ${PLUGINS} uhttpd_misectel_debug)
++ADD_LIBRARY(uhttpd_misectel_debug MODULE misectel-debug.c)
++TARGET_LINK_LIBRARIES(uhttpd_misectel_debug ${ubox})
++
+ IF(PLUGINS)
+ 	SET_TARGET_PROPERTIES(${PLUGINS} PROPERTIES
+ 		PREFIX ""
