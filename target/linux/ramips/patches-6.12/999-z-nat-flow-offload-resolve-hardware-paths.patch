@@ -1,0 +1,60 @@
+--- a/net/netfilter/nft_flow_offload.c
++++ b/net/netfilter/nft_flow_offload.c
+@@ -196,7 +196,7 @@
+ 	return found;
+ }
+ 
+-static void nft_dev_forward_path(struct nf_flow_route *route,
++static bool nft_dev_forward_path(struct nf_flow_route *route,
+ 				 const struct nf_conn *ct,
+ 				 enum ip_conntrack_dir dir,
+ 				 struct nft_flowtable *ft)
+@@ -218,7 +218,7 @@
+ 				info.indev ? info.indev->name : "none",
+ 				ntohs(ct->tuplehash[dir].tuple.src.u.all),
+ 				ntohs(ct->tuplehash[dir].tuple.dst.u.all));
+-		return;
++		return false;
+ 	}
+ 
+ 	route->tuple[!dir].in.ifindex = info.indev->ifindex;
+@@ -236,6 +236,7 @@
+ 		route->tuple[dir].out.hw_ifindex = info.hw_outdev->ifindex;
+ 		route->tuple[dir].xmit_type = info.xmit_type;
+ 	}
++	return true;
+ }
+ 
+ static int nft_flow_route(const struct nft_pktinfo *pkt,
+@@ -247,6 +248,7 @@
+ 	struct dst_entry *this_dst = skb_dst(pkt->skb);
+ 	struct dst_entry *other_dst = NULL;
+ 	struct flowi fl;
++	bool this_ready, other_ready;
+ 
+ 	memset(&fl, 0, sizeof(fl));
+ 	switch (nft_pf(pkt)) {
+@@ -284,8 +286,21 @@
+ 
+ 	if (route->tuple[dir].xmit_type	== FLOW_OFFLOAD_XMIT_NEIGH &&
+ 	    route->tuple[!dir].xmit_type == FLOW_OFFLOAD_XMIT_NEIGH) {
+-		nft_dev_forward_path(route, ct, dir, ft);
+-		nft_dev_forward_path(route, ct, !dir, ft);
++		this_ready = nft_dev_forward_path(route, ct, dir, ft);
++		other_ready = nft_dev_forward_path(route, ct, !dir, ft);
++
++		/* A missing neighbour/FDB entry is transient. Caching a NEIGH
++		 * route here prevents later hardware retries from discovering
++		 * the real egress port, leaving a flow only partly offloaded.
++		 * Keep forwarding normally and retry after L2 resolution.
++		 * Software-only flowtables retain their NEIGH fallback.
++		 */
++		if (nf_flowtable_hw_offload(&ft->data) &&
++		    (!this_ready || !other_ready)) {
++			dst_release(this_dst);
++			dst_release(other_dst);
++			return -ENOENT;
++		}
+ 	}
+ 
+ 	return 0;

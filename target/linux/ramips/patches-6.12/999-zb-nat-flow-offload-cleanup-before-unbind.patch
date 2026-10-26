@@ -1,0 +1,17 @@
+--- a/net/netfilter/nf_flow_table_offload.c
++++ b/net/netfilter/nf_flow_table_offload.c
+@@ -1283,6 +1283,14 @@
+ 	if (!nf_flowtable_hw_offload(flowtable))
+ 		return nf_flow_offload_xdp_setup(flowtable, dev, cmd);
+ 
++	/* Destroy affected hardware flows while their driver callbacks are
++	 * still registered. Removing callbacks first leaves bound PPE entries
++	 * behind when the flowtable is deleted or its devices change.
++	 * Drain pending work before handing FLOW_BLOCK_UNBIND to the driver.
++	 */
++	if (cmd == FLOW_BLOCK_UNBIND)
++		nf_flow_table_gc_cleanup(flowtable, dev);
++
+ 	if (dev->netdev_ops->ndo_setup_tc)
+ 		err = nf_flow_table_offload_cmd(&bo, flowtable, dev, cmd,
+ 						&extack);

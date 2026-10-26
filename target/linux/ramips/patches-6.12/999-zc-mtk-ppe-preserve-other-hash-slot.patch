@@ -1,0 +1,14 @@
+--- a/drivers/net/ethernet/mediatek/mtk_ppe.c
++++ b/drivers/net/ethernet/mediatek/mtk_ppe.c
+@@ -805,7 +805,10 @@
+ 	hlist_for_each_entry_safe(entry, n, head, list) {
+ 		if (found ||
+ 		    !mtk_flow_entry_match(ppe->eth, entry, &foe, entry_len)) {
+-			if (entry->hash != 0xffff)
++			/* One software bucket covers multiple hardware slots.
++			 * Only the slot being replaced has lost its binding.
++			 */
++			if (entry->hash == hash)
+ 				__mtk_foe_entry_clear(ppe, entry, false);
+ 			continue;
+ 		}
