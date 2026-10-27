@@ -193,10 +193,10 @@ misectel,m02k45)
 	;;
 misectel,m02k88)
 	ucidef_set_led_wlan "wlan" "WLAN" "wifi" "phy0tpt"
-	ucidef_set_led_netdev "lan2_green" "LAN2 (green)" "green:lan2" "lan2" "link"
-	ucidef_set_led_netdev "lan2_amber" "LAN2 (amber)" "amber:lan2" "lan2" "link tx rx"
-	ucidef_set_led_netdev "lan3_green" "LAN3 (green)" "green:lan3" "lan3" "link"
-	ucidef_set_led_netdev "lan3_amber" "LAN3 (amber)" "amber:lan3" "lan3" "link tx rx"
+	ucidef_set_led_netdev "lan2_green" "LAN2 (green)" "mt7530-0:01:green:lan" "lan2" "link"
+	ucidef_set_led_netdev "lan2_amber" "LAN2 (amber)" "mt7530-0:01:amber:activity" "lan2" "link tx rx"
+	ucidef_set_led_netdev "lan3_green" "LAN3 (green)" "mt7530-0:00:green:lan" "lan3" "link"
+	ucidef_set_led_netdev "lan3_amber" "LAN3 (amber)" "mt7530-0:00:amber:activity" "lan3" "link tx rx"
 	;;
 netcore,n60)
 	ucidef_set_led_netdev "wan" "WAN" "mdio-bus:06:green:wan" "eth1" "link tx rx"
