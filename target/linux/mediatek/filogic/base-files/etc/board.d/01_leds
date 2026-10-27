@@ -187,10 +187,8 @@ misectel,m01k43-usb|\
 misectel,m01k43-usb-p)
 	ucidef_set_led_netdev "wlan" "WLAN" "blue:wlan" "phy0-ap0"
 	;;
-misectel,m02k45)
-	# Both 2.4 GHz and 5 GHz interfaces belong to phy0.
-	ucidef_set_led_wlan "wlan" "WLAN" "wifi" "phy0tpt"
-	;;
+misectel,m02k45|\
+misectel,m02k45-emmc|\
 misectel,m02k88)
 	ucidef_set_led_wlan "wlan" "WLAN" "wifi" "phy0tpt"
 	ucidef_set_led_netdev "lan2_green" "LAN2 (green)" "mt7530-0:01:green:lan" "lan2" "link"

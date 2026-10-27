@@ -4,7 +4,10 @@
 . /lib/functions/system.sh
 . /usr/share/libubox/jshn.sh
 
-[ "$(board_name)" = "misectel,m02k88" ] || exit 0
+case "$(board_name)" in
+misectel,m02k45|misectel,m02k45-emmc|misectel,m02k88) ;;
+*) exit 0 ;;
+esac
 
 # A preserved /etc/config/system is not regenerated during an upgrade.
 # Import missing PHY LEDs and migrate the former GPIO LED names. The netdev
