@@ -91,6 +91,10 @@ mediatek_setup_interfaces()
 	zbtlink,zbt-z8106ax-s)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "eth1"
 		;;
+	misectel,m01k43-emmc)
+		# The sole enabled GMAC is registered as eth0, regardless of MAC ID.
+		ucidef_set_interface_lan "eth0"
+		;;
 	misectel,m01k43|\
 	misectel,m01k43-usb)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"

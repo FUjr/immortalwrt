@@ -127,7 +127,7 @@
 +CONFIG_HEXDUMP=y
 --- /dev/null
 +++ b/arch/arm/dts/mt7981-misectel-m01k43-emmc.dts
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,158 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +/dts-v1/;
 +
@@ -220,14 +220,19 @@
 +
 +&eth {
 +	status = "okay";
-+	mediatek,gmac-id = <0>;
-+	phy-mode = "2500base-x";
-+	mediatek,switch = "mt7531";
-+	reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
++	mediatek,gmac-id = <1>;
++	phy-mode = "gmii";
++	phy-handle = <&int_gbe_phy>;
 +
-+	fixed-link {
-+		speed = <2500>;
-+		full-duplex;
++	mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		int_gbe_phy: ethernet-phy@0 {
++			compatible = "ethernet-phy-id03a2.9461";
++			reg = <0>;
++			phy-mode = "gmii";
++		};
 +	};
 +};
 +
@@ -313,7 +318,7 @@
 +mmc_read_fit=mmc read $loadaddr $part_addr 0x100 && imszb $loadaddr image_size && test 0x$image_size -le 0x$part_size && mmc read $loadaddr $part_addr $image_size
 +mmc_write_fit=imszb $loadaddr image_size && test 0x$image_size -le 0x$part_size && mmc erase $part_addr $part_size && mmc write $loadaddr $part_addr $image_size
 +mmc_write_rootfs=part start mmc 0 rootfs part_addr && part size mmc 0 rootfs part_size && run mmc_write_fit
-+mmc_write_uboot=part start mmc 0 uboot part_addr && part size mmc 0 uboot part_size && setexpr image_blocks $filesize + 0x1ff && setexpr image_blocks $image_blocks / 0x200 && test $image_blocks -le $part_size && mmc erase $part_addr $part_size && mmc write $loadaddr $part_addr $image_blocks
++mmc_write_uboot=part start mmc 0 fip part_addr && part size mmc 0 fip part_size && setexpr image_blocks $filesize + 0x1ff && setexpr image_blocks $image_blocks / 0x200 && test $image_blocks -le $part_size && mmc erase $part_addr $part_size && mmc write $loadaddr $part_addr $image_blocks
 +mmc_write_bl2=setexpr image_blocks $filesize + 0x1ff && setexpr image_blocks $image_blocks / 0x200 && test $image_blocks -le 0x400 && mmc partconf 0 1 1 1 && mmc erase 0 0x400 && mmc write $loadaddr 0 $image_blocks ; mmc partconf 0 1 1 0
 +ethaddr_factory=part start mmc 0 factory part_addr && mmc read 0x46000000 $part_addr 8 && env readmem -b ethaddr 0x46000004 6
 +_init_env=run ethaddr_factory ; saveenv ; saveenv

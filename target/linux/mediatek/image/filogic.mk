@@ -91,7 +91,7 @@ define Build/misectel-m01k43-emmc-gpt
 	ptgen -g -o $@.tmp -a 1 -l 1024 \
 		-t 0x83 -N uboot-env -r -p 512k@4M \
 		-t 0x83 -N factory   -r -p 2M@4608k \
-		-t 0xef -N uboot     -r -p 4M@6656k \
+		-t 0xef -N fip       -r -p 4M@6656k \
 		-t 0x83 -N ledeinfo  -r -p 64k@10752k \
 		-t 0x83 -N woem      -r -p 64k@10816k \
 		-t 0x2e -N rootfs       -p $(CONFIG_TARGET_ROOTFS_PARTSIZE)M@12M
