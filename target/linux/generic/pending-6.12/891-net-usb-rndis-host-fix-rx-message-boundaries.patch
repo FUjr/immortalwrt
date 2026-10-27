@@ -1,0 +1,71 @@
+From: Misectel firmware maintainers
+Subject: [PATCH] net: usb: rndis_host: bound RX fields and advance by message length
+
+RNDIS DataOffset is relative to byte eight and may include padding before
+Ethernet data. After pulling that offset, advance by the remaining message
+length rather than assuming the data always starts after the 44-byte header.
+
+Validate the complete header before reading it and use subtraction-based
+bounds checks so device-controlled additions cannot wrap. Reject a data
+region overlapping the header or shorter than an Ethernet header. Decide
+whether this is the last message from MessageLength, including padding.
+
+Validated on Linux 6.12.94 with the exported rndis_rx_fixup() and real kernel
+SKBs: a valid two-message batch with DataOffset=40 loses its second frame
+before this change. A wrapping DataOffset can also deliver header bytes as
+an Ethernet frame. This fixes parser defects; it does not attribute the
+customer's 5GLAN FDB migration to a particular modem or driver.
+
+Link: https://learn.microsoft.com/en-us/windows-hardware/drivers/network/remote-ndis-packet-msg
+Link: https://kernel.googlesource.com/pub/scm/linux/security/vulns/+/232d7fba617d3a7106f0d98ed38ad81c3263c5c8
+
+--- a/drivers/net/usb/rndis_host.c
++++ b/drivers/net/usb/rndis_host.c
+@@ -506,6 +506,12 @@
+ 		struct rndis_data_hdr	*hdr = (void *)skb->data;
+ 		struct sk_buff		*skb2;
+ 		u32			msg_type, msg_len, data_offset, data_len;
++		u32			frame_offset;
++
++		if (unlikely(skb->len < sizeof(*hdr))) {
++			dev->net->stats.rx_frame_errors++;
++			return 0;
++		}
+ 
+ 		msg_type = le32_to_cpu(hdr->msg_type);
+ 		msg_len = le32_to_cpu(hdr->msg_len);
+@@ -514,17 +520,22 @@
+ 
+ 		/* don't choke if we see oob, per-packet data, etc */
+ 		if (unlikely(msg_type != RNDIS_MSG_PACKET || skb->len < msg_len
+-				|| (data_offset + data_len + 8) > msg_len)) {
++				|| msg_len < sizeof(*hdr)
++				|| data_offset < sizeof(*hdr) - 8
++				|| data_offset > msg_len - 8
++				|| data_len < ETH_HLEN
++				|| data_len > msg_len - data_offset - 8)) {
+ 			dev->net->stats.rx_frame_errors++;
+ 			netdev_dbg(dev->net, "bad rndis message %d/%d/%d/%d, len %d\n",
+ 				   le32_to_cpu(hdr->msg_type),
+ 				   msg_len, data_offset, data_len, skb->len);
+ 			return 0;
+ 		}
+-		skb_pull(skb, 8 + data_offset);
++		frame_offset = 8 + data_offset;
++		skb_pull(skb, frame_offset);
+ 
+ 		/* at most one packet left? */
+-		if (likely((data_len - skb->len) <= sizeof *hdr)) {
++		if (likely(skb->len == msg_len - frame_offset)) {
+ 			skb_trim(skb, data_len);
+ 			break;
+ 		}
+@@ -533,7 +544,7 @@
+ 		skb2 = skb_clone(skb, GFP_ATOMIC);
+ 		if (unlikely(!skb2))
+ 			break;
+-		skb_pull(skb, msg_len - sizeof *hdr);
++		skb_pull(skb, msg_len - frame_offset);
+ 		skb_trim(skb2, data_len);
+ 
+ 		if (unlikely(dst_mac_fixup))
