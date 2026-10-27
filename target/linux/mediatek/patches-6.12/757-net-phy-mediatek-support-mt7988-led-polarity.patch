@@ -1,37 +1,53 @@
 From: fjr <fujianrong@fnnas.com>
 Subject: [PATCH] net: phy: mediatek: honor explicit MT7988 LED polarity
 
-Reuse the existing LED polarity register interface for MT7988. Boards
-without explicit LED polarity properties retain their strap-derived defaults.
-The callback runs after PHY probe has initialized those defaults.
+MT7988 LED ON_CTRL bit 14 selects active-high output. Keep its callback
+separate from AN7581, whose existing callback uses the opposite encoding.
+Boards without explicit polarity properties retain strap-derived defaults.
 
 Signed-off-by: fjr <fujianrong@fnnas.com>
 ---
 --- a/drivers/net/phy/mediatek/mtk-ge-soc.c
 +++ b/drivers/net/phy/mediatek/mtk-ge-soc.c
-@@ -1428,7 +1428,7 @@
- 	return 0;
+@@ -1454,6 +1454,33 @@
+ 			      MTK_PHY_LED_ON_POLARITY, val);
  }
  
--static int an7581_phy_led_polarity_set(struct phy_device *phydev, int index,
-+static int mtk_socphy_led_polarity_set(struct phy_device *phydev, int index,
- 				       unsigned long modes)
- {
- 	u16 val = 0;
-@@ -1488,6 +1488,7 @@
++/* MT7988 bit 14 selects active-high, unlike the AN7581 callback. */
++static int mt7988_phy_led_polarity_set(struct phy_device *phydev, int index,
++				       unsigned long modes)
++{
++	u16 val = 0;
++	u32 mode;
++
++	if (index < 0 || index >= MTK_PHY_MAX_LEDS)
++		return -EINVAL;
++
++	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
++		switch (mode) {
++		case PHY_LED_ACTIVE_HIGH:
++			val = MTK_PHY_LED_ON_POLARITY;
++			break;
++		case PHY_LED_ACTIVE_LOW:
++			break;
++		default:
++			return -EINVAL;
++		}
++	}
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, index ?
++			      MTK_PHY_LED1_ON_CTRL : MTK_PHY_LED0_ON_CTRL,
++			      MTK_PHY_LED_ON_POLARITY, val);
++}
++
+ static struct phy_driver mtk_socphy_driver[] = {
+ 	{
+ 		PHY_ID_MATCH_EXACT(MTK_GPHY_ID_MT7981),
+@@ -1488,6 +1515,7 @@
  		.led_hw_is_supported = mt798x_phy_led_hw_is_supported,
  		.led_hw_control_set = mt798x_phy_led_hw_control_set,
  		.led_hw_control_get = mt798x_phy_led_hw_control_get,
-+		.led_polarity_set = mtk_socphy_led_polarity_set,
++		.led_polarity_set = mt7988_phy_led_polarity_set,
  	},
  	{
  		PHY_ID_MATCH_EXACT(MTK_GPHY_ID_AN7581),
-@@ -1498,7 +1499,7 @@
- 		.led_hw_is_supported = mt798x_phy_led_hw_is_supported,
- 		.led_hw_control_set = mt798x_phy_led_hw_control_set,
- 		.led_hw_control_get = mt798x_phy_led_hw_control_get,
--		.led_polarity_set = an7581_phy_led_polarity_set,
-+		.led_polarity_set = mtk_socphy_led_polarity_set,
- 	},
- };
- 
