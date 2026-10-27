@@ -2629,6 +2629,11 @@ define Device/misectel_m02k88
   $(call Device/misectel_m02k45)
   DEVICE_MODEL := M02K88
   DEVICE_DTS := mt7988d-misectel_m02k88
+  # The parent expands these immediate assignments with its own DEVICE_DTS.
+  # Bind both FIT recipes again after selecting the M02K88 device tree.
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
   SUPPORTED_DEVICES := misectel,m02k88
   DEVICE_PACKAGES += kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl
   ARTIFACTS := preloader.bin bl31-uboot.fip
