@@ -242,12 +242,14 @@
 	status = "okay";
 	function = LED_FUNCTION_LAN;
 	color = <LED_COLOR_ID_GREEN>;
+	active-high;
 };
 
 &gsw_phy0_led1 {
 	status = "okay";
 	function = LED_FUNCTION_ACTIVITY;
 	color = <LED_COLOR_ID_AMBER>;
+	active-low;
 };
 
 &gsw_phy1 {
@@ -259,12 +261,14 @@
 	status = "okay";
 	function = LED_FUNCTION_LAN;
 	color = <LED_COLOR_ID_GREEN>;
+	active-low;
 };
 
 &gsw_phy1_led1 {
 	status = "okay";
 	function = LED_FUNCTION_ACTIVITY;
 	color = <LED_COLOR_ID_AMBER>;
+	active-low;
 };
 
 &gsw_phy2 {
