@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. /lib/functions.sh
+. /lib/functions/system.sh
+. /usr/share/libubox/jshn.sh
+
+[ "$(board_name)" = "misectel,m02k88" ] || exit 0
+
+# A preserved /etc/config/system is not regenerated during an upgrade.
+# Import missing LEDs from the board data, retaining user-configured LEDs.
+led_present() {
+	local value
+	config_get value "$1" sysfs
+	[ "$value" != "$sysfs" ] || present=1
+}
+
+config_load system
+json_load "$(cat /etc/board.json)" || exit 1
+json_select led || exit 1
+changed=0
+for key in lan2_green lan2_amber lan3_green lan3_amber; do
+	json_select "$key" || exit 1
+	json_get_vars name sysfs device mode
+	json_select ..
+	[ -n "$sysfs" ] && [ -n "$device" ] || exit 1
+	present=0
+	config_foreach led_present led
+	[ "$present" = 0 ] || continue
+	uci -q get "system.led_$key" >/dev/null && continue
+	uci -q batch <<-EOF
+		set system.led_$key=led
+		set system.led_$key.name='$name'
+		set system.led_$key.sysfs='$sysfs'
+		set system.led_$key.trigger='netdev'
+		set system.led_$key.dev='$device'
+		set system.led_$key.mode='$mode'
+	EOF
+	[ "$?" = 0 ] || exit 1
+	changed=1
+done
+[ "$changed" = 0 ] || uci commit system
+exit 0
