@@ -6,7 +6,24 @@ CFG=/etc/board.json
 . /lib/functions/ipv4.sh
 
 [ -s $CFG ] || /bin/board_detect || exit 1
-[ -s /etc/config/network -a -s /etc/config/system ] && exit 0
+generate_modem_capability() {
+	local preset_modem_num multi_modem=0
+	json_get_var preset_modem_num preset_modem_num
+	case "$preset_modem_num" in ''|*[!0-9]*) preset_modem_num=0;; esac
+	[ "$preset_modem_num" -le 1 ] || multi_modem=1
+	uci -q set system.modem=capability
+	uci -q set system.modem.preset_modem_num="$preset_modem_num"
+	uci -q set system.modem.multi_modem="$multi_modem"
+}
+
+# Refresh capabilities on retained configurations without regenerating networking.
+if [ -s /etc/config/network -a -s /etc/config/system ]; then
+	json_init
+	json_load "$(cat "$CFG")"
+	generate_modem_capability
+	uci -q commit system
+	exit 0
+fi
 
 generate_bridge() {
 	local name=$1
@@ -558,4 +575,5 @@ if [ "$fresh_config" = 1 ] && [ -d /lib/functions/config_generate.d ]; then
 	done
 fi
 
+generate_modem_capability
 uci commit
