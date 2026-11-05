@@ -4091,3 +4091,19 @@ ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
 endif
 endef
 TARGET_DEVICES += zyxel_wx5600-t0-ubootmod
+
+define Device/alwaylink_m60k63
+  DEVICE_VENDOR := Alwaylink
+  DEVICE_MODEL := M60K63
+  DEVICE_DTS := mt7986a-alwaylink-m60k63
+  DEVICE_DTS_DIR := ../dts
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 65536k
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7986-firmware mt7986-wo-firmware
+  KERNEL_IN_UBI := 1
+  SUPPORTED_DEVICES += feiyan,m60k63
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += alwaylink_m60k63
