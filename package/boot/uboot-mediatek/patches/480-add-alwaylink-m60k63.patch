@@ -1,0 +1,218 @@
+--- /dev/null
++++ b/configs/mt7986_alwaylink_m60k63_defconfig
+@@ -0,0 +1,102 @@
++CONFIG_ARM=y
++CONFIG_SYS_HAS_NONCACHED_MEMORY=y
++CONFIG_POSITION_INDEPENDENT=y
++CONFIG_ARCH_MEDIATEK=y
++CONFIG_TEXT_BASE=0x41e00000
++CONFIG_SYS_MALLOC_F_LEN=0x4000
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_DEFAULT_DEVICE_TREE="mt7986a-alwaylink-m60k63"
++CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_TARGET_MT7986=y
++CONFIG_SYS_LOAD_ADDR=0x46000000
++CONFIG_PRE_CON_BUF_ADDR=0x4007EF00
++CONFIG_DEBUG_UART_BASE=0x11002000
++CONFIG_DEBUG_UART_CLOCK=40000000
++CONFIG_DEBUG_UART=y
++CONFIG_FIT=y
++CONFIG_BOOTDELAY=30
++CONFIG_AUTOBOOT_KEYED=y
++CONFIG_AUTOBOOT_MENU_SHOW=y
++CONFIG_DEFAULT_FDT_FILE="mediatek/mt7986a-alwaylink-m60k63.dtb"
++CONFIG_LOGLEVEL=7
++CONFIG_PRE_CONSOLE_BUFFER=y
++CONFIG_LOG=y
++# CONFIG_BOARD_INIT is not set
++CONFIG_BOARD_LATE_INIT=y
++CONFIG_HUSH_PARSER=y
++CONFIG_SYS_PROMPT="MT7986> "
++CONFIG_CMD_CPU=y
++CONFIG_CMD_LICENSE=y
++CONFIG_CMD_BOOTMENU=y
++CONFIG_CMD_ASKENV=y
++CONFIG_CMD_ERASEENV=y
++CONFIG_CMD_ENV_FLAGS=y
++CONFIG_CMD_STRINGS=y
++CONFIG_CMD_DM=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_MTD=y
++CONFIG_CMD_TFTPSRV=y
++CONFIG_CMD_RARP=y
++CONFIG_CMD_CDP=y
++CONFIG_CMD_SNTP=y
++CONFIG_CMD_LINK_LOCAL=y
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_DNS=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_PXE=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_PSTORE=y
++CONFIG_CMD_PSTORE_MEM_ADDR=0x42ff0000
++CONFIG_CMD_UUID=y
++CONFIG_CMD_HASH=y
++CONFIG_CMD_SMC=y
++CONFIG_CMD_UBI=y
++CONFIG_CMD_UBI_RENAME=y
++CONFIG_OF_EMBED=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_USE_DEFAULT_ENV_TEXT_FILE=y
++CONFIG_ENV_DEFAULT_ENV_TEXT_FILE="defenvs/alwaylink_m60k63_env"
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_VERSION_VARIABLE=y
++CONFIG_NETCONSOLE=y
++CONFIG_USE_IPADDR=y
++CONFIG_IPADDR="192.168.1.1"
++CONFIG_USE_SERVERIP=y
++CONFIG_SERVERIP="192.168.1.254"
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_BUTTON=y
++CONFIG_BUTTON_GPIO=y
++CONFIG_CLK=y
++CONFIG_GPIO_HOG=y
++# CONFIG_I2C is not set
++# CONFIG_MMC is not set
++CONFIG_MTD=y
++CONFIG_DM_MTD=y
++CONFIG_MTD_SPI_NAND=y
++CONFIG_MTD_UBI_FASTMAP=y
++CONFIG_PHY_FIXED=y
++CONFIG_MEDIATEK_ETH=y
++CONFIG_PHY=y
++CONFIG_PINCTRL=y
++CONFIG_PINCONF=y
++CONFIG_PINCTRL_MT7986=y
++CONFIG_POWER_DOMAIN=y
++CONFIG_MTK_POWER_DOMAIN=y
++CONFIG_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_RAM=y
++CONFIG_DM_SERIAL=y
++CONFIG_SERIAL_RX_BUFFER=y
++CONFIG_MTK_SERIAL=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_MTK_SPIM=y
++CONFIG_RANDOM_UUID=y
++CONFIG_ZSTD=y
++CONFIG_HEXDUMP=y
++CONFIG_ENV_IS_NOWHERE=y
++CONFIG_NMBM=y
++CONFIG_NMBM_MTD=y
+--- /dev/null
++++ b/arch/arm/dts/mt7986a-alwaylink-m60k63.dts
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/dts-v1/;
++#include "mt7986a-rfb.dts"
++#include <dt-bindings/input/linux-event-codes.h>
++/ {
++	model = "Alwaylink M60K63";
++	compatible = "alwaylink,m60k63", "mediatek,mt7986";
++	alwaylink,modem-power-gpios = <&pio 13 GPIO_ACTIVE_LOW>;
++	memory@40000000 { reg = <0x40000000 0x40000000>; };
++	keys {
++		compatible = "gpio-keys";
++		reset { label = "reset"; linux,code = <KEY_RESTART>;
++			gpios = <&pio 9 GPIO_ACTIVE_LOW>; };
++	};
++};
++&snand { status = "disabled"; };
++&spi0 {
++	/delete-node/ spi_nor@0;
++	/delete-node/ spi_nand@1;
++	spi_nand@0 {
++		compatible = "spi-nand";
++		reg = <0>;
++		spi-max-frequency = <20000000>;
++		spi-rx-bus-width = <4>;
++		spi-tx-bus-width = <4>;
++	};
++};
+--- /dev/null
++++ b/defenvs/alwaylink_m60k63_env
+@@ -0,0 +1,9 @@
++bootdelay=3
++bootcmd=run boot_ubi
++boot_ubi=ubi part ubi && ubi read ${loadaddr} kernel && bootm ${loadaddr}
++bootmenu_0=Boot firmware=run boot_ubi
++bootmenu_1=TFTP initramfs recovery=tftpboot ${loadaddr} m60k63-initramfs.itb && bootm ${loadaddr}
++bootmenu_2=Reboot=reset
++bootmenu_delay=3
++mtdids=nmbm0=nmbm0
++mtdparts=nmbm0:1024k(BL2),512k(u-boot-env),2048k(Factory),2048k(FIP),256k(config),128k(woem),128k(ledeinfo),235520k(ubi)
+--- a/board/mediatek/mt7986/mt7986_rfb.c
++++ b/board/mediatek/mt7986/mt7986_rfb.c
+@@ -10,6 +10,8 @@
+ #include <env.h>
+ #include <init.h>
+ #include <asm/io.h>
++#include <asm/gpio.h>
++#include <dm/ofnode.h>
+ #include <linux/delay.h>
+ #include <linux/libfdt.h>
+ #include <mtd.h>
+@@ -20,6 +22,28 @@
+ #ifndef CONFIG_RESET_BUTTON_LABEL
+ #define CONFIG_RESET_BUTTON_LABEL "reset"
+ #endif
++
++static int m60k63_cycle_modem_power(void)
++{
++	struct gpio_desc power;
++	int ret;
++
++	if (!of_machine_is_compatible("alwaylink,m60k63"))
++		return 0;
++
++	/* Inactive is physical high: GPIO13 low enables modem power. */
++	ret = gpio_request_by_name_nodev(ofnode_root(),
++		"alwaylink,modem-power-gpios", 0, &power, GPIOD_IS_OUT);
++	if (ret)
++		return ret;
++	mdelay(1000);
++	ret = dm_gpio_set_value(&power, 1);
++	if (ret)
++		return ret;
++	mdelay(1000);
++	puts("M60K63: modem power cycled on GPIO13\n");
++	return 0;
++}
+ 
+ int board_late_init(void)
+ {
+@@ -40,11 +64,29 @@
+ 		}
+ 	}
+ 	env_relocate();
+-	return 0;
++	return m60k63_cycle_modem_power();
+ }
+ 
+ int board_nmbm_init(void)
+ {
++#if CONFIG_IS_ENABLED(NMBM_MTD)
++	if (of_machine_is_compatible("alwaylink,m60k63")) {
++		struct mtd_info *lower, *upper;
++		int ret;
++
++		mtd_probe_devices();
++		lower = get_mtd_device_nm("spi-nand0");
++		if (IS_ERR_OR_NULL(lower))
++			return -ENODEV;
++		/* Attach existing stock mapping only; never create or update it. */
++		ret = nmbm_attach_mtd(lower,
++			NMBM_F_READ_ONLY | NMBM_F_EMPTY_PAGE_ECC_OK,
++			1, 256, &upper);
++		if (ret)
++			return ret;
++		return add_mtd_device(upper);
++	}
++#endif
+ #ifdef CONFIG_ENABLE_NAND_NMBM
+ 	struct mtd_info *lower, *upper;
+ 	int ret;
