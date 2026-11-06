@@ -20,6 +20,16 @@
 	gpio-leds {
 		compatible = "gpio-leds";
 
+		led-sys-blue {
+			label = "sys:blue";
+			gpios = <&pio 29 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-sys-red {
+			label = "sys:red";
+			gpios = <&pio 30 GPIO_ACTIVE_HIGH>;
+		};
+
 		led-wifi {
 			label = "wifi";
 			gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
@@ -82,6 +92,14 @@
 			gpio-export,output = <0>;
 		};
 	};
+};
+
+/* The product fan service owns manual and configurable temperature modes.
+ * Inherited cooling maps would reset its PWM duty on every thermal update.
+ * Keep the inherited hot/critical trips for kernel overtemperature protection.
+ */
+&cpu_thermal {
+	/delete-node/ cooling-maps;
 };
 
 /* LAN2/3 share the PHY LED pinmux and polarities with M02K45. */
