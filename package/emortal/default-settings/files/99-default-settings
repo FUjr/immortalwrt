@@ -5,10 +5,13 @@
 uci -q get system.@imm_init[0] > "/dev/null" || uci -q add system imm_init > "/dev/null"
 
 if ! uci -q get system.@imm_init[0].lang > "/dev/null"; then
+	# config_generate may already have applied an OEM language. Keep any
+	# configured value; auto is only the fallback for a missing option.
+	if [ -z "$(uci -q get luci.main.lang)" ]; then
+		uci -q set luci.main.lang='auto'
+		uci -q commit luci
+	fi
 	uci -q batch <<-EOF
-		set luci.main.lang="auto"
-		commit luci
-
 		set system.@imm_init[0].lang="1"
 		commit system
 	EOF
