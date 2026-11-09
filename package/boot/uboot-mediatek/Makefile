@@ -84,6 +84,15 @@ define U-Boot/mt7621_nex905_f-405
   UBOOT_IMAGE:=u-boot-mt7621.bin
 endef
 
+define U-Boot/mt7621_nex905_f-405-32m
+  NAME:=NEX905 F-405 (32M A/B)
+  UBOOT_CONFIG:=mt7621_nex905_f-405-32m
+  BUILD_DEVICES:=nex905_f-405-32m
+  BUILD_TARGET:=ramips
+  BUILD_SUBTARGET:=mt7621
+  UBOOT_IMAGE:=u-boot-mt7621.bin
+endef
+
 define U-Boot/mt7621_misectel_7621evb-32m
   NAME:=Misectel 7621EVB (32M Dual Slot)
   UBOOT_CONFIG:=mt7621_misectel_7621evb-32m
@@ -1415,6 +1424,7 @@ UBOOT_TARGETS := \
 	mt7620_rfb \
 	mt7621_misectel_7621evb \
 	mt7621_nex905_f-405 \
+	mt7621_nex905_f-405-32m \
 	mt7621_misectel_7621evb-32m \
 	mt7621_misectel_m01k21 \
 	mt7621_nand_rfb \

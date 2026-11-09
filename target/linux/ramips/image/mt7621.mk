@@ -815,7 +815,7 @@ define Device/misectel_7621evb
 endef
 TARGET_DEVICES += misectel_7621evb
 
-define Device/nex905_f-405
+define Device/nex905_f-405-common
   $(Device/dsa-migration)
   DEVICE_VENDOR := NEX905
   DEVICE_MODEL := F-405
@@ -823,7 +823,7 @@ define Device/nex905_f-405
   DEVICE_DTS := mt7621_nex905_f-405
   IMAGE_SIZE := 15936k
   SUPPORTED_DEVICES += misectel,7621evb misectel_7621evb
-	DEVICE_PACKAGES := -uboot-envtools -wpad-openssl kmod-vrf ip-bridge \
+	DEVICE_PACKAGES := -wpad-openssl kmod-vrf ip-bridge \
 	kmod-rtc-pcf85063 luci-ssl-openssl luci-base-misectel \
 	luci-theme-misectel luci-app-misectel-dashboard luci-app-misectel-network \
 	luci-app-misectel-vrf luci-app-misectel-system \
@@ -831,7 +831,20 @@ define Device/nex905_f-405
 	misectel-security-manager luci-app-misectel-security misectel-system-manager \
 	misectel-watchdog mdio-tools
 endef
+define Device/nex905_f-405
+  $(Device/nex905_f-405-common)
+  DEVICE_PACKAGES += -uboot-envtools
+endef
 TARGET_DEVICES += nex905_f-405
+
+define Device/nex905_f-405-32m
+  $(Device/nex905_f-405-common)
+  DEVICE_VARIANT := 32M A/B NAT Gateway
+  DEVICE_DTS := mt7621_nex905_f-405-32m
+  SUPPORTED_DEVICES := nex905,f-405-32m
+  DEVICE_PACKAGES += uboot-envtools mkfs-jffs2
+endef
+TARGET_DEVICES += nex905_f-405-32m
 
 define Device/misectel_7621evb-32m
   $(Device/dsa-migration)

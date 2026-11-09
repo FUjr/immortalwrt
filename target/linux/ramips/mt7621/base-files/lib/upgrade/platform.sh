@@ -5,7 +5,7 @@
 PART_NAME=firmware
 REQUIRE_IMAGE_METADATA=1
 
-RAMFS_COPY_BIN='fw_printenv fw_setenv'
+RAMFS_COPY_BIN='fw_printenv fw_setenv mkfs.jffs2 sha256sum head wc dd hexdump'
 RAMFS_COPY_DATA='/etc/fw_env.config /var/lock/fw_printenv.lock'
 
 platform_check_image() {
@@ -55,6 +55,9 @@ platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+	nex905,f-405-32m)
+		nex905_ab_upgrade "$1"
+		;;
 	misectel,7621evb-32m)
 		misectel_7621evb_32m_upgrade "$1"
 		;;

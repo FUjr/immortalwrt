@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+#include "mt7621_nex905_f-405.dts"
+
+/ {
+ compatible = "nex905,f-405-32m", "nex905,f-405", "mediatek,mt7621-soc";
+ model = "NAT Gateway NEX905-F-405 (32M A/B)";
+ chosen { /delete-property/ bootargs; };
+};
+
+&spi0 {
+ flash@0 {
+  partitions {
+   /delete-node/ partition@70000;
+   // No automatic split of either slot here. U-Boot supplies mtdparts with
+   // only the running slot named firmware, so rootfs_data follows that slot.
+   partition@70000 { label = "firmware_a"; reg = <0x70000 0xf90000>; };
+   partition@1000000 { label = "firmware_b"; reg = <0x1000000 0xf90000>; };
+   partition@1ff0000 { label = "u-boot-env-redund"; reg = <0x1ff0000 0x10000>; };
+  };
+ };
+};

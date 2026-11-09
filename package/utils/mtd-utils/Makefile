@@ -39,6 +39,17 @@ define Package/mtd-utils/Default
   DEPENDS:=@NAND_SUPPORT
 endef
 
+define Package/mkfs-jffs2
+ $(call Package/mtd-utils/Default)
+  DEPENDS:=
+  TITLE:=Create JFFS2 images for verified NOR upgrades
+endef
+
+define Package/mkfs-jffs2/install
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/mkfs.jffs2 $(1)/usr/sbin/
+endef
+
 define Package/ubi-utils
  $(call Package/mtd-utils/Default)
   TITLE:=Utilities for ubi info/debug
@@ -91,5 +102,6 @@ define Package/nand-utils/install
 	$(PKG_INSTALL_DIR)/usr/lib/mtd-utils/nandbiterrs $(1)/usr/sbin/
 endef
 
+$(eval $(call BuildPackage,mkfs-jffs2))
 $(eval $(call BuildPackage,ubi-utils))
 $(eval $(call BuildPackage,nand-utils))

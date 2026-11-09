@@ -12,6 +12,10 @@ touch /etc/config/ubootenv
 board=$(board_name)
 
 case "$board" in
+nex905,f-405-32m)
+	ubootenv_add_uci_config "/dev/mtd$(find_mtd_index u-boot-env)" "0x0" "0x10000" "0x10000"
+	ubootenv_add_uci_config "/dev/mtd$(find_mtd_index u-boot-env-redund)" "0x0" "0x10000" "0x10000"
+	;;
 alfa-network,ac1200rm|\
 alfa-network,awusfree1|\
 alfa-network,quad-e4g|\
