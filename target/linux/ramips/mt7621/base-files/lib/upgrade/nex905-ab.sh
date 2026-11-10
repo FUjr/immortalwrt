@@ -30,7 +30,11 @@ nex905_ab_prepare() {
 	[ "$magic" = deadc0de ] || return 1
 	mkdir -p /tmp/nex905-ab-config || return 1
 	cp "$UPGRADE_BACKUP" /tmp/nex905-ab-config/sysupgrade.tgz || return 1
+	# The target enables LZMA/RTIME, but mkfs.jffs2 may default to ZLIB,
+	# which this kernel cannot decode. Preserve the gzip archive byte-for-byte
+	# in uncompressed JFFS2 nodes rather than adding another compression layer.
 	mkfs.jffs2 --little-endian --eraseblock=65536 --pad --no-cleanmarkers \
+		--compression-mode=none \
 		--root=/tmp/nex905-ab-config --output=/tmp/nex905-ab-overlay || return 1
 	dd if="$source" of="$destination" bs=65536 count="$offset" 2>/dev/null || return 1
 	cat /tmp/nex905-ab-overlay >> "$destination" || return 1
