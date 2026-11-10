@@ -205,7 +205,7 @@ static int ws_connect_tcp_target(void)
 	return fd;
 }
 
-static int ws_connect_unix_target(void)
+static int ws_connect_unix_target(const char *path)
 {
 	struct sockaddr_un address = { 0 };
 	int flags;
@@ -215,11 +215,11 @@ static int ws_connect_unix_target(void)
 	if (fd < 0)
 		return -1;
 	address.sun_family = AF_UNIX;
-	if (strlen(WS_TARGET_UNIX) >= sizeof(address.sun_path)) {
+	if (strlen(path) >= sizeof(address.sun_path)) {
 		close(fd);
 		return -1;
 	}
-	strncpy(address.sun_path, WS_TARGET_UNIX, sizeof(address.sun_path) - 1U);
+	strncpy(address.sun_path, path, sizeof(address.sun_path) - 1U);
 	if (connect(fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
 		close(fd);
 		return -1;
@@ -232,9 +232,28 @@ static int ws_connect_unix_target(void)
 	return fd;
 }
 
-static int ws_connect_target(void)
+static int ws_connect_target(const char *url)
 {
-	int fd = ws_connect_unix_target();
+	const char *query = strchr(url, '?');
+	if (query) {
+		for (const char *part = query + 1; *part;) {
+			const char *end = strchr(part, '&');
+			size_t length = end ? (size_t)(end - part) : strlen(part);
+			if (length >= 6 && !strncmp(part, "group=", 6)) {
+				char modem[48], path[108];
+				length -= 6;
+				if (!length || length >= sizeof(modem)) return -1;
+				memcpy(modem, part + 6, length); modem[length] = 0;
+				if (strspn(modem, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") != length) return -1;
+				snprintf(path, sizeof(path), "/var/run/qmodem_voip/%s/websocket.sock", modem);
+				/* Never fall back to another modem when a binding was requested. */
+				return ws_connect_unix_target(path);
+			}
+			if (!end) break;
+			part = end + 1;
+		}
+	}
+	int fd = ws_connect_unix_target(WS_TARGET_UNIX);
 	return fd >= 0 ? fd : ws_connect_tcp_target();
 }
 
@@ -283,7 +302,7 @@ static void ws_handle_request(struct client *cl, char *url, struct path_info *pi
 	proxy->client = cl;
 	INIT_LIST_HEAD(&proxy->list);
 	list_add_tail(&proxy->list, &ws_proxies);
-	proxy->upstream_fd = ws_connect_target();
+	proxy->upstream_fd = ws_connect_target(url);
 	if (proxy->upstream_fd < 0) {
 		syslog(LOG_WARNING, "qmodem websocket backend connect failed");
 		list_del(&proxy->list);
