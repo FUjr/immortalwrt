@@ -2635,7 +2635,7 @@ define Device/misectel_m02k88
         fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
   SUPPORTED_DEVICES := misectel,m02k88
-  DEVICE_PACKAGES += kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl
+  DEVICE_PACKAGES += kmod-mhi-net kmod-mhi-wwan-ctrl
   ARTIFACTS := preloader.bin bl31-uboot.fip
   ARTIFACT/bl31-uboot.fip := mt7988-bl31-uboot misectel_m02k88
 endef
@@ -2648,7 +2648,7 @@ define Device/misectel_m01k43
   DEVICE_DTS_DIR := ../dts
   SUPPORTED_DEVICES := misectel,m01k43 misectel,m01k43-usb
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
-	kmod-usb3 kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl \
+	kmod-usb3 kmod-mhi-net kmod-mhi-wwan-ctrl \
 	kmod-mhi-wwan-mbim kmod-qrtr-mhi uboot-envtools
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
@@ -2709,7 +2709,7 @@ define Device/misectel_m01k43-emmc
   DEVICE_DTS_LOADADDR := 0x43f00000
   SUPPORTED_DEVICES := misectel,m01k43-emmc
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
-	kmod-usb3 kmod-mhi-pci-generic kmod-mhi-net kmod-mhi-wwan-ctrl \
+	kmod-usb3 kmod-mhi-net kmod-mhi-wwan-ctrl \
 	kmod-mhi-wwan-mbim kmod-qrtr-mhi uboot-envtools mmc-utils lsblk partx-utils
   KERNEL_LOADADDR := 0x44000000
   KERNEL := kernel-bin | gzip
