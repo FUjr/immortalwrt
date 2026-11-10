@@ -33,7 +33,9 @@ nex905_ab_prepare() {
 	# The target enables LZMA/RTIME, but mkfs.jffs2 may default to ZLIB,
 	# which this kernel cannot decode. Preserve the gzip archive byte-for-byte
 	# in uncompressed JFFS2 nodes rather than adding another compression layer.
-	mkfs.jffs2 --little-endian --eraseblock=65536 --pad --no-cleanmarkers \
+	# NOR summary nodes account for a 12-byte in-band cleanmarker. Omitting
+	# it puts the first dirent at offset zero and breaks the next summary scan.
+	mkfs.jffs2 --little-endian --eraseblock=65536 --pad --cleanmarker=12 \
 		--compression-mode=none \
 		--root=/tmp/nex905-ab-config --output=/tmp/nex905-ab-overlay || return 1
 	dd if="$source" of="$destination" bs=65536 count="$offset" 2>/dev/null || return 1
