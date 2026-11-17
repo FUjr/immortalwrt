@@ -47,7 +47,7 @@
 			label = "blue:system";
 			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "timer";
-			led-pattern = <500 500>;
+			led-pattern = <1000 1000>;
 		};
 		rf1 {
 			label = "blue:rf1";

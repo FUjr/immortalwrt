@@ -10,8 +10,8 @@ start() {
 	[ -e /sys/class/leds/m16k43:watchdog/trigger ] || return 0
 	[ -d "$led" ] || return 0
 	echo timer > "$led/trigger"
-	echo 500 > "$led/delay_on"
-	echo 500 > "$led/delay_off"
+	echo 1000 > "$led/delay_on"
+	echo 1000 > "$led/delay_off"
 }
 
 stop() {
