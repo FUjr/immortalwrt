@@ -1,0 +1,20 @@
+#!/bin/sh /etc/rc.common
+
+START=96
+STOP=01
+
+start() {
+	. /lib/functions/m16k43.sh
+	m16k43_clock_period 500
+	local led=/sys/class/leds/blue:system
+	[ -e /sys/class/leds/m16k43:watchdog/trigger ] || return 0
+	[ -d "$led" ] || return 0
+	echo timer > "$led/trigger"
+	echo 500 > "$led/delay_on"
+	echo 500 > "$led/delay_off"
+}
+
+stop() {
+	. /lib/functions/m16k43.sh
+	m16k43_clock_period 250
+}

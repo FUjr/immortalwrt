@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+/* NOR + NAND layout and radio calibration match M01K43. */
+#include "mt7981b-misectel-m01k43.dts"
+
+/ {
+	model = "Misectel M16K43";
+	compatible = "misectel,m16k43", "mediatek,mt7981";
+	/delete-node/ gpio-keys;
+	/delete-node/ leds;
+	/delete-node/ gpio-export;
+	aliases {
+		/delete-property/ led-boot;
+		/delete-property/ led-failsafe;
+		/delete-property/ led-running;
+		/delete-property/ led-upgrade;
+		led-boot = &led_system;
+		led-running = &led_system;
+	};
+	leds {
+		compatible = "gpio-leds";
+		/* External supervisor needs a clock, including during userspace shutdown. */
+		watchdog-clock {
+			label = "m16k43:watchdog";
+			gpios = <&pio 2 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+			led-pattern = <500 500>;
+		};
+		wifi {
+			label = "blue:wlan";
+			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
+		};
+		sim {
+			label = "blue:sim";
+			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
+		};
+		led_system: system {
+			label = "blue:system";
+			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+			led-pattern = <500 500>;
+		};
+		rf1 {
+			label = "blue:rf1";
+			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
+		};
+		rf2 {
+			label = "blue:rf2";
+			gpios = <&pio 6 GPIO_ACTIVE_HIGH>;
+		};
+		rf3 {
+			label = "blue:rf3";
+			gpios = <&pio 13 GPIO_ACTIVE_HIGH>;
+		};
+		rf4 {
+			label = "blue:rf4";
+			gpios = <&pio 11 GPIO_ACTIVE_HIGH>;
+		};
+	};
+	gpio-export {
+		compatible = "gpio-export";
+		modem-power {
+			gpio-export,name = "5gpower";
+			gpio-export,output = <0>;
+			gpios = <&pio 25 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};
+
+&mdio_bus {
+	/delete-node/ switch@1f;
+};
+
+&gmac0 {
+	phy-mode = "2500base-x";
+	phy-handle = <&phy6>;
+	/delete-node/ fixed-link;
+};
