@@ -39,7 +39,7 @@ validate_ntp_section() {
 }
 
 start_ntpd_instance() {
-	local peer
+	local peer resolved
 
 	[ "$2" = 0 ] || {
 		echo "validation failed"
@@ -67,7 +67,13 @@ start_ntpd_instance() {
 	fi
 	[ -x "$HOTPLUG_SCRIPT" ] && procd_append_param command -S "$HOTPLUG_SCRIPT"
 	for peer in $server; do
-		procd_append_param command -p $peer
+		case "$peer" in
+			*[!0-9.]*)
+				resolved="$(resolveip -4 -t 5 "$peer" 2>/dev/null | sed -n '1p')"
+				procd_append_param command -p "${resolved:-$peer}"
+				;;
+			*) procd_append_param command -p "$peer";;
+		esac
 	done
 	procd_set_param respawn
 	[ -x /sbin/ujail -a -e /etc/capabilities/ntpd.json ] && {
