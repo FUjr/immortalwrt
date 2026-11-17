@@ -18,6 +18,14 @@
 		led-boot = &led_system;
 		led-running = &led_system;
 	};
+	gpio-keys {
+		compatible = "gpio-keys";
+		reset {
+			label = "reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
+		};
+	};
 	leds {
 		compatible = "gpio-leds";
 		/* External supervisor needs a clock, including during userspace shutdown. */
