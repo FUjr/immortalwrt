@@ -1,0 +1,34 @@
+From: Misectel <support@misectel.com>
+Subject: [PATCH] net: phy: mediatek: support board-selected activity-only LED0
+
+Keep PHY hardware activity indication, including switched/offloaded traffic,
+while a separate GPIO LED provides link indication. Preserve LED polarity.
+Only boards selecting mediatek,led0-activity-only change behavior.
+
+--- a/drivers/net/phy/mediatek/mtk-ge.c
++++ b/drivers/net/phy/mediatek/mtk-ge.c
+@@ -70,6 +70,24 @@ static int mt7530_phy_config_init(struct
+ 	phy_write_paged(phydev, MTK_PHY_PAGE_EXTENDED_3,
+ 			MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG11, 0x4b);
+ 
++	if (of_property_read_bool(phydev->mdio.dev.of_node,
++				  "mediatek,led0-activity-only")) {
++		int ret;
++
++		/* Clear steady-on conditions, retaining enable and polarity. */
++		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2,
++				     MTK_PHY_LED0_ON_CTRL,
++				     MTK_GPHY_LED_ON_MASK, 0);
++		if (ret < 0)
++			return ret;
++		/* RX/TX at 10/100/1000; no forced/error blink conditions. */
++		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2,
++				     MTK_PHY_LED0_BLINK_CTRL,
++				     GENMASK(9, 0), GENMASK(5, 0));
++		if (ret < 0)
++			return ret;
++	}
++
+ 	return 0;
+ }
+ 

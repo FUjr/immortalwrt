@@ -1,0 +1,21 @@
+#!/bin/sh
+# Install new physical link indicators even on a retained-config upgrade.
+. /lib/functions.sh
+. /lib/functions/system.sh
+case "$(board_name)" in
+nex905,f-405|nex905,f-405-32m) ;;
+*) exit 0 ;;
+esac
+# LAN4 uses GPIO7; GPIO20/21 retain MDIO for the integrated MT7530.
+for port in wan lan1 lan2 lan3 lan4; do
+	uci -q batch <<-EOT
+		set system.led_${port}_link=led
+		set system.led_${port}_link.name='$port Link'
+		set system.led_${port}_link.sysfs='$port:link'
+		set system.led_${port}_link.trigger='netdev'
+		set system.led_${port}_link.dev='$port'
+		set system.led_${port}_link.mode='link'
+	EOT
+done
+uci commit system
+exit 0

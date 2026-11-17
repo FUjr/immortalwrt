@@ -7,6 +7,12 @@ board=$(board_name)
 board_config_update
 
 case $board in
+nex905,f-405|\
+nex905,f-405-32m)
+	for port in wan lan1 lan2 lan3 lan4; do
+		ucidef_set_led_netdev "${port}_link" "$port Link" "$port:link" "$port" "link"
+	done
+	;;
 alfa-network,ax1800rm)
 	ucidef_set_led_netdev "lan1" "lan1" "green:lan1" "lan1"
 	ucidef_set_led_netdev "lan2" "lan2" "green:lan2" "lan2"

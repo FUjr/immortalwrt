@@ -29,6 +29,36 @@
 	leds {
 		compatible = "gpio-leds";
 
+		wan-link {
+			label = "wan:link";
+			gpios = <&gpio 14 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		lan1-link {
+			label = "lan1:link";
+			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		lan2-link {
+			label = "lan2:link";
+			gpios = <&gpio 16 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		lan3-link {
+			label = "lan3:link";
+			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		lan4-link {
+			label = "lan4:link";
+			gpios = <&gpio 7 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
 		watchdog_feed: watchdog-feed {
 			label = "watchdog-feed";
 			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
@@ -123,6 +153,7 @@
 };
 
 &ethphy0 {
+	mediatek,led0-activity-only;
 	/delete-property/ interrupts;
 };
 
@@ -165,4 +196,20 @@
 		groups = "jtag", "uart3", "wdt", "uart2";
 		function = "gpio";
 	};
+};
+
+&ethphy1 {
+	mediatek,led0-activity-only;
+};
+
+&ethphy2 {
+	mediatek,led0-activity-only;
+};
+
+&ethphy3 {
+	mediatek,led0-activity-only;
+};
+
+&ethphy4 {
+	mediatek,led0-activity-only;
 };
